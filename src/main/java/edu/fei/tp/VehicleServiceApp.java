@@ -1,9 +1,9 @@
-package org.example.starter;
+package edu.fei.tp;
 
 import com.netgrif.application.engine.ApplicationEngine;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.ActionDelegate;
 import com.netgrif.application.engine.startup.RunnerController;
-import org.example.starter.startup.CustomRunnerController;
+import edu.fei.tp.startup.CustomRunnerController;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
@@ -17,12 +17,12 @@ import org.springframework.scheduling.annotation.EnableAsync;
 @EnableAsync
 @EnableCaching
 @SpringBootApplication
-@ComponentScan({"com.netgrif.application.engine", "org.example.starter"})
-public class StarterApplication {
+@ComponentScan({"com.netgrif.application.engine", "edu.fei.tp"})
+public class VehicleServiceApp {
 
     public static void main(String[] args) {
         new SpringApplicationBuilder()
-                .sources(ApplicationEngine.class, StarterApplication.class)
+                .sources(ApplicationEngine.class, VehicleServiceApp.class)
                 .run(args);
     }
 
