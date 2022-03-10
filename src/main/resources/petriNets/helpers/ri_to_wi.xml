@@ -117,13 +117,16 @@
 						])
 						finishTask(createTask)
 
+						def newOENumber = new com.netgrif.application.engine.petrinet.domain.I18nString(wiCase.getFieldValue("OENumber"))
+						def newWiCaseId = new com.netgrif.application.engine.petrinet.domain.I18nString(wiCase.stringId)
+
 						if(oeNumbersInWh == [] || oeNumbersInWh == null){
-							whCase.dataSet.get("OENumbers").choices = [wiCase.getFieldValue("OENumber") as String]
-							whCase.dataSet.get("items").choices = [wiCase.stringId]
+							whCase.dataSet.get("OENumbers").choices = [newOENumber]
+							whCase.dataSet.get("items").choices = [newWiCaseId]
 						}
 						else{
-							whCase.dataSet.get("OENumbers").choices = oeNumbersInWh + [wiCase.getFieldValue("OENumber") as String]
-							whCase.dataSet.get("items").choices = whCase.dataSet.get("items").choices + [wiCase.stringId]
+							whCase.dataSet.get("OENumbers").choices = oeNumbersInWh + [newOENumber]
+							whCase.dataSet.get("items").choices = whCase.dataSet.get("items").choices + [newWiCaseId]
 						}
 						workflowService.save(whCase)
 					}

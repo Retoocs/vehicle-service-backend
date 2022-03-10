@@ -89,8 +89,10 @@
 				change warehouseId value { warehouse_enum.value }
 
 				def newWarehouse = findCase( {it._id.eq(warehouse_enum.value)} )
-				newWarehouse.dataSet.get("items").choices = newWarehouse.dataSet.get("items").choices + [useCase.stringId]
-				newWarehouse.dataSet.get("OENumbers").choices = newWarehouse.dataSet.get("OENumbers").choices + [OENumber.value]
+				def newItemId = new com.netgrif.application.engine.petrinet.domain.I18nString(useCase.stringId)
+				newWarehouse.dataSet.get("items").choices = newWarehouse.dataSet.get("items").choices + [newItemId]
+				def newOENumber = new com.netgrif.application.engine.petrinet.domain.I18nString(useCase.stringId)
+				newWarehouse.dataSet.get("OENumbers").choices = newWarehouse.dataSet.get("OENumbers").choices + [newOENumber]
 				workflowService.save(newWarehouse)
 			}
 			else { change is_event_from_warehouseId value { false } }

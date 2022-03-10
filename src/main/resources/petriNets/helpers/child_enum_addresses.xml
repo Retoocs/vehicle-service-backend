@@ -718,7 +718,6 @@
 		<event type="finish">
 			<id>0</id>
 			<actions phase="pre">
-				<!--				todo change group name-->
 				<action>
 					cities: f.cities,
 					system_streets: f.system_streets;

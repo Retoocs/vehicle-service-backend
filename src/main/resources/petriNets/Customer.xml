@@ -237,17 +237,24 @@
 		</layout>
 		<label name="t_create">Create</label>
 		<dataGroup>
-			<id>DataGroup</id>
+			<id>dg0</id>
+			<stretch>true</stretch>
 			<dataRef>
 				<id>input_form</id>
 				<logic>
 					<behavior>editable</behavior>
+					<behavior>required</behavior>
 				</logic>
 			</dataRef>
+		</dataGroup>
+		<dataGroup>
+			<id>dg1</id>
+			<stretch>true</stretch>
 			<dataRef>
 				<id>adress_form</id>
 				<logic>
 					<behavior>editable</behavior>
+					<behavior>required</behavior>
 				</logic>
 			</dataRef>
 		</dataGroup>
@@ -544,7 +551,7 @@
 		</layout>
 		<label name="t_update">Update</label>
 		<dataGroup>
-			<id>DataGroup</id>
+			<id>dg0</id>
 			<stretch>true</stretch>
 			<dataRef>
 				<id>input_form</id>
@@ -554,7 +561,7 @@
 			</dataRef>
 		</dataGroup>
 		<dataGroup>
-			<id>dg2</id>
+			<id>dg1</id>
 			<stretch>true</stretch>
 			<dataRef>
 				<id>change_address</id>
@@ -595,11 +602,80 @@
 					</action>
 				</logic>
 			</dataRef>
+			<dataGroup>
+				<id>dg2</id>
+				<stretch>true</stretch>
+				<dataRef>
+					<id>adress_form</id>
+					<logic>
+						<behavior>editable</behavior>
+					</logic>
+				</dataRef>
+			</dataGroup>
+		</dataGroup>
+		<dataGroup>
+			<id>dg3</id>
+			<layout>grid</layout>
+			<title name="dg_address">Address</title>
 			<dataRef>
-				<id>adress_form</id>
+				<id>city</id>
 				<logic>
-					<behavior>editable</behavior>
+					<behavior>visible</behavior>
 				</logic>
+				<layout>
+					<x>1</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>street</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>2</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>postal_code</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>house_number</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>1</x>
+					<y>2</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
 			</dataRef>
 		</dataGroup>
 		<event type="assign">

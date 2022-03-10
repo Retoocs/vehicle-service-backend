@@ -488,13 +488,7 @@
 		<label name="item_addition">Item addition</label>
 		<assignPolicy>auto</assignPolicy>
 		<dataGroup>
-			<id>DataGroup</id>
-			<dataRef>
-				<id>item_addition_taskref</id>
-				<logic>
-					<behavior>editable</behavior>
-				</logic>
-			</dataRef>
+			<id>dg0</id>
 			<dataRef>
 				<id>select_addition_type</id>
 				<logic>
@@ -546,6 +540,15 @@
 							// set taskref view
 						}
 					</action>
+				</logic>
+			</dataRef>
+		</dataGroup>
+		<dataGroup>
+			<id>dg1</id>
+			<dataRef>
+				<id>item_addition_taskref</id>
+				<logic>
+					<behavior>editable</behavior>
 				</logic>
 			</dataRef>
 		</dataGroup>

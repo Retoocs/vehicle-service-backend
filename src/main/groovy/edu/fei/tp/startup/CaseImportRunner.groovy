@@ -47,7 +47,7 @@ class CaseImportRunner extends AbstractOrderedCommandLineRunner{
 
     /** temporary */
     private void forTesting(){
-        def orderedCreateList = ["vehicle", "customer", "child_enum_addresses", "child_enum_vehicles"]
+        def orderedCreateList = ["warehouse", "child_enum_addresses", "child_enum_vehicles"]
 
         orderedCreateList.forEach( netId -> {
             if(!createCaseByNetId(netId, netId, "white", userService.findByEmail("super@netgrif.com", true))){

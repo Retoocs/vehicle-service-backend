@@ -77,11 +77,6 @@
 		<id>enum_form</id>
 		<title></title>
 	</data>
-<!--	todo toto je asi zbytocne-->
-	<data type="taskRef">
-		<id>t_read_taskref</id>
-		<title></title>
-	</data>
 	<data type="number">
 		<id>kilometers</id>
 		<title name="kilometers">Number of KM</title>
