@@ -602,16 +602,16 @@
 					</action>
 				</logic>
 			</dataRef>
-			<dataGroup>
-				<id>dg2</id>
-				<stretch>true</stretch>
-				<dataRef>
-					<id>adress_form</id>
-					<logic>
-						<behavior>editable</behavior>
-					</logic>
-				</dataRef>
-			</dataGroup>
+		</dataGroup>
+		<dataGroup>
+			<id>dg2</id>
+			<stretch>true</stretch>
+			<dataRef>
+				<id>adress_form</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+			</dataRef>
 		</dataGroup>
 		<dataGroup>
 			<id>dg3</id>
