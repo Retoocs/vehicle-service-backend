@@ -91,7 +91,7 @@
 				def newWarehouse = findCase( {it._id.eq(warehouse_enum.value)} )
 				def newItemId = new com.netgrif.application.engine.petrinet.domain.I18nString(useCase.stringId)
 				newWarehouse.dataSet.get("items").choices = newWarehouse.dataSet.get("items").choices + [newItemId]
-				def newOENumber = new com.netgrif.application.engine.petrinet.domain.I18nString(useCase.stringId)
+				def newOENumber = new com.netgrif.application.engine.petrinet.domain.I18nString(OENumber.value)
 				newWarehouse.dataSet.get("OENumbers").choices = newWarehouse.dataSet.get("OENumbers").choices + [newOENumber]
 				workflowService.save(newWarehouse)
 			}
