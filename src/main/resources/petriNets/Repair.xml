@@ -1298,10 +1298,11 @@
 							return
 
 						def customerVehicles = selectedCustomer.dataSet.get("vehicles").choices
+						def selectedVehicleId = new com.netgrif.application.engine.petrinet.domain.I18nString(selected_vehicle_id.value)
 						if(customerVehicles == null)
-							selectedCustomer.dataSet.get("vehicles").choices = [selected_vehicle_id.value]
+							selectedCustomer.dataSet.get("vehicles").choices = [selectedVehicleId]
 						else
-							selectedCustomer.dataSet.get("vehicles").choices = customerVehicles + [selected_vehicle_id.value]
+							selectedCustomer.dataSet.get("vehicles").choices = customerVehicles + [selectedVehicleId]
 						workflowService.save(selectedCustomer)
 					}
 					else return
