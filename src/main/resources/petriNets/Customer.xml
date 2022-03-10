@@ -1,0 +1,1214 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://netgrif.github.io/petriflow/petriflow.schema.xsd">
+	<id>customer</id>
+	<initials>CUS</initials>
+	<title name="case_title">Customer</title>
+	<defaultRole>true</defaultRole>
+	<transitionRole>false</transitionRole>
+	<caseName name="default_case_name">Customer</caseName>
+	<caseEvents>
+		<event type="delete">
+			<id>case_delete</id>
+			<actions phase="pre">
+				<action>
+					delete_vehicles: f.delete_vehicles,
+					vehicles: f.vehicles;
+
+					if(delete_vehicles.value){
+						vehicles.choices.each{ workflowService.deleteCase(it.defaultValue) }
+					}
+					else{
+						vehicles.choices.each{
+							def idcko = it.defaultValue
+
+							def vehicle_case = findCase( { it._id.eq(idcko) } )
+
+							setData("t_read", vehicle_case, [
+							    "status": [
+							        "value": "unassigned",
+							        "type" : "enumeration_map"
+							    ],
+							])
+						}
+					}
+				</action>
+				<action>
+					def cea = findCase( {it.processIdentifier.eq("child_enum_addresses").and(it.dataSet.get("target_id").value?.eq(useCase.stringId))} )
+					if(cea == null)
+						return
+
+					def exists = false
+						for(taskpair in cea.tasks){
+						if(taskpair.transition == "t_select_address"){
+							exists = true
+							break
+						}
+					}
+
+					if(exists)
+						cancelTask("t_select_address", cea)
+				</action>
+			</actions>
+		</event>
+	</caseEvents>
+	<!-- TRANSACTIONS -->
+	<!-- ROLES -->
+	<!-- PROCESS ROLE REFS -->
+	<!-- PROCESS USER REFS -->
+	<!-- DATA -->
+	<data type="text">
+		<id>name</id>
+		<title name="name">Name</title>
+	</data>
+	<data type="text">
+		<id>surname</id>
+		<title name="surname">Surname</title>
+	</data>
+	<data type="text">
+		<id>company_name</id>
+		<title name="company_name">Company name</title>
+	</data>
+	<data type="text">
+		<id>email</id>
+		<title name="email">E-mail</title>
+	</data>
+	<data type="text">
+		<id>businessID</id>
+		<title name="businessID">Business ID</title>
+	</data>
+	<data type="text">
+		<id>taxID</id>
+		<title name="taxID">Tax ID</title>
+	</data>
+	<data type="text">
+		<id>phone_number</id>
+		<title name="phone_number">Phone number</title>
+	</data>
+	<data type="text">
+		<id>street</id>
+		<title name="street">Street</title>
+	</data>
+	<data type="text">
+		<id>house_number</id>
+		<title name="house_number">House number</title>
+	</data>
+	<data type="text">
+		<id>city</id>
+		<title name="city">City</title>
+	</data>
+	<data type="text">
+		<id>postal_code</id>
+		<title name="postal_code">Postal code</title>
+	</data>
+	<data type="boolean">
+		<id>natural_legal_person</id>
+		<title name="natural_legal_person">Natural P. - Legal P.</title>
+		<init>false</init>
+	</data>
+	<data type="enumeration_map">
+		<id>status</id>
+		<title name="status">Status</title>
+		<options>
+			<option key="created" name="status_created">Created</option>
+		</options>
+		<view>
+			<autocomplete/>
+		</view>
+	</data>
+	<data type="taskRef">
+		<id>input_form</id>
+		<title></title>
+		<init>t_input_form</init>
+	</data>
+	<data type="taskRef">
+		<id>view_vehicles</id>
+		<title></title>
+	</data>
+	<data type="enumeration">
+		<id>vehicles</id>
+		<title>Vehicles</title>
+	</data>
+	<data type="boolean">
+		<id>delete_vehicles</id>
+		<title name="delete_vehicles">Delete customer's vehicles </title>
+		<init>false</init>
+	</data>
+	<data type="taskRef">
+		<id>adress_form</id>
+		<title></title>
+	</data>
+	<data type="boolean">
+		<id>change_address</id>
+		<title name="change_address">Do you want to change the address?</title>
+	</data>
+		<data type="multichoice_map">
+		<id>choose_existing_car</id>
+		<title name="choose_existing_car">Choose vehicle</title>
+	</data>
+	<data type="boolean">
+		<id>confirm_existing_vehicle</id>
+		<title name="confirm_existing_vehicle">Change owner</title>
+		<init>false</init>
+	</data>
+	<data type="boolean">
+		<id>add_new_vehicle</id>
+		<title name="add_new_vehicle">Create new vehicle</title>
+		<init>false</init>
+	</data>
+	<data type="taskRef">
+		<id>new_vehicle_taskref</id>
+		<title></title>
+	</data>
+	<data type="boolean">
+		<id>has_owner_flag</id>
+		<title></title>
+		<init>false</init>
+	</data>
+	<!-- I18NS -->
+	<i18n locale="sk">
+		<i18nString name="t_create">Vytvoriť</i18nString>
+		<i18nString name="t_read">Prečítať</i18nString>
+		<i18nString name="t_update">Aktualizovať</i18nString>
+		<i18nString name="t_delete">Vymazať</i18nString>
+		<i18nString name="t_input_form">Vstupný formulár</i18nString>
+		<i18nString name="default_case_name">Zákazník</i18nString>
+		<i18nString name="case_title">Zákazník</i18nString>
+		<i18nString name="name">Meno</i18nString>
+		<i18nString name="surname">Priezvisko</i18nString>
+		<i18nString name="company_mane">Názov firmy</i18nString>
+		<i18nString name="email">E-mail</i18nString>
+		<i18nString name="businessID">IČO</i18nString>
+		<i18nString name="taxID">DIČO</i18nString>
+		<i18nString name="phone_number">Telefónne číslo</i18nString>
+		<i18nString name="street">Ulica</i18nString>
+		<i18nString name="house_number">Popisné číslo</i18nString>
+		<i18nString name="city">Obec</i18nString>
+		<i18nString name="postal_code">PSČ</i18nString>
+		<i18nString name="status">Stav</i18nString>
+		<i18nString name="status_created">Vytvorené</i18nString>
+		<i18nString name="natural_legal_person">Fyzic. O - Právn. O</i18nString>
+		<i18nString name="t_view_vehicles">Zobraziť vozidlá</i18nString>
+		<i18nString name="delete_vehicles">Zmazať zákazníkove vozidlá</i18nString>
+		<i18nString name="change_address">Chcete zmeniť adresu?</i18nString>
+		<i18nString name="dg_basic_info">Základné informácie</i18nString>
+		<i18nString name="dg_address">Adresa</i18nString>
+		<i18nString name="choose_existing_car">Vybrať vozidlo</i18nString>
+		<i18nString name="confirm_existing_vehicle">Zmeniť majitela</i18nString>
+		<i18nString name="add_new_vehicle">Pridať nové vozidlo</i18nString>
+	</i18n>
+	<i18n locale="de">
+		<i18nString name="t_create">Schaffen</i18nString>
+		<i18nString name="t_read">Lesen</i18nString>
+		<i18nString name="t_update">Aktualisieren</i18nString>
+		<i18nString name="t_delete">Löschen</i18nString>
+		<i18nString name="t_input_form">Eintragsformular</i18nString>
+		<i18nString name="default_case_name">Kunde</i18nString>
+		<i18nString name="case_title">Kunde</i18nString>
+		<i18nString name="name">Name</i18nString>
+		<i18nString name="surname">Familienname</i18nString>
+		<i18nString name="company_mane">Firmennahme</i18nString>
+		<i18nString name="email">E-mail</i18nString>
+		<i18nString name="businessID">Id. Nr. - Identifikationsnummer</i18nString>
+		<i18nString name="taxID">USt.-Ident.-Nr.</i18nString>
+		<i18nString name="phone_number">Rufnummer</i18nString>
+		<i18nString name="street">Straße</i18nString>
+		<i18nString name="house_number">Konskriptionsnummer</i18nString>
+		<i18nString name="city">Ort (Stadt)</i18nString>
+		<i18nString name="postal_code">PLZ</i18nString>
+		<i18nString name="status">Zustand</i18nString>
+		<i18nString name="status_created">Erstellt</i18nString>
+		<i18nString name="natural_legal_person">Natürliche P. - Juristische P.</i18nString>
+		<i18nString name="t_view_vehicles">Fahrzeug anzeigen</i18nString>
+		<i18nString name="delete_vehicles">Kundenfahrzeuge löschen</i18nString>
+		<i18nString name="change_address">Möchten Sie die Adresse ändern?</i18nString>
+		<i18nString name="dg_basic_info">Grundlegende Informationen</i18nString>
+		<i18nString name="dg_address">Adresse</i18nString>
+		<i18nString name="choose_existing_car">Wählen ein Fahrzeug</i18nString>
+		<i18nString name="confirm_existing_vehicle">Besitzerwechsel</i18nString>
+		<i18nString name="add_new_vehicle">Neues Fahrzeug hinzufügen</i18nString>
+	</i18n>
+	<!-- TRANSITIONS -->
+	<transition>
+		<id>t_create</id>
+		<x>540</x>
+		<y>340</y>
+		<layout>
+			<offset>0</offset>
+		</layout>
+		<label name="t_create">Create</label>
+		<dataGroup>
+			<id>DataGroup</id>
+			<dataRef>
+				<id>input_form</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+			</dataRef>
+			<dataRef>
+				<id>adress_form</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+			</dataRef>
+		</dataGroup>
+		<event type="finish">
+			<id>0</id>
+			<actions phase="post">
+				<action>
+					company_name: f.company_name,
+					surname: f.surname,
+					name: f.name,
+					natural_legal_person: f.natural_legal_person,
+					t_input_form: t.t_input_form,
+					status: f.status;
+
+					make natural_legal_person, hidden on t_input_form when { true }
+					change status value { return "created"; }
+
+					changeCaseProperty "title" about {
+						if (natural_legal_person.value == false) {
+							return name.value + " " +  surname.value;
+						} else {
+							return company_name.value;
+						}
+					}
+				</action>
+				<action>
+                    def Case = findCase( {it.processIdentifier.eq("child_enum_addresses").and(it.author.email.eq(loggedUser().email))} )
+					if(Case == null)
+						throw new IllegalArgumentException("Cannot find your instance of process Child addresses enumeration")
+
+					async.run{ finishTask("t_select_address", Case) }
+				</action>
+				<action>
+					useCase.dataSet.get("adress_form").value = []
+					workflowService.save(useCase)
+				</action>
+			</actions>
+		</event>
+		<event type="cancel">
+			<id>t_create_cancel</id>
+			<actions phase="post">
+				<action>
+					async.run{
+						workflowService.deleteCase(useCase.stringId)
+					}
+				</action>
+			</actions>
+		</event>
+		<event type="assign">
+			<id>t_create_assign</id>
+			<actions phase="pre">
+				<action>
+                    adress_form: f.adress_form;
+
+					def Case = findCase( {it.processIdentifier.eq("child_enum_addresses").and(it.author.email.eq(loggedUser().email))} )
+					if(Case == null)
+						throw new IllegalArgumentException("Cannot find your instance of process Child addresses enumeration")
+
+                    def addressTask = findTask( {it.caseId.eq(Case.stringId).and(it.transitionId.eq("t_select_address"))} )
+					if(addressTask == null)
+						throw new IllegalArgumentException("Cannot find task with id t_select_address in ${Case.title}")
+
+					async.run{ assignTask(addressTask) }
+                    change adress_form value{ [addressTask.stringId] }
+
+                    setData("t_select_address", Case, [
+						"target_id": [
+							"value": useCase.stringId,
+							"type" : "text"
+						],
+					])
+				</action>
+			</actions>
+		</event>
+	</transition>
+	<transition>
+		<id>t_input_form</id>
+		<x>420</x>
+		<y>220</y>
+		<layout>
+			<offset>0</offset>
+		</layout>
+		<label name="t_input_form">Input form</label>
+		<dataGroup>
+			<id>DataGroup</id>
+			<layout>grid</layout>
+			<title name="dg_basic_info">Basic informations</title>
+			<dataRef>
+				<id>name</id>
+				<logic>
+					<behavior>editable</behavior>
+					<behavior>required</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>surname</id>
+				<logic>
+					<behavior>editable</behavior>
+					<behavior>required</behavior>
+				</logic>
+				<layout>
+					<x>2</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>company_name</id>
+				<logic>
+					<behavior>required</behavior>
+					<behavior>hidden</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>2</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>email</id>
+				<logic>
+					<behavior>editable</behavior>
+					<behavior>required</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>4</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>businessID</id>
+				<logic>
+					<behavior>required</behavior>
+					<behavior>hidden</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>5</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>taxID</id>
+				<logic>
+					<behavior>required</behavior>
+					<behavior>hidden</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>6</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>phone_number</id>
+				<logic>
+					<behavior>editable</behavior>
+					<behavior>required</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>3</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>natural_legal_person</id>
+				<logic>
+					<behavior>editable</behavior>
+					<action trigger="set">
+						name: f.name,
+						taxID: f.taxID,
+						businessID: f.businessID,
+						natural_legal_person: f.natural_legal_person,
+						t_input_form: t.t_input_form,
+						company_name: f.company_name,
+						surname: f.surname;
+
+						make name, editable on t_input_form when { natural_legal_person.value == false; }
+						make surname, editable on t_input_form when { natural_legal_person.value == false; }
+						make name, required on t_input_form when { natural_legal_person.value == false; }
+						make surname, required on t_input_form when { natural_legal_person.value == false; }
+						make company_name, hidden on t_input_form when { natural_legal_person.value == false; }
+						make taxID, hidden on t_input_form when { natural_legal_person.value == false; }
+						make businessID, hidden on t_input_form when { natural_legal_person.value == false; }
+
+						make name, hidden on t_input_form when { natural_legal_person.value == true; }
+						make surname, hidden on t_input_form when { natural_legal_person.value == true; }
+						make company_name, editable on t_input_form when { natural_legal_person.value == true; }
+						make businessID, editable on t_input_form when { natural_legal_person.value == true; }
+						make taxID, editable on t_input_form when { natural_legal_person.value == true; }
+						make company_name, required on t_input_form when { natural_legal_person.value == true; }
+						make businessID, required on t_input_form when { natural_legal_person.value == true; }
+						make taxID, required on t_input_form when { natural_legal_person.value == true; }
+
+						if (natural_legal_person.value == true) {
+							change name value { null; }
+							change surname value {  null; }
+						}else {
+							 change company_name value { null; }
+							 change businessID value { null; }
+							 change taxID value { null; }
+						}
+					</action>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<offset>0</offset>
+					<template>material</template>
+				</layout>
+			</dataRef>
+		</dataGroup>
+	</transition>
+	<transition>
+		<id>t_delete</id>
+		<x>780</x>
+		<y>340</y>
+		<layout>
+			<offset>0</offset>
+		</layout>
+		<label name="t_delete">Delete</label>
+		<dataGroup>
+			<id>DataGroup</id>
+			<layout>grid</layout>
+			<dataRef>
+				<id>delete_vehicles</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance></appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
+		<event type="finish">
+			<id>t_delete_finish</id>
+			<actions phase="post">
+				<action>async.run{
+					workflowService.deleteCase(useCase.stringId);
+				}
+				</action>
+			</actions>
+		</event>
+	</transition>
+	<transition>
+		<id>t_update</id>
+		<x>660</x>
+		<y>220</y>
+		<layout>
+			<offset>0</offset>
+		</layout>
+		<label name="t_update">Update</label>
+		<dataGroup>
+			<id>DataGroup</id>
+			<stretch>true</stretch>
+			<dataRef>
+				<id>input_form</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+			</dataRef>
+		</dataGroup>
+		<dataGroup>
+			<id>dg2</id>
+			<stretch>true</stretch>
+			<dataRef>
+				<id>change_address</id>
+				<logic>
+					<behavior>editable</behavior>
+					<action trigger="set">
+						change_address: f.this,
+						adress_form: f.adress_form;
+
+						if(!change_address.value){
+							if(adress_form.value == null || adress_form.value == [])
+								return
+							def tazk = findTask( {it._id.eq(adress_form.value[0])} )
+							async.run{ cancelTask(tazk) }
+							change adress_form value { [] }
+
+							return
+						}
+
+						def myEnumCase = findCase( {it.processIdentifier.eq("child_enum_addresses").and(it.author.email.eq(loggedUser().email))} )
+						if(myEnumCase == null)
+							throw new IllegalArgumentException("Cannot find your instance of process Child address enumeration")
+
+						def enumTask = findTask( {it.caseId.eq(myEnumCase.stringId).and(it.transitionId.eq("t_select_address"))} )
+						if(enumTask == null)
+							throw new IllegalArgumentException("Cannot find task with id t_select_address in ${myEnumCase.title}")
+
+						async.run{ assignTask(enumTask) }
+
+						change adress_form value { [enumTask.stringId] }
+
+						setData("t_select_address", myEnumCase, [
+							"target_id": [
+								"value": useCase.stringId,
+								"type" : "text"
+							],
+						])
+					</action>
+				</logic>
+			</dataRef>
+			<dataRef>
+				<id>adress_form</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+			</dataRef>
+		</dataGroup>
+		<event type="assign">
+			<id>0</id>
+			<actions phase="pre">
+				<action>
+					change_address: f.change_address;
+					change change_address value { false }
+				</action>
+			</actions>
+		</event>
+		<event type="cancel">
+			<id>1</id>
+			<actions phase="pre">
+				<action>
+					def cea = findCase( {it.processIdentifier.eq("child_enum_addresses").and(it.dataSet.get("target_id").value?.eq(useCase.stringId))} )
+					if(cea == null)
+						return
+
+					def exists = false
+					for(taskpair in cea.tasks){
+						if(taskpair.transition == "t_select_address"){
+						exists = true
+						break
+						}
+					}
+
+					if(exists)
+						cancelTask("t_select_address", cea)
+				</action>
+			</actions>
+		</event>
+		<event type="finish">
+			<id>t_update_finish</id>
+			<actions phase="pre">
+				<action>
+					def myEnumCase = findCase( {it.processIdentifier.eq("child_enum_addresses").and(it.author.email.eq(loggedUser().email))} )
+					if(myEnumCase == null)
+						throw new IllegalArgumentException("Cannot find your instance of process Child address enumeration")
+
+					async.run{ finishTask("t_select_address", myEnumCase) }
+				</action>
+			</actions>
+			<actions phase="post">
+				<action>
+					adress_form: f.adress_form;
+
+					change adress_form value { [] }
+				</action>
+				<action>
+					company_name: f.company_name,
+					surname: f.surname,
+					name: f.name,
+					natural_legal_person: f.natural_legal_person;
+
+					changeCaseProperty "title" about {
+						if (natural_legal_person.value == false) {
+							return name.value + " " +  surname.value;
+						} else {
+							return company_name.value;
+						}
+					}
+				</action>
+			</actions>
+		</event>
+	</transition>
+	<transition>
+		<id>t_read</id>
+		<x>660</x>
+		<y>460</y>
+		<layout>
+			<offset>0</offset>
+		</layout>
+		<label name="t_read">Read</label>
+		<dataGroup>
+			<id>dg1</id>
+			<dataRef>
+				<id>input_form</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+			</dataRef>
+		</dataGroup>
+		<dataGroup>
+			<id>dg2</id>
+			<layout>grid</layout>
+			<title name="dg_address">Address</title>
+			<dataRef>
+				<id>city</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>1</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>street</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>2</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>postal_code</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>house_number</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>1</x>
+					<y>2</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
+		<event type="cancel">
+			<title></title>
+		</event>
+		<event type="assign">
+			<title></title>
+		</event>
+		<event type="finish">
+			<title></title>
+		</event>
+		<event type="delegate">
+			<title></title>
+		</event>
+	</transition>
+	<transition>
+		<id>t_view_vehicles</id>
+		<x>780</x>
+		<y>460</y>
+		<layout>
+			<offset>0</offset>
+			<cols>5</cols>
+		</layout>
+		<label name="t_view_vehicles">View Vehicles</label>
+		<dataGroup>
+			<id>DataGroup</id>
+			<layout>grid</layout>
+			<dataRef>
+				<id>view_vehicles</id>
+				<logic>
+					<behavior>editable</behavior>
+					<action trigger="get">
+						vehicles: f.vehicles,
+						view_vehicles: f.view_vehicles;
+
+						change view_vehicles value {[]}
+						for(i18_item_id in vehicles.choices){
+							def vehicle_task = findTask( { it.caseId.eq(i18_item_id.defaultValue).and(it.transitionId.eq("t_short_description_cus")) } )
+
+							if(vehicle_task != null){
+								change view_vehicles value { view_vehicles.value + [vehicle_task.stringId] }
+							}
+						}
+					</action>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>5</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
+	</transition>
+	<transition>
+		<id>t_synchronize</id>
+		<x>350</x>
+		<y>60</y>
+		<layout>
+			<offset>0</offset>
+		</layout>
+		<label>Synchronize</label>
+	</transition>
+	<transition>
+		<id>t_add_vehicle</id>
+		<x>780</x>
+		<y>220</y>
+		<layout>
+			<offset>0</offset>
+		</layout>
+		<label>Add vehicles</label>
+		<assignPolicy>auto</assignPolicy>
+		<dataGroup>
+			<id>DataGroup</id>
+			<layout>grid</layout>
+			<dataRef>
+				<id>choose_existing_car</id>
+				<logic>
+					<behavior>editable</behavior>
+					<action trigger="set">
+						vehicles: f.vehicles,
+						confirm_existing_vehicle: f.confirm_existing_vehicle,
+						has_owner_flag: f.has_owner_flag,
+						t_add_vehicle: t.t_add_vehicle,
+						choose_existing_car: f.choose_existing_car;
+
+						change has_owner_flag value {return false;}
+						make confirm_existing_vehicle, hidden on t_add_vehicle when { true }
+
+						def selected_vehicle_ids = choose_existing_car.value;
+
+						for (opt in selected_vehicle_ids) {
+
+							def curr_vehicle = findCase( { it._id.eq(opt) } )
+							if(curr_vehicle == null) {
+								continue;
+							}
+
+							def customer_status = curr_vehicle.dataSet.get("status").value
+
+							if (customer_status == "assigned") {
+								make confirm_existing_vehicle, editable on t_add_vehicle when { true }
+								change has_owner_flag value {return true;}
+								return
+							}
+						}
+					</action>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>add_new_vehicle</id>
+				<logic>
+					<behavior>editable</behavior>
+					<action trigger="set">
+						confirm_existing_vehicle: f.confirm_existing_vehicle,
+						choose_existing_car: f.choose_existing_car,
+						add_new_vehicle: f.add_new_vehicle,
+						t_add_vehicle: t.t_add_vehicle,
+						new_vehicle_taskref: f.new_vehicle_taskref;
+
+						make choose_existing_car, editable on t_add_vehicle when { add_new_vehicle.value == false; }
+						make choose_existing_car, required on t_add_vehicle when { add_new_vehicle.value == false; }
+
+						make choose_existing_car, visible on t_add_vehicle when { add_new_vehicle.value == true; }
+
+						if (add_new_vehicle.value == true) {
+							//VYTVORENIE NOVEHO VOZIDLA - REFERENCUJEM T_CREATE PRECHOD Z VEHICLE PROCESU
+
+							def new_vehicle_instance = createCase("vehicle")
+							if (new_vehicle_instance == null) {
+								return
+							}
+
+							def vehicle_create_task = findTask({it.caseId.eq(new_vehicle_instance.stringId).and(it.transitionId.eq("t_create"))})
+							if(vehicle_create_task == null) {
+								return
+							}
+
+							assignTask(vehicle_create_task)
+							change new_vehicle_taskref value { [vehicle_create_task.stringId]; }
+
+							change choose_existing_car value {null}
+
+						} else {
+							//VYBERAM EXISTUJUCE VOZIDLO, CANCEL AK JE NOVY PROCES VEHICLE VYTVORENY
+							if(new_vehicle_taskref.value == null || new_vehicle_taskref.value == []) {
+								return
+							}
+
+							def vehicle_create_to_cancel = findTask({it._id.eq(new_vehicle_taskref.value.first())})
+							if(vehicle_create_to_cancel == null) {
+								return
+							}
+
+							cancelTask(vehicle_create_to_cancel)
+							change new_vehicle_taskref value { [] }
+						}
+					</action>
+				</logic>
+				<layout>
+					<x>2</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<offset>0</offset>
+					<template>material</template>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>confirm_existing_vehicle</id>
+				<logic>
+					<behavior>hidden</behavior>
+				</logic>
+				<layout>
+					<x>3</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<offset>0</offset>
+					<template>material</template>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>new_vehicle_taskref</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
+		<event type="assign">
+			<id>t_add_vehicle_assign</id>
+			<actions phase="pre">
+				<action>
+					confirm_existing_vehicle: f.confirm_existing_vehicle,
+					has_owner_flag: f.has_owner_flag,
+					choose_existing_car: f.choose_existing_car,
+					add_new_vehicle: f.add_new_vehicle;
+
+					change has_owner_flag value {return false;}
+					change confirm_existing_vehicle value {return false;}
+					change add_new_vehicle value {return false;}
+
+					change choose_existing_car options {[:]}
+					change choose_existing_car value {null}
+
+				</action>
+				<action>
+					choose_existing_car: f.choose_existing_car;
+
+					def cases = findCases( {it.processIdentifier.eq("vehicle").and(it.dataSet.get("actual_customer_id").value?.ne(useCase.stringId))} );
+
+					for (caze in cases) {
+						change choose_existing_car options { return choose_existing_car.options + [(caze.stringId):(caze.dataSet.get("licenceNumber").value + " - " + caze.dataSet.get("manufacturer").value + " " + caze.dataSet.get("model").value) ] }
+					}
+				</action>
+			</actions>
+		</event>
+		<event type="cancel">
+			<id>t_add_vehicle_cancel</id>
+			<actions phase="post">
+				<action>
+				confirm_existing_vehicle: f.confirm_existing_vehicle,
+				has_owner_flag: f.has_owner_flag,
+				choose_existing_car: f.choose_existing_car,
+				add_new_vehicle: f.add_new_vehicle,
+				new_vehicle_taskref: f.new_vehicle_taskref;
+
+				//CANCEL AK JE NOVY PROCES VEHICLE VYTVORENY, NULOVANIE PREMENNYCH
+
+				change has_owner_flag value {return false;}
+				change confirm_existing_vehicle value {return false;}
+				change add_new_vehicle value {return false;}
+
+				change choose_existing_car options {[:]}
+				change choose_existing_car value {null}
+
+
+				if(new_vehicle_taskref.value == null || new_vehicle_taskref.value == []) {
+					return
+				}
+
+				def vehicle_create_to_cancel = findTask({it._id.eq(new_vehicle_taskref.value.first())})
+				if(vehicle_create_to_cancel == null) {
+					change new_vehicle_taskref value { [] }
+					return
+				}
+
+				cancelTask(vehicle_create_to_cancel)
+
+				change new_vehicle_taskref value { [] }
+				</action>
+			</actions>
+		</event>
+		<event type="finish">
+			<id>t_add_vehicle_finish</id>
+			<actions phase="pre">
+				<action>
+					vehicles: f.vehicles,
+					confirm_existing_vehicle: f.confirm_existing_vehicle,
+					has_owner_flag: f.has_owner_flag,
+					choose_existing_car: f.choose_existing_car,
+					add_new_vehicle: f.add_new_vehicle;
+
+					if (add_new_vehicle.value == false) {
+						//VYBER Z EXISTUJUCICH VOZIDIEL
+
+						if((has_owner_flag.value == true).and(confirm_existing_vehicle.value == false)) {
+							throw new IllegalArgumentException("Vehicle has owner, but overwrite boolean is not set!")
+						}
+
+						def selected_vehicle_ids = choose_existing_car.value;
+
+						for (opt in selected_vehicle_ids) {
+
+							def curr_vehicle = findCase( { it._id.eq(opt) } )
+
+							if(curr_vehicle == null) {
+								continue;
+							}
+
+							def old_customer_id = curr_vehicle.dataSet.get("actual_customer_id").value
+
+							if(old_customer_id != null) {
+								def old_customer_case = findCase( { it._id.eq(old_customer_id) } )
+								if(old_customer_case != null) {
+
+									def old_customer_vehicles = old_customer_case.dataSet.get("vehicles").choices.collect{it.defaultValue}
+									old_customer_case.dataSet.get("vehicles").choices = old_customer_vehicles - opt
+
+									workflowService.save(old_customer_case)
+								}
+							}
+
+							setData("t_read", curr_vehicle, [
+								"actual_customer_id": [
+									"value": useCase.stringId,
+									"type" : "text"
+								],
+								"status": [
+									"value": "assigned",
+									"type" : "enumeration_map"
+								],
+							])
+
+							change vehicles choices { return vehicles.choices + [opt] }
+
+						}
+					}
+				</action>
+			</actions>
+			<actions phase="post">
+				<action>
+				vehicles: f.vehicles,
+				add_new_vehicle: f.add_new_vehicle,
+				new_vehicle_taskref: f.new_vehicle_taskref;
+
+				if (add_new_vehicle.value == true) {
+					//VYTVORENIE NOVEHO VOZIDLA
+
+					def new_created_vehicle_task = findTask({it._id.eq(new_vehicle_taskref.value.first())})
+					if(new_created_vehicle_task == null) {
+						return
+					}
+
+					def new_vehicle_instance = findCase( { it._id.eq(new_created_vehicle_task.caseId) } )
+
+					setData("t_synchronize", new_vehicle_instance, [
+								"actual_customer_id": [
+									"value": useCase.stringId,
+									"type" : "text"
+								],
+								"status": [
+									"value": "assigned",
+									"type" : "enumeration_map"
+								],
+							])
+
+					change vehicles choices { return vehicles.choices + [new_created_vehicle_task.caseId] }
+
+					finishTask(new_created_vehicle_task)
+
+					change new_vehicle_taskref value { [] }
+				}
+
+				</action>
+			</actions>
+		</event>
+	</transition>
+	<!-- PLACES -->
+	<place>
+		<id>p1</id>
+		<x>420</x>
+		<y>340</y>
+		<label></label>
+		<tokens>1</tokens>
+		<static>false</static>
+	</place>
+	<place>
+		<id>p2</id>
+		<x>660</x>
+		<y>340</y>
+		<label></label>
+		<tokens>0</tokens>
+		<static>false</static>
+	</place>
+	<place>
+		<id>p3</id>
+		<x>940</x>
+		<y>340</y>
+		<label></label>
+		<tokens>0</tokens>
+		<static>false</static>
+	</place>
+	<!-- ARCS -->
+	<arc>
+		<id>a1</id>
+		<type>regular</type>
+		<sourceId>p1</sourceId>
+		<destinationId>t_create</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a2</id>
+		<type>regular</type>
+		<sourceId>t_create</sourceId>
+		<destinationId>p2</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a3</id>
+		<type>regular</type>
+		<sourceId>p2</sourceId>
+		<destinationId>t_update</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a4</id>
+		<type>regular</type>
+		<sourceId>t_update</sourceId>
+		<destinationId>p2</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a5</id>
+		<type>regular</type>
+		<sourceId>p2</sourceId>
+		<destinationId>t_delete</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a6</id>
+		<type>regular</type>
+		<sourceId>t_delete</sourceId>
+		<destinationId>p3</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a7</id>
+		<type>read</type>
+		<sourceId>p2</sourceId>
+		<destinationId>t_read</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a9</id>
+		<type>read</type>
+		<sourceId>p2</sourceId>
+		<destinationId>t_view_vehicles</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a10</id>
+		<type>regular</type>
+		<sourceId>p2</sourceId>
+		<destinationId>t_add_vehicle</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a11</id>
+		<type>regular</type>
+		<sourceId>t_add_vehicle</sourceId>
+		<destinationId>p2</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+</document>

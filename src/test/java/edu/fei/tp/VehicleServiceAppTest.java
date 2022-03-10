@@ -1,4 +1,4 @@
-package org.example.starter;
+package edu.fei.tp;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -9,7 +9,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 @SpringBootTest
 @ActiveProfiles({"test"})
 @ExtendWith(SpringExtension.class)
-class StarterApplicationTest {
+class VehicleServiceAppTest {
 
     @Test
     void contextLoads() {

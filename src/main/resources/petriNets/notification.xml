@@ -1,0 +1,656 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://netgrif.github.io/petriflow/petriflow.schema.xsd">
+	<id>notification</id>
+	<initials>NTF</initials>
+	<title name="case_title">Notification</title>
+	<defaultRole>true</defaultRole>
+	<transitionRole>false</transitionRole>
+	<caseName name="default_case_name">Notification</caseName>
+	<!-- TRANSACTIONS -->
+	<!-- ROLES -->
+	<!-- PROCESS ROLE REFS -->
+	<!-- PROCESS USER REFS -->
+	<!-- DATA -->
+	<data type="text">
+		<id>message</id>
+		<title name="message">Message</title>
+		<values>area</values>
+	</data>
+	<data type="text">
+		<id>title</id>
+		<title name="title">Title</title>
+	</data>
+	<data type="dateTime">
+		<id>dateOfSending</id>
+		<title name="dateOfSending">Send date</title>
+	</data>
+	<data type="boolean">
+		<id>isSent</id>
+		<title name="isSent">Is sent?</title>
+		<init>false</init>
+	</data>
+	<data type="text">
+		<id>sourceVisualId</id>
+		<title name="sourceVisualId">Visual id of source</title>
+		<action trigger="set">
+			sourceCaseName: f.sourceCaseName,
+			sourceMongoId: f.sourceMongoId,
+			sourceVisualId: f.this;
+			
+			def sourceCase
+			
+			// if sourceVisualId.value is valid (not null or empty)
+			if(sourceVisualId.value?.trim()){
+				sourceCase = findCase( {it.visualId.eq(sourceVisualId.value)} )
+				
+				// if the case was found
+				if(sourceCase){
+					change sourceCaseName value { return sourceCase.title; }	
+					
+					// if MongoId is null or empty
+					if(!sourceMongoId.value?.trim()){
+						change sourceMongoId value { return sourceCase.stringId; }
+					}
+
+					// if MongoId is something else than it should be
+					if(!sourceMongoId.value?.equals(sourceCase.stringId)){
+						change sourceMongoId value { return sourceCase.stringId; }
+					}
+				}
+			}
+			
+			if(!sourceCase){
+				change sourceCaseName value { return null; }				
+				change sourceMongoId value { return null; }
+			}
+		</action>
+	</data>
+	<data type="text">
+		<id>sourceMongoId</id>
+		<title name="sourceMongoId">Mongo id of source</title>
+		<action trigger="set">
+			sourceCaseName: f.sourceCaseName,
+			sourceMongoId: f.this,
+			sourceVisualId: f.sourceVisualId;
+			
+			def sourceCase
+			
+			// if sourceMongoId.value is valid (not null or empty)
+			if(sourceMongoId.value?.trim()){
+				sourceCase = findCase( {it._id.eq(sourceMongoId.value)} )
+				
+				// if the case was found
+				if(sourceCase){
+					change sourceCaseName value { return sourceCase.title; }	
+					
+					// if visualId is null or empty
+					if(!sourceVisualId.value?.trim()){
+						change sourceVisualId value { return sourceCase.visualId; }
+					}
+
+					// if visualId is something else than it should be
+					if(!sourceVisualId.value?.equals(sourceCase.visualId)){
+						change sourceVisualId value { return sourceCase.visualId; }
+					}
+				}
+			}
+			
+			if(!sourceCase){
+				change sourceCaseName value { return null; }				
+				change sourceVisualId value { return null; }
+			}
+		</action>
+	</data>
+	<data type="text">
+		<id>targetVisualId</id>
+		<title name="targetVisualId">Visual id of target</title>
+		<action trigger="set">
+			targetCaseName: f.targetCaseName,
+			targetMongoId: f.targetMongoId,
+			targetVisualId: f.this;
+			
+			def targetCase
+			
+			// if targetVisualId.value is valid (not null or empty)
+			if(targetVisualId.value?.trim()){
+				targetCase = findCase( {it.visualId.eq(targetVisualId.value)} )
+				
+				// if the case was found
+				if(targetCase){
+					change targetCaseName value { return targetCase.title; }	
+					
+					// if MongoId is null or empty
+					if(!targetMongoId.value?.trim()){
+						change targetMongoId value { return targetCase.stringId; }
+					}
+
+					// if MongoId is something else than it should be
+					if(!targetMongoId.value?.equals(targetCase.stringId)){
+						change targetMongoId value { return targetCase.stringId; }
+					}
+				}
+			}
+			
+			if(!targetCase){
+				change targetCaseName value { return null; }				
+				change targetMongoId value { return null; }
+			}
+		</action>
+	</data>
+	<data type="text">
+		<id>targetMongoId</id>
+		<title name="targetMongoId">Mongo id of target</title>
+		<action trigger="set">
+			targetCaseName: f.targetCaseName,
+			targetMongoId: f.this,
+			targetVisualId: f.targetVisualId;
+			
+			def targetCase
+			
+			// if targetMongoId.value is valid (not null or empty)
+			if(targetMongoId.value?.trim()){
+				targetCase = findCase( {it._id.eq(targetMongoId.value)} )
+				
+				// if the case was found
+				if(targetCase){
+					change targetCaseName value { return targetCase.title; }	
+					
+					// if visualId is null or empty
+					if(!targetVisualId.value?.trim()){
+						change targetVisualId value { return targetCase.visualId; }
+					}
+
+					// if visualId is something else than it should be
+					if(!targetVisualId.value?.equals(targetCase.visualId)){
+						change targetVisualId value { return targetCase.visualId; }
+					}
+				}
+			}
+			
+			if(!targetCase){
+				change targetCaseName value { return null; }				
+				change targetVisualId value { return null; }
+			}
+		</action>
+	</data>
+	<data type="text">
+		<id>sourceCaseName</id>
+		<title name="sourceCaseName">Source case name</title>
+	</data>
+	<data type="text">
+		<id>targetCaseName</id>
+		<title name="targetCaseName">Target case name</title>
+	</data>
+	<data type="enumeration_map">
+		<id>status</id>
+		<title name="status">Status</title>
+		<options>
+			<option key="created" name="status_created">Created</option>
+		</options>
+		<view>
+			<autocomplete/>
+		</view>
+	</data>
+	<data type="taskRef">
+		<id>input_form</id>
+		<title></title>
+		<init>t_input_form</init>
+	</data>
+	<!-- I18NS -->
+	<i18n locale="sk">
+        <i18nString name="t_create">Vytvoriť</i18nString>
+		<i18nString name="t_read">Prečítať</i18nString>
+		<i18nString name="t_update">Aktualizovať</i18nString>
+		<i18nString name="t_delete">Vymazať</i18nString>
+		<i18nString name="t_input_form">Vstupný formulár</i18nString>
+		<i18nString name="default_case_name">Notifikácia</i18nString>
+		<i18nString name="case_title">Notifikácia</i18nString>
+		<i18nString name="message">Správa</i18nString>
+		<i18nString name="title">Nadpis</i18nString>
+		<i18nString name="dateOfSending">Dátum odoslania</i18nString>
+		<i18nString name="isSent">Je zaslaný?</i18nString>
+		<i18nString name="sourceVisualId">Vizuálne id zdroja</i18nString>
+		<i18nString name="sourceMongoId">Mongo id zdroja</i18nString>
+		<i18nString name="targetVisualId">Vizuálne id cieľa</i18nString>
+		<i18nString name="targetMongoId">Mongo id cieľa</i18nString>
+		<i18nString name="sourceCaseName">Názov inštancie zdroja</i18nString>
+		<i18nString name="targetCaseName">Názov inštancie cieľa</i18nString>
+		<i18nString name="status">Stav</i18nString>
+		<i18nString name="status_created">Vytvorené</i18nString>
+    </i18n>
+    <i18n locale="de">
+        <i18nString name="t_create">Schaffen</i18nString>
+		<i18nString name="t_read">Lesen</i18nString>
+		<i18nString name="t_update">Aktualisieren</i18nString>
+		<i18nString name="t_delete">Löschen</i18nString>
+		<i18nString name="t_input_form">Eintragsformular</i18nString>
+		<i18nString name="default_case_name">Benachrichtigung</i18nString>
+		<i18nString name="case_title">Benachrichtigung</i18nString>
+		<i18nString name="message">Nachricht</i18nString>
+		<i18nString name="title">Titel</i18nString>
+		<i18nString name="dateOfSending">Versanddatum</i18nString>
+		<i18nString name="isSent">Wird es gesendet?</i18nString>
+		<i18nString name="sourceVisualId">Visuelle Quellen-ID</i18nString>
+		<i18nString name="sourceMongoId">Mongo Quellen-ID</i18nString>
+		<i18nString name="targetVisualId">Visuelle Ziel-ID</i18nString>
+		<i18nString name="targetMongoId">Mongo Ziel-ID</i18nString>
+		<i18nString name="sourceCaseName">Name der Ressourceninstanz</i18nString>
+		<i18nString name="targetCaseName">Name der Zielinstanz</i18nString>
+		<i18nString name="status">Zustand</i18nString>
+		<i18nString name="status_created">Erstellt</i18nString>
+    </i18n>
+	<!-- TRANSITIONS -->
+	<transition>
+		<id>t_create</id>
+		<x>420</x>
+		<y>220</y>
+		<layout>
+			<offset>0</offset>
+		</layout>
+		<label name="t_create">Create</label>
+		<dataGroup>
+			<id>DataGroup</id>
+			<dataRef>
+				<id>input_form</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+			</dataRef>
+		</dataGroup>
+		<event type="finish">
+			<id>t_create_finish</id>
+			<actions phase="post">
+				<action>
+					status: f.status;					
+					change status value { return "created"; }	
+				</action>
+			</actions>
+		</event>
+		<event type="cancel">
+			<id>t_create_cancel</id>
+			<actions phase="post">
+				<action>
+				async.run{
+					workflowService.deleteCase(useCase.stringId)
+				}
+				</action>
+			</actions>
+		</event>
+	</transition>
+	<transition>
+		<id>t_update</id>
+		<x>580</x>
+		<y>60</y>
+		<layout>
+			<offset>0</offset>
+		</layout>
+		<label name="t_update">Update</label>
+		<dataGroup>
+			<id>DataGroup</id>
+			<dataRef>
+				<id>input_form</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+			</dataRef>
+		</dataGroup>
+	</transition>
+	<transition>
+		<id>t_read</id>
+		<x>580</x>
+		<y>380</y>
+		<layout>
+			<offset>0</offset>
+		</layout>
+		<label name="t_read">Read</label>
+		<dataGroup>
+			<id>DataGroup</id>
+			<layout>grid</layout>
+			<dataRef>
+				<id>title</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>message</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>sourceCaseName</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>2</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>targetCaseName</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>2</x>
+					<y>2</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>isSent</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>3</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<offset>0</offset>
+					<template>material</template>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>dateOfSending</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>2</x>
+					<y>3</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>status</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>4</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
+		<event type="cancel">
+			<title></title>
+		</event>
+		<event type="assign">
+			<title></title>
+		</event>
+		<event type="finish">
+			<title></title>
+		</event>
+		<event type="delegate">
+			<title></title>
+		</event>
+	</transition>
+	<transition>
+		<id>t_delete</id>
+		<x>740</x>
+		<y>220</y>
+		<layout>
+			<offset>0</offset>
+		</layout>
+		<label name="t_delete">Delete</label>
+		<event type="finish">
+			<id>t_delete_finish</id>
+			<actions phase="post">
+				<action>
+					async.run{
+						workflowService.deleteCase(useCase.stringId);
+					}	
+				</action>
+			</actions>
+		</event>
+	</transition>
+	<transition>
+		<id>t_input_form</id>
+		<x>50</x>
+		<y>50</y>
+		<layout>
+			<offset>0</offset>
+		</layout>
+		<label name="t_input_form">Input form</label>
+		<dataGroup>
+			<id>DataGroup</id>
+			<layout>grid</layout>
+			<dataRef>
+				<id>title</id>
+				<logic>
+					<behavior>editable</behavior>
+					<behavior>required</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>message</id>
+				<logic>
+					<behavior>editable</behavior>
+					<behavior>required</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>sourceVisualId</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>2</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>targetVisualId</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>2</x>
+					<y>2</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>sourceMongoId</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>3</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>targetMongoId</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>2</x>
+					<y>3</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>sourceCaseName</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>4</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>targetCaseName</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>2</x>
+					<y>4</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
+	</transition>
+	<!-- PLACES -->
+	<place>
+		<id>p1</id>
+		<x>300</x>
+		<y>220</y>
+		<label></label>
+		<tokens>1</tokens>
+		<static>false</static>
+	</place>
+	<place>
+		<id>p2</id>
+		<x>580</x>
+		<y>220</y>
+		<label></label>
+		<tokens>0</tokens>
+		<static>false</static>
+	</place>
+	<place>
+		<id>p3</id>
+		<x>900</x>
+		<y>220</y>
+		<label></label>
+		<tokens>0</tokens>
+		<static>false</static>
+	</place>
+	<!-- ARCS -->
+	<arc>
+		<id>a1</id>
+		<type>regular</type>
+		<sourceId>p1</sourceId>
+		<destinationId>t_create</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a2</id>
+		<type>regular</type>
+		<sourceId>t_create</sourceId>
+		<destinationId>p2</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a3</id>
+		<type>regular</type>
+		<sourceId>p2</sourceId>
+		<destinationId>t_delete</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a4</id>
+		<type>regular</type>
+		<sourceId>t_delete</sourceId>
+		<destinationId>p3</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a5</id>
+		<type>regular</type>
+		<sourceId>p2</sourceId>
+		<destinationId>t_update</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a6</id>
+		<type>regular</type>
+		<sourceId>t_update</sourceId>
+		<destinationId>p2</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a7</id>
+		<type>read</type>
+		<sourceId>p2</sourceId>
+		<destinationId>t_read</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+</document>
