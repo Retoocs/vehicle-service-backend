@@ -1,0 +1,231 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://netgrif.github.io/petriflow/petriflow.schema.xsd">
+	<id>wi_to_ri</id>
+	<initials>WTR</initials>
+	<title>WI to RI</title>
+	<defaultRole>true</defaultRole>
+	<transitionRole>false</transitionRole>
+	<!-- TRANSACTIONS -->
+	<!-- ROLES -->
+	<!-- PROCESS ROLE REFS -->
+	<!-- PROCESS USER REFS -->
+	<!-- DATA -->
+	<data type="text">
+		<id>origin_wi_id</id>
+		<title>origin_wi_id</title>
+	</data>
+	<data type="text">
+		<id>origin_wh_id</id>
+		<title>origin_wh_id</title>
+	</data>
+	<data type="text">
+		<id>target_repair_id</id>
+		<title>target_repair_id</title>
+	</data>
+	<data type="number">
+		<id>quantity_to_transfer</id>
+		<title>quantity_to_transfer</title>
+	</data>
+	<data type="text">
+		<id>created_ri_id</id>
+		<title>created_ri_id</title>
+	</data>
+	<data type="boolean">
+		<id>is_all_quantity</id>
+		<title>is_all_quantity</title>
+		<init>false</init>
+	</data>
+	<!-- I18NS -->
+	<!-- TRANSITIONS -->
+	<transition>
+		<id>t_initialize</id>
+		<x>160</x>
+		<y>140</y>
+		<layout>
+			<offset>0</offset>
+		</layout>
+		<label>Initialize [await synch]</label>
+	</transition>
+	<transition>
+		<id>t_do_wi_to_ri</id>
+		<x>380</x>
+		<y>140</y>
+		<layout>
+			<offset>0</offset>
+		</layout>
+		<label>do_wi_to_ri [await synch]</label>
+		<event type="finish">
+			<id>0</id>
+			<actions phase="pre">
+				<action>
+					target_repair_id: f.target_repair_id,
+					quantity_to_transfer: f.quantity_to_transfer,
+					is_all_quantity: f.is_all_quantity,
+					created_ri_id: f.created_ri_id,
+					origin_wi_id: f.origin_wi_id;
+
+					if(origin_wi_id.value == null)
+						return
+
+					def wiCase = findCase( {it._id.eq(origin_wi_id.value)} )
+					if(wiCase == null)
+						return
+
+					def transferingQuantity = wiCase.dataSet.get("quantity_transfer_to_repair").value
+					def actualQuantity = wiCase.dataSet.get("quantity").value
+					change quantity_to_transfer value { transferingQuantity }
+					if(transferingQuantity >= actualQuantity)
+						change is_all_quantity value { true }
+
+					def repairCase = findCase( {it._id.eq(target_repair_id.value)} )
+					if(repairCase == null)
+						return
+					def oeNumbersInRepair = repairCase.dataSet.get("OENumbers").choices?.collect{it.defaultValue}
+
+					// just increment quantity
+					def OENumberToCheck = wiCase.dataSet.get("OENumber").value
+					if(oeNumbersInRepair?.contains(OENumberToCheck)){
+						def riCaseToUpdateQuantity = findCase( {it.processIdentifier.eq("repair_item")
+															.and(it.dataSet.get("OENumber").value.eq(OENumberToCheck))
+															.and(it.dataSet.get("repair_id").value.eq(target_repair_id.value))
+														} )
+						if(riCaseToUpdateQuantity == null)
+							return
+
+						riCaseToUpdateQuantity.dataSet.get("quantity").value = riCaseToUpdateQuantity.dataSet.get("quantity").value + transferingQuantity
+						workflowService.save(riCaseToUpdateQuantity)
+					}
+					// create RI
+					else {
+						def riCase = createCase("repair_item")
+						change created_ri_id value { riCase.stringId }
+
+						def createTask = assignTask("t_create", riCase)
+						setData(createTask, [
+							"OENumber" : ["type": "text", "value": wiCase.getFieldValue("OENumber") as String],
+							"manufacturer" : ["type": "text", "value": wiCase.getFieldValue("manufacturer") as String],
+							"title" : ["type": "text", "value": wiCase.getFieldValue("title") as String],
+							"description" : ["type": "text", "value": wiCase.getFieldValue("description") as String],
+							"nonVatPrice" : ["type": "number", "value": wiCase.getFieldValue("nonVatPrice") as String],
+							"vatPrice" : ["type": "number", "value": wiCase.getFieldValue("vatPrice") as String],
+							"unit" : ["type": "enumeration_map", "value": wiCase.getFieldValue("unit") as String],
+							"tax" : ["type": "number", "value": wiCase.getFieldValue("tax") as String],
+							"short_description" : ["type": "text", "value": wiCase.getFieldValue("short_description") as String],
+							"repair_id" : ["type": "text", "value": target_repair_id.value],
+							"quantity": ["type": "number", "value": transferingQuantity]
+						])
+						finishTask(createTask)
+
+						def newOENumber = new com.netgrif.application.engine.petrinet.domain.I18nString(wiCase.getFieldValue("OENumber"))
+						def newRiCaseId = new com.netgrif.application.engine.petrinet.domain.I18nString(riCase.stringId)
+
+						if(oeNumbersInRepair == [] || oeNumbersInRepair == null){
+							repairCase.dataSet.get("OENumbers").choices = [newOENumber]
+							repairCase.dataSet.get("repair_items").choices = [newRiCaseId]
+						}
+						else{
+							repairCase.dataSet.get("OENumbers").choices = oeNumbersInRepair + [newOENumber]
+							repairCase.dataSet.get("repair_items").choices = repairCase.dataSet.get("repair_items").choices + [newRiCaseId]
+						}
+						workflowService.save(repairCase)
+
+					}
+				</action>
+<!--				decrement quantity or remove item from warehouse if needed-->
+				<action>
+					quantity_to_transfer: f.quantity_to_transfer,
+					is_all_quantity: f.is_all_quantity,
+					created_ri_id: f.created_ri_id,
+					origin_wi_id: f.origin_wi_id,
+					origin_wh_id: f.origin_wh_id;
+
+					if(origin_wi_id.value == null)
+						return
+
+					if(is_all_quantity.value){
+						workflowService.deleteCase(origin_wi_id.value)
+						return
+					}
+
+					def wiCase = findCase( {it._id.eq(origin_wi_id.value)} )
+					if(wiCase == null)
+						return
+
+					wiCase.dataSet.get("quantity").value = wiCase.dataSet.get("quantity").value - quantity_to_transfer.value
+					workflowService.save(wiCase)
+				</action>
+			</actions>
+			<actions phase="post">
+				<action>
+					target_repair_id: f.target_repair_id;
+
+					if(target_repair_id.value == null)
+						return
+
+					def repairCase = findCase( {it._id.eq(target_repair_id.value)} )
+					if(repairCase == null)
+						return
+
+					async.run{
+						def succesfulyAddedTask = assignTask("t_item_added", repairCase)
+						finishTask(succesfulyAddedTask)
+					}
+				</action>
+			</actions>
+		</event>
+	</transition>
+	<!-- PLACES -->
+	<place>
+		<id>p0</id>
+		<x>60</x>
+		<y>140</y>
+		<label>uninitialized</label>
+		<tokens>1</tokens>
+		<static>false</static>
+	</place>
+	<place>
+		<id>p1</id>
+		<x>260</x>
+		<y>140</y>
+		<label>unfired</label>
+		<tokens>0</tokens>
+		<static>false</static>
+	</place>
+	<place>
+		<id>p2</id>
+		<x>500</x>
+		<y>140</y>
+		<label>fired</label>
+		<tokens>0</tokens>
+		<static>false</static>
+	</place>
+	<!-- ARCS -->
+	<arc>
+		<id>a0</id>
+		<type>regular</type>
+		<sourceId>p0</sourceId>
+		<destinationId>t_initialize</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a1</id>
+		<type>regular</type>
+		<sourceId>p1</sourceId>
+		<destinationId>t_do_wi_to_ri</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a2</id>
+		<type>regular</type>
+		<sourceId>t_do_wi_to_ri</sourceId>
+		<destinationId>p2</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a3</id>
+		<type>regular</type>
+		<sourceId>t_initialize</sourceId>
+		<destinationId>p1</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+</document>

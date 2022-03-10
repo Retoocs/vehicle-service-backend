@@ -1,0 +1,843 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://netgrif.github.io/petriflow/petriflow.schema.xsd">
+	<id>child_enum_addresses</id>
+	<initials>CEA</initials>
+	<title>Child enum addresses</title>
+	<defaultRole>true</defaultRole>
+	<transitionRole>false</transitionRole>
+	<!-- FUNCTIONS -->
+	<function scope="process" name="clear_selection">
+		{ cities, postal_code, filtered_streets, undefined_city,
+			undefined_street, is_undefined_city, is_undefined_street,
+			house_number, flag_city_no_action_trigger, flag_street_no_action_trigger,
+			target_id, trans ->
+
+			change postal_code value { null }
+			change cities value { null }
+			change filtered_streets value { null }
+			change filtered_streets options { [:] }
+			change undefined_city value { null }
+			change undefined_street value { null }
+			change flag_city_no_action_trigger value { true }
+			change is_undefined_city value { false }
+			change flag_street_no_action_trigger value { true }
+			change is_undefined_street value { false }
+			change target_id value { null }
+			change house_number value { null }
+
+			make filtered_streets, hidden on trans when { true }
+			make filtered_streets, optional on trans when { true }
+			make undefined_city,hidden on trans when { true }
+			make undefined_city,optional on trans when { true }
+			make undefined_street,hidden on trans when { true }
+			make undefined_street,optional on trans when { true }
+			make house_number,hidden on trans when { true }
+			make is_undefined_street,hidden on trans when { true }
+
+			make cities,editable on trans when { true }
+			make cities,required on trans when { true }
+		}
+	</function>
+	<!-- TRANSACTIONS -->
+	<!-- ROLES -->
+	<!-- PROCESS ROLE REFS -->
+	<!-- PROCESS USER REFS -->
+	<!-- DATA -->
+	<data type="text">
+		<id>postal_code</id>
+		<title name="postal_code">Postal code</title>
+		<desc name="postal_code_desc">Type here the postal code</desc>
+	</data>
+	<data type="boolean">
+		<id>is_undefined_city</id>
+		<title name="is_undefined_city">City not in list</title>
+		<init>false</init>
+	</data>
+	<data type="boolean">
+		<id>is_undefined_street</id>
+		<title name="is_undefined_street">City not in list</title>
+		<init>false</init>
+	</data>
+	<data type="boolean">
+		<id>flag_city_no_action_trigger</id>
+		<title>flag_city_no_action_trigger</title>
+		<init>false</init>
+	</data>
+	<data type="boolean">
+		<id>flag_street_no_action_trigger</id>
+		<title>flag_street_no_action_trigger</title>
+		<init>false</init>
+	</data>
+	<data type="text">
+		<id>undefined_city</id>
+		<title name="undefined_city">City</title>
+		<desc name="undefined_city_desc">Type here the city</desc>
+	</data>
+	<data type="text">
+		<id>undefined_street</id>
+		<title name="undefined_street">Street</title>
+		<desc name="undefined_street_desc">Type here the city</desc>
+	</data>
+	<data type="enumeration_map">
+		<id>cities</id>
+		<title name="cities">City</title>
+		<desc name="cities_desc">Select the city</desc>
+		<view> <autocomplete/> </view>
+	</data>
+	<data type="enumeration_map">
+		<id>system_streets</id>
+		<title>system_streets</title>
+	</data>
+	<data type="text">
+		<id>target_id</id>
+		<title>target_id</title>
+	</data>
+	<data type="text">
+		<id>house_number</id>
+		<title name="house_number">House number</title>
+		<desc name="house_number_desc">Type here the house number</desc>
+	</data>
+	<data type="enumeration_map">
+		<id>filtered_streets</id>
+		<title name="filtered_streets">Street</title>
+		<desc name="filtered_streets_desc">Select the street</desc>
+		<view> <autocomplete/> </view>
+	</data>
+	<data type="text">
+		<id>status</id>
+		<title name="status">Status</title>
+	</data>
+	<data type="number">
+		<id>requests_processed</id>
+		<title name="requests_processed">Requests processed</title>
+		<desc name="requests_processed_desc">Number of requests processed</desc>
+		<init>0</init>
+	</data>
+	<data type="dateTime">
+		<id>list_actualization_date_cities</id>
+		<title name="list_actualization_date_cities">Date of last change</title>
+		<desc name="list_actualization_date_cities_desc">Date when last change in list of cities has been made</desc>
+		<action trigger="get">
+			list_actualization_date_cities: f.list_actualization_date_cities;
+			//TODO: Groupid
+			//def mainCase = findCase( {it.processIdentifier.eq("main_enum_addresses")} );
+			//change list_actualization_date_cities value { mainCase?.dataSet.get("last_imported_file_cities")?.value; }
+		</action>
+	</data>
+	<data type="dateTime">
+		<id>list_actualization_date_streets</id>
+		<title name="list_actualization_date_streets">Date of last change</title>
+		<desc name="list_actualization_date_streets_desc">Date when last change in list of streets has been made</desc>
+		<action trigger="get">
+			list_actualization_date_streets: f.list_actualization_date_streets;
+			//TODO: Groupid
+			//def mainCase = findCase( {it.processIdentifier.eq("main_enum_addresses")} );
+			//change list_actualization_date_streets value { mainCase?.dataSet.get("last_imported_file_streets")?.value; }
+		</action>
+	</data>
+	<data type="dateTime">
+		<id>initialization_date</id>
+		<title name="initialization_date">Initialization date of instance</title>
+	</data>
+	<!-- I18NS -->
+	<i18n locale="sk">
+		<i18nString name="postal_code">PSČ</i18nString>
+		<i18nString name="postal_code_desc">Sem napíš PSČ</i18nString>
+		<i18nString name="is_undefined_city">Obec nie je v zozname</i18nString>
+		<i18nString name="is_undefined_street">Ulica nie je v zozname</i18nString>
+		<i18nString name="undefined_city">Obec</i18nString>
+		<i18nString name="undefined_city_desc">Sem napíš názov obce</i18nString>
+		<i18nString name="undefined_street">Ulica</i18nString>
+		<i18nString name="undefined_street_desc">Sem napíš názov ulice</i18nString>
+		<i18nString name="cities">Obec</i18nString>
+		<i18nString name="cities_desc">Vyber obec zo zoznamu</i18nString>
+		<i18nString name="house_number">Číslo domu</i18nString>
+		<i18nString name="house_number_desc">Sem napíš číslo domu</i18nString>
+		<i18nString name="filtered_streets">Ulica</i18nString>
+		<i18nString name="filtered_streets_desc">Vyber ulicu zo zoznamu</i18nString>
+		<i18nString name="t_status">Stav</i18nString>
+		<i18nString name="initialization_date">Dátum inicializácie inštancie</i18nString>
+		<i18nString name="list_actualization_date_cities">Dátum aktualizovania zoznamu</i18nString>
+		<i18nString name="list_actualization_date_cities_desc">Dátum aktualizovania zoznamu obcí</i18nString>
+		<i18nString name="list_actualization_date_streets">Dátum aktualizovania zoznamu</i18nString>
+		<i18nString name="list_actualization_date_streets_desc">Dátum aktualizovania zoznamu ulíc</i18nString>
+		<i18nString name="status">Stav</i18nString>
+		<i18nString name="requests_processed">Počet vykonaných operácií</i18nString>
+		<i18nString name="requests_processed_desc">Počet vykonaných operácií</i18nString>
+		<i18nString name="dg_address">Adresa</i18nString>
+	</i18n>
+	<i18n locale="de">
+		<i18nString name="postal_code">Postleitzahl</i18nString>
+		<i18nString name="postal_code_desc">Schreib die Postleitzahl hier</i18nString>
+		<i18nString name="is_undefined_city">Stadt ist nicht in der Liste</i18nString>
+		<i18nString name="is_undefined_street">Straße ist nicht in der Liste</i18nString>
+		<i18nString name="undefined_city">Stadt</i18nString>
+		<i18nString name="undefined_city_desc">Schreib die Stadt hier</i18nString>
+		<i18nString name="undefined_street">Straße</i18nString>
+		<i18nString name="undefined_street_desc">Schreib die Straße hier</i18nString>
+		<i18nString name="cities">Stadt</i18nString>
+		<i18nString name="cities_desc">Wählen eine Stadt aus der Liste</i18nString>
+		<i18nString name="house_number">Hausnummer</i18nString>
+		<i18nString name="house_number_desc">Schreib die Hausnummber hier</i18nString>
+		<i18nString name="filtered_streets">Straße</i18nString>
+		<i18nString name="filtered_streets_desc">Wähle eine Straße aus der Liste</i18nString>
+		<i18nString name="t_status">Status</i18nString>
+		<i18nString name="initialization_date">Datum der Instanzinitialisierung</i18nString>
+		<i18nString name="list_actualization_date_cities">Datum der Listenaktualisierung</i18nString>
+		<i18nString name="list_actualization_date_cities_desc">Datum der Aktualisierung der Städteliste</i18nString>
+		<i18nString name="list_actualization_date_streets">Datum der Listenaktualisierung</i18nString>
+		<i18nString name="list_actualization_date_streets_desc">Aktualisierungsdatum der Straßenliste</i18nString>
+		<i18nString name="status">Status</i18nString>
+		<i18nString name="requests_processed">Anzahl der durchgeführten Operationen</i18nString>
+		<i18nString name="requests_processed_desc">Anzahl der durchgeführten Operationen</i18nString>
+		<i18nString name="dg_address">Adresse</i18nString>
+	</i18n>
+	<!-- TRANSITIONS -->
+	<transition>
+		<id>t_status</id>
+		<x>300</x>
+		<y>380</y>
+		<layout>
+			<offset>0</offset>
+		</layout>
+		<label name="t_status">Check status</label>
+		<dataGroup>
+			<id>dg1</id>
+			<stretch>true</stretch>
+			<dataRef>
+				<id>requests_processed</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+			</dataRef>
+			<dataRef>
+				<id>status</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+			</dataRef>
+			<dataRef>
+				<id>initialization_date</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+			</dataRef>
+			<dataRef>
+				<id>list_actualization_date_cities</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+			</dataRef>
+			<dataRef>
+				<id>list_actualization_date_streets</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+			</dataRef>
+		</dataGroup>
+		<event type="cancel">
+			<title></title>
+		</event>
+		<event type="assign">
+			<title></title>
+		</event>
+		<event type="finish">
+			<title></title>
+		</event>
+		<event type="delegate">
+			<title></title>
+		</event>
+	</transition>
+	<transition>
+		<id>t_process_selection</id>
+		<x>740</x>
+		<y>380</y>
+		<layout>
+			<offset>0</offset>
+		</layout>
+		<label>Process the selection [auto]</label>
+		<trigger type="auto"/>
+		<event type="assign">
+			<id>0</id>
+			<actions phase="pre">
+				<action>
+					status: f.status;
+					change status value {"Processing in progress"; }
+				</action>
+			</actions>
+			<actions phase="post">
+				<action>
+					cities: f.cities,
+					filtered_streets: f.filtered_streets,
+					undefined_city: f.undefined_city,
+					undefined_street: f.undefined_street,
+					is_undefined_city: f.is_undefined_city,
+					is_undefined_street: f.is_undefined_street,
+					house_number: f.house_number,
+					postal_code: f.postal_code,
+					target_id: f.target_id;
+
+					if(target_id.value == null)
+						return
+
+					def targetCase = findCase( {it._id.eq(target_id.value)} )
+					if(targetCase == null)
+						return
+
+					String tmpCity, tmpStreet
+
+					if(is_undefined_city.value)
+						tmpCity = undefined_city.value
+					else
+						tmpCity = cities.options?.get(cities.value)?.defaultValue
+
+					if(is_undefined_street.value)
+						tmpStreet = undefined_street.value
+					else
+						tmpStreet = filtered_streets.options?.get(filtered_streets.value)?.defaultValue
+
+					setData("t_synchronize", targetCase, [
+						"postal_code": [
+							"value": postal_code.value,
+							"type" : "text"
+						],
+						"city": [
+							"value": tmpCity,
+							"type" : "text"
+						],
+						"street": [
+							"value": tmpStreet,
+							"type" : "text"
+						],
+						"house_number": [
+							"value": house_number.value,
+							"type" : "text"
+						],
+					])
+				</action>
+			</actions>
+		</event>
+		<event type="finish">
+			<id>1</id>
+			<actions phase="pre">
+				<action>
+					trans: t.t_select_address,
+					cities: f.cities,
+					postal_code: f.postal_code,
+					filtered_streets: f.filtered_streets,
+					undefined_city: f.undefined_city,
+					undefined_street: f.undefined_street,
+					is_undefined_city: f.is_undefined_city,
+					is_undefined_street: f.is_undefined_street,
+					house_number: f.house_number,
+					flag_city_no_action_trigger: f.flag_city_no_action_trigger,
+					flag_street_no_action_trigger: f.flag_street_no_action_trigger,
+					target_id: f.target_id;
+
+					clear_selection(
+						cities, postal_code, filtered_streets, undefined_city,
+						undefined_street, is_undefined_city, is_undefined_street, house_number,
+						flag_city_no_action_trigger, flag_street_no_action_trigger, target_id, trans
+					)
+				</action>
+			</actions>
+			<actions phase="post">
+				<action>
+					requests_processed: f.requests_processed;
+					change requests_processed value { requests_processed.value+1; }
+				</action>
+				<action>
+					status: f.status;
+					change status value { "Waiting to start selection"; }
+				</action>
+			</actions>
+		</event>
+	</transition>
+	<transition>
+		<id>t_select_address</id>
+		<x>940</x>
+		<y>180</y>
+		<layout>
+			<offset>0</offset>
+		</layout>
+		<label>Select address [await synch]</label>
+		<dataGroup>
+			<id>dg0</id>
+			<layout>grid</layout>
+			<title name="dg_address">Address</title>
+			<dataRef>
+				<id>postal_code</id>
+				<logic>
+					<behavior>editable</behavior>
+					<behavior>required</behavior>
+					<action trigger="set">
+						postal_code: f.this,
+						is_undefined_city: f.is_undefined_city,
+						cities: f.cities;
+
+						if(postal_code.value == null)
+							return
+
+						if(cities.value != postal_code.value &amp;&amp; is_undefined_city.value == false)
+							change cities value { postal_code.value }
+					</action>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>cities</id>
+				<logic>
+					<behavior>editable</behavior>
+					<behavior>required</behavior>
+					<action trigger="set">
+						thisTrans: t.t_select_address,
+						cities: f.this,
+						postal_code: f.postal_code,
+						is_undefined_street: f.is_undefined_street,
+						undefined_street: f.undefined_street,
+						house_number: f.house_number,
+						system_streets: f.system_streets,
+						filtered_streets: f.filtered_streets;
+
+						if(cities.value == null)
+							return
+
+						change filtered_streets value { "" }
+						change filtered_streets options { [:] }
+
+						// value must be exactly the key
+						if(cities.options?.containsKey(cities.value)){
+							make filtered_streets,editable on thisTrans when { true }
+							make filtered_streets,required on thisTrans when { true }
+							make is_undefined_street,editable on thisTrans when { true }
+							make house_number,editable on thisTrans when { true }
+
+							def selectedPostalCode = cities.value
+							def keysToFilter = system_streets.options.findAll{ it.key.contains(selectedPostalCode) }.collect{ it.key }
+							if(keysToFilter == null || keysToFilter == []){
+								change is_undefined_street value { true }
+								make is_undefined_street,visible on thisTrans when { true }
+							} else {
+								change filtered_streets options { system_streets.options?.subMap(keysToFilter) }
+							}
+
+							if(postal_code.value != cities.value)
+								change postal_code value { cities.value }
+						}
+						// value is not exactly the key
+						else{
+							make filtered_streets,hidden on thisTrans when { true }
+							make filtered_streets,optional on thisTrans when { true }
+							make is_undefined_street,hidden on thisTrans when { true }
+							make house_number,hidden on thisTrans when { true }
+
+							if(postal_code.value != cities.value)
+								change postal_code value { null }
+						}
+					</action>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>3</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>undefined_city</id>
+				<logic>
+					<behavior>hidden</behavior>
+					<behavior>optional</behavior>
+					<action trigger="set">
+						thisTrans: t.t_select_address,
+						undefined_city: f.undefined_city,
+						is_undefined_street: f.is_undefined_street,
+						undefined_street: f.undefined_street,
+						house_number: f.house_number;
+
+						if(undefined_city.value == null || undefined_city.value?.isEmpty()){
+							make undefined_street,hidden on thisTrans when { true }
+							make undefined_street,optional on thisTrans when { true }
+							make is_undefined_street,hidden on thisTrans when { true }
+							make house_number,hidden on thisTrans when { true }
+						}
+						else{
+							change undefined_street value { "" }
+							make undefined_street,editable on thisTrans when { true }
+							make undefined_street,required on thisTrans when { true }
+							make is_undefined_street,visible on thisTrans when { true }
+							make house_number,editable on thisTrans when { true }
+						}
+					</action>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>3</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>is_undefined_city</id>
+				<logic>
+					<behavior>editable</behavior>
+					<action trigger="set">
+						trans: t.t_select_address,
+						cities: f.cities,
+						filtered_streets: f.filtered_streets,
+						house_number: f.house_number,
+						undefined_city: f.undefined_city,
+						undefined_street: f.undefined_street,
+						is_undefined_street: f.is_undefined_street,
+						flag_street_no_action_trigger: f.flag_street_no_action_trigger,
+						flag_city_no_action_trigger: f.flag_city_no_action_trigger,
+						is_undefined_city: f.is_undefined_city;
+
+						if(flag_city_no_action_trigger.value){
+							change flag_city_no_action_trigger value { false }
+							return
+						}
+
+						if(is_undefined_city.value){
+							change cities value { null }
+							change undefined_street value { null }
+							change filtered_streets value { null }
+							change house_number value { null }
+
+							make cities,hidden on trans when { true }
+							make cities,optional on trans when { true }
+							make filtered_streets,hidden on trans when { true }
+							make filtered_streets,optional on trans when { true }
+							make undefined_street,hidden on trans when { true }
+							make undefined_street,optional on trans when { true }
+							make house_number,hidden on trans when { true }
+
+							make undefined_city,editable on trans when { true }
+							make undefined_city,required on trans when { true }
+
+							change flag_street_no_action_trigger value { true }
+							change is_undefined_street value { true }
+							make is_undefined_street,hidden on trans when { true }
+						}
+						else{
+							change undefined_city value { null }
+							change undefined_street value { null }
+							change filtered_streets value { null }
+							change house_number value { null }
+
+							make undefined_city,hidden on trans when { true }
+							make undefined_city,optional on trans when { true }
+							make undefined_street,hidden on trans when { true }
+							make undefined_street,optional on trans when { true }
+							make filtered_streets,hidden on trans when { true }
+							make filtered_streets,optional on trans when { true }
+							make house_number,hidden on trans when { true }
+
+							make cities,editable on trans when { true }
+							make cities,required on trans when { true }
+
+							change flag_street_no_action_trigger value { true }
+							change is_undefined_street value { false }
+							make is_undefined_street,hidden on trans when { true }
+						}
+					</action>
+				</logic>
+				<layout>
+					<x>3</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>filtered_streets</id>
+				<logic>
+					<behavior>hidden</behavior>
+					<behavior>optional</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>2</y>
+					<rows>1</rows>
+					<cols>3</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>undefined_street</id>
+				<logic>
+					<behavior>hidden</behavior>
+					<behavior>optional</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>2</y>
+					<rows>1</rows>
+					<cols>3</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>is_undefined_street</id>
+				<logic>
+					<behavior>hidden</behavior>
+					<action trigger="set">
+						trans: t.t_select_address,
+						filtered_streets: f.filtered_streets,
+						house_number: f.house_number,
+						undefined_street: f.undefined_street,
+						is_undefined_city: f.is_undefined_city,
+						flag_street_no_action_trigger: f.flag_street_no_action_trigger,
+						is_undefined_street: f.is_undefined_street;
+
+						if(flag_street_no_action_trigger.value){
+							change flag_street_no_action_trigger value { false }
+							return
+						}
+
+						if(is_undefined_street.value){
+							change filtered_streets value { null }
+
+							make filtered_streets,hidden on trans when { true }
+							make filtered_streets,optional on trans when { true }
+
+							make undefined_street,editable on trans when { true }
+							make undefined_street,required on trans when { true }
+						}
+						else{
+							change undefined_street value { null }
+
+							make undefined_street,hidden on trans when { true }
+							make undefined_street,optional on trans when { true }
+
+							make filtered_streets,editable on trans when { true }
+							make filtered_streets,required on trans when { true }
+						}
+					</action>
+				</logic>
+				<layout>
+					<x>3</x>
+					<y>2</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>house_number</id>
+				<logic>
+					<behavior>hidden</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>3</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
+		<event type="cancel">
+			<id>0</id>
+			<actions phase="post">
+				<action>
+					trans: t.t_select_address,
+					cities: f.cities,
+					postal_code: f.postal_code,
+					filtered_streets: f.filtered_streets,
+					undefined_city: f.undefined_city,
+					undefined_street: f.undefined_street,
+					is_undefined_city: f.is_undefined_city,
+					is_undefined_street: f.is_undefined_street,
+					house_number: f.house_number,
+					flag_city_no_action_trigger: f.flag_city_no_action_trigger,
+					flag_street_no_action_trigger: f.flag_street_no_action_trigger,
+					target_id: f.target_id;
+
+					clear_selection(
+						cities, postal_code, filtered_streets, undefined_city,
+						undefined_street, is_undefined_city, is_undefined_street, house_number,
+						flag_city_no_action_trigger, flag_street_no_action_trigger, target_id, trans
+					)
+				</action>
+			</actions>
+		</event>
+		<event type="assign">
+			<id>1</id>
+			<actions phase="pre">
+				<action>
+					status: f.status;
+					change status value {"Selection in progress"; }
+				</action>
+			</actions>
+		</event>
+		<event type="finish">
+			<id>2</id>
+			<actions phase="post">
+				<action>
+					status: f.status;
+					change status value { "Address selected"; }
+				</action>
+			</actions>
+		</event>
+	</transition>
+	<transition>
+		<id>t_init</id>
+		<x>500</x>
+		<y>180</y>
+		<layout>
+			<offset>0</offset>
+		</layout>
+		<label>Initialize [auto]</label>
+		<trigger type="auto"/>
+		<event type="finish">
+			<id>0</id>
+			<actions phase="pre">
+				<action>
+					cities: f.cities,
+					system_streets: f.system_streets;
+
+					def mainCase = findCase( {it.processIdentifier.eq("main_enum_addresses")} )
+
+					if(mainCase == null)
+						return
+
+					change cities options { mainCase.getField("system_cities").options }
+					change system_streets options { mainCase.getField("system_streets").options }
+				</action>
+			</actions>
+			<actions phase="post">
+				<action>
+					initialization_date: f.initialization_date,
+					status: f.status;
+
+					change initialization_date value {  java.time.LocalDateTime.now();}
+					change status value { "Created"; }
+				</action>
+			</actions>
+		</event>
+		<event type="assign">
+			<id>t_init_assign</id>
+			<actions phase="post">
+				<action>
+					changeCaseProperty "title" about { return useCase.author.getFullName() + " - Address enumeration"; }
+				</action>
+			</actions>
+		</event>
+	</transition>
+	<!-- PLACES -->
+	<place>
+		<id>p5</id>
+		<x>500</x>
+		<y>380</y>
+		<label>created</label>
+		<tokens>0</tokens>
+		<static>false</static>
+	</place>
+	<place>
+		<id>p3</id>
+		<x>940</x>
+		<y>380</y>
+		<label>address selected</label>
+		<tokens>0</tokens>
+		<static>false</static>
+	</place>
+	<place>
+		<id>p2</id>
+		<x>740</x>
+		<y>180</y>
+		<label>initialized</label>
+		<tokens>0</tokens>
+		<static>false</static>
+	</place>
+	<place>
+		<id>p1</id>
+		<x>300</x>
+		<y>180</y>
+		<label>uninitialized</label>
+		<tokens>1</tokens>
+		<static>false</static>
+	</place>
+	<!-- ARCS -->
+	<arc>
+		<id>a1</id>
+		<type>regular</type>
+		<sourceId>p1</sourceId>
+		<destinationId>t_init</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a2</id>
+		<type>regular</type>
+		<sourceId>t_init</sourceId>
+		<destinationId>p2</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a3</id>
+		<type>regular</type>
+		<sourceId>p2</sourceId>
+		<destinationId>t_select_address</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a4</id>
+		<type>regular</type>
+		<sourceId>t_select_address</sourceId>
+		<destinationId>p3</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a5</id>
+		<type>regular</type>
+		<sourceId>p3</sourceId>
+		<destinationId>t_process_selection</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a6</id>
+		<type>regular</type>
+		<sourceId>t_process_selection</sourceId>
+		<destinationId>p2</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a8</id>
+		<type>regular</type>
+		<sourceId>t_init</sourceId>
+		<destinationId>p5</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a11</id>
+		<type>read</type>
+		<sourceId>p5</sourceId>
+		<destinationId>t_status</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+</document>
