@@ -47,7 +47,6 @@
 		<init>0</init>
 		<action trigger="get">
 			child_enumeration: f.child_enumeration;
-			// TODO: groupid
 			def cases = findCases( {it.processIdentifier.eq("child_enum_addresses")} )
 			change child_enumeration value { return cases?.size(); }
 		</action>
@@ -64,6 +63,15 @@
 		<id>last_imported_file</id>
 		<title name="last_imported_file">Date of last change</title>
 		<desc name="last_imported_file_desc">Date when last import has been made</desc>
+	</data>
+	<data type="multichoice_map">
+		<id>system_child_enums</id>
+		<title>System Child Enums</title>
+	</data>
+	<data type="boolean">
+		<id>check_all</id>
+		<title>Check all</title>
+		<init>false</init>
 	</data>
 	<!-- I18NS -->
 	<i18n locale="sk">
@@ -155,7 +163,7 @@
 				<action>
 					system_cities: f.system_cities,
 					system_streets: f.system_streets;
-					// todo: change group id
+
 					def childEnums = findCases( {it.processIdentifier.eq("child_enum_addresses")} )
 					if(childEnums == null)
 						return
@@ -218,19 +226,19 @@
 		<event type="assign">
 			<id>t_init_assign</id>
 			<actions phase="post">
-			<action>
-				changeCaseProperty "title" about { "Addresses enumeration – importing data" }
-			</action>
+				<action>
+					changeCaseProperty "title" about { "Addresses enumeration – importing data" }
+				</action>
 			</actions>
 		</event>
 		<event type="finish">
 			<id>t_init_finish</id>
 			<actions phase="post">
 				<action>initialization_date: f.initialization_date,
-				status: f.status;
+					status: f.status;
 
-				change initialization_date value {  java.time.LocalDateTime.now();}
-				change status value { "Created"; }
+					change initialization_date value {  java.time.LocalDateTime.now();}
+					change status value { "Created"; }
 				</action>
 			</actions>
 		</event>
@@ -260,7 +268,7 @@
 			<dataRef>
 				<id>import_file_streets</id>
 				<logic>
-					<behavior>editable</behavior>					
+					<behavior>editable</behavior>
 				</logic>
 			</dataRef>
 		</dataGroup>
@@ -280,6 +288,153 @@
 				<action>
 					status: f.status;
 					change status value { "File is imported"; }
+				</action>
+			</actions>
+		</event>
+	</transition>
+	<transition>
+		<id>t_redistribute_data</id>
+		<x>580</x>
+		<y>300</y>
+		<layout>
+			<offset>0</offset>
+		</layout>
+		<label>Redistribute_data</label>
+		<assignPolicy>auto</assignPolicy>
+		<dataGroup>
+			<id>DataGroup</id>
+			<layout>grid</layout>
+			<dataRef>
+				<id>system_child_enums</id>
+				<logic>
+					<behavior>editable</behavior>
+					<action trigger="set">
+						system_child_enums: f.system_child_enums,check_all: f.check_all;
+
+						if(system_child_enums.value.size() != system_child_enums.options.size() &amp;&amp; check_all.value)
+							change check_all value { false }
+						else if(system_child_enums.value.size() == system_child_enums.options.size() &amp;&amp; !check_all.value)
+							change check_all value { true }
+					</action>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>3</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>check_all</id>
+				<logic>
+					<behavior>editable</behavior>
+					<action trigger="get">thisTrans: t.t_redistribute_data,
+						system_child_enums: f.system_child_enums;
+						make system_child_enums,visible on thisTrans when { system_child_enums.options == null || system_child_enums.options == [:] }
+					</action>
+					<action trigger="set">
+						system_child_enums: f.system_child_enums,
+						check_all: f.check_all;
+
+						if(check_all.value)
+							change system_child_enums value { system_child_enums.options.collect{ it.key } }
+						else if(system_child_enums.value.size() == system_child_enums.options.size())
+							change system_child_enums value { [] }
+					</action>
+				</logic>
+				<layout>
+					<x>3</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance></appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
+		<event type="assign">
+			<id>redistribute_data_assign</id>
+			<actions phase="pre">
+				<action>
+					system_child_enums: f.system_child_enums,
+					system_cities: f.system_cities,
+					system_streets: f.system_streets;
+
+					def childCases = findCases( {it.processIdentifier.eq("child_enum_addresses")} )
+					if(childCases == null)
+						return
+					def tmpMap = [:]
+
+					change system_child_enums value { null }
+					change system_child_enums options { [] }
+
+					for(childCase in childCases){
+						tmpMap = tmpMap + [ (childCase.stringId) : childCase.title ]
+					}
+					change system_child_enums options { tmpMap }
+
+				</action>
+			</actions>
+		</event>
+		<event type="cancel">
+			<id>redistribute_data_cancel</id>
+			<actions phase="post">
+				<action>
+					check_all: f.check_all,
+					system_child_enums: f.system_child_enums;
+
+					change system_child_enums value { null }
+					change system_child_enums options { [] }
+					change check_all value { false }
+				</action>
+			</actions>
+		</event>
+	</transition>
+	<transition>
+		<id>t_process_selection</id>
+		<x>740</x>
+		<y>300</y>
+		<layout>
+			<offset>0</offset>
+		</layout>
+		<label>Process_the_selection [auto]</label>
+		<trigger type="auto"/>
+		<event type="assign">
+			<id>t_process_selection_assign</id>
+			<actions phase="post">
+				<action>
+					system_cities: f.system_cities,
+					system_streets: f.system_streets,
+					system_child_enums: f.system_child_enums;
+
+					for ( child in system_child_enums.value ) {
+						def childCase = findCase( {it._id.eq(child)} );
+
+						if(childCase == null)
+							continue
+
+						childCase.dataSet.get("system_streets").options = system_streets.options
+						childCase.dataSet.get("cities").options = system_cities.options
+
+						workflowService.save(childCase)
+					}
+				</action>
+			</actions>
+		</event>
+		<event type="finish">
+			<id>t_process_selection_finish</id>
+			<actions phase="post">
+				<action>
+					check_all: f.check_all,
+					system_child_enums: f.system_child_enums;
+
+					change system_child_enums value { null }
+					change system_child_enums options { [] }
+					change check_all value { false }
 				</action>
 			</actions>
 		</event>
@@ -323,6 +478,14 @@
 		<y>420</y>
 		<label>uninitialized</label>
 		<tokens>1</tokens>
+		<static>false</static>
+	</place>
+	<place>
+		<id>p7</id>
+		<x>660</x>
+		<y>220</y>
+		<label></label>
+		<tokens>0</tokens>
 		<static>false</static>
 	</place>
 	<!-- ARCS -->
@@ -394,6 +557,34 @@
 		<type>regular</type>
 		<sourceId>t_import</sourceId>
 		<destinationId>p3</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a24</id>
+		<type>regular</type>
+		<sourceId>p2</sourceId>
+		<destinationId>t_redistribute_data</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a25</id>
+		<type>regular</type>
+		<sourceId>t_redistribute_data</sourceId>
+		<destinationId>p7</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a26</id>
+		<type>regular</type>
+		<sourceId>p7</sourceId>
+		<destinationId>t_process_selection</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a27</id>
+		<type>regular</type>
+		<sourceId>t_process_selection</sourceId>
+		<destinationId>p2</destinationId>
 		<multiplicity>1</multiplicity>
 	</arc>
 </document>
