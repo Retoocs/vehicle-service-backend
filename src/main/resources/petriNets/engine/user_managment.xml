@@ -1,0 +1,133 @@
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://netgrif.github.io/petriflow/petriflow.schema.xsd">
+	<id>user_managment</id>
+	<initials>UM</initials>
+	<title>User Managment</title>
+	<icon>device_hub</icon>
+	<defaultRole>true</defaultRole>
+	<anonymousRole>false</anonymousRole>
+	<transitionRole>false</transitionRole>
+	<role>
+		<id>admin</id>
+		<title>System</title>
+	</role>
+	<data type="text">
+		<id>reg_invite_email</id>
+		<title name="reg_invite_email">An email to send registration invite</title>
+	</data>
+	<transition>
+		<id>t_add_user</id>
+		<x>260</x>
+		<y>60</y>
+		<label>Add user</label>
+		<roleRef>
+			<id>admin</id>
+			<logic>
+				<perform>true</perform>
+			</logic>
+		</roleRef>
+		<dataGroup>
+			<id>dg0</id>
+			<stretch>true</stretch>
+			<dataRef>
+				<id>reg_invite_email</id>
+				<logic>
+					<behavior>editable</behavior>
+					<behavior>required</behavior>
+				</logic>
+			</dataRef>
+		</dataGroup>
+		<event type="finish">
+			<id>0</id>
+			<actions phase="post">
+<!--				todo-->
+<!--				<action>-->
+<!--					reg_invite_email: f.reg_invite_email;-->
+
+<!--					inviteUserForRegistration(reg_invite_email.value)-->
+<!--				</action>-->
+			</actions>
+		</event>
+	</transition>
+	<transition>
+		<id>t3</id>
+		<x>420</x>
+		<y>220</y>
+		<label>Remove user</label>
+	</transition>
+	<transition>
+		<id>t4</id>
+		<x>260</x>
+		<y>380</y>
+		<label>Users info</label>
+	</transition>
+	<transition>
+		<id>t5</id>
+		<x>100</x>
+		<y>220</y>
+		<label>Manage roles</label>
+	</transition>
+	<place>
+		<id>p1</id>
+		<x>260</x>
+		<y>220</y>
+		<label>ready</label>
+		<tokens>1</tokens>
+		<static>false</static>
+	</place>
+	<arc>
+		<id>a2</id>
+		<type>regular</type>
+		<sourceId>p1</sourceId>
+		<destinationId>t_add_user</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a3</id>
+		<type>regular</type>
+		<sourceId>t_add_user</sourceId>
+		<destinationId>p1</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a4</id>
+		<type>regular</type>
+		<sourceId>p1</sourceId>
+		<destinationId>t3</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a5</id>
+		<type>regular</type>
+		<sourceId>t3</sourceId>
+		<destinationId>p1</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a6</id>
+		<type>regular</type>
+		<sourceId>p1</sourceId>
+		<destinationId>t4</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a7</id>
+		<type>regular</type>
+		<sourceId>t4</sourceId>
+		<destinationId>p1</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a10</id>
+		<type>regular</type>
+		<sourceId>p1</sourceId>
+		<destinationId>t5</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a11</id>
+		<type>regular</type>
+		<sourceId>t5</sourceId>
+		<destinationId>p1</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+</document>
