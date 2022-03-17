@@ -6,6 +6,10 @@
 	<defaultRole>true</defaultRole>
 	<anonymousRole>false</anonymousRole>
 	<transitionRole>false</transitionRole>
+	<role>
+		<id>admin</id>
+		<title>System</title>
+	</role>
 	<data type="text">
 		<id>reg_invite_email</id>
 		<title name="reg_invite_email">An email to send registration invite</title>
@@ -15,6 +19,12 @@
 		<x>260</x>
 		<y>60</y>
 		<label>Add user</label>
+		<roleRef>
+			<id>admin</id>
+			<logic>
+				<perform>true</perform>
+			</logic>
+		</roleRef>
 		<dataGroup>
 			<id>dg0</id>
 			<stretch>true</stretch>
@@ -29,11 +39,12 @@
 		<event type="finish">
 			<id>0</id>
 			<actions phase="post">
-				<action>
-					reg_invite_email: f.reg_invite_email;
+<!--				todo-->
+<!--				<action>-->
+<!--					reg_invite_email: f.reg_invite_email;-->
 
-					inviteUserForRegistration(reg_invite_email.value)
-				</action>
+<!--					inviteUserForRegistration(reg_invite_email.value)-->
+<!--				</action>-->
 			</actions>
 		</event>
 	</transition>

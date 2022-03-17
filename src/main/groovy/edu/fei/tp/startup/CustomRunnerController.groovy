@@ -29,9 +29,10 @@ class CustomRunnerController extends RunnerController {
             NetImportRunner,
             CaseImportRunner,
             CsvImportRunner,
-            VSFinisherRunner,
+            UserRunner,
             // END OF ADDITIONAL CUSTOM RUNNERS
             FinisherRunner,
+            VSFinisherRunner,
     ]
 
     @Override

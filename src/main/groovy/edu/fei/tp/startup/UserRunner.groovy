@@ -1,0 +1,82 @@
+package edu.fei.tp.startup
+
+import com.netgrif.application.engine.auth.domain.Authority
+import com.netgrif.application.engine.auth.domain.User
+import com.netgrif.application.engine.auth.domain.UserState
+import com.netgrif.application.engine.auth.service.interfaces.IAuthorityService
+import com.netgrif.application.engine.auth.service.interfaces.IUserService
+import com.netgrif.application.engine.startup.AbstractOrderedCommandLineRunner
+import edu.fei.tp.helpers.NetEnum
+import edu.fei.tp.helpers.VSUserManagmentHelper
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Value
+import org.springframework.stereotype.Component
+
+@Component
+class UserRunner extends AbstractOrderedCommandLineRunner{
+
+    public static final Logger log = LoggerFactory.getLogger(UserRunner.class)
+
+    @Autowired
+    private IUserService userService
+
+    @Autowired
+    private IAuthorityService authorityService
+
+    @Autowired
+    private VSUserManagmentHelper userManagmentHelper
+
+    @Value("\${timak.user.email}")
+    private String timakEmail
+    @Value("\${timak.user.firstname}")
+    private String timakFirstname
+    @Value("\${timak.user.lastname}")
+    private String timakLastname
+    @Value("\${timak.user.password}")
+    private String timakPassword
+    private Map<String, List<String>> timakRoleMapping = [
+            (NetEnum.CEA.netIdentifier): [],
+            (NetEnum.CEV.netIdentifier): [],
+            (NetEnum.MEA.netIdentifier): [],
+            (NetEnum.MEV.netIdentifier): [],
+            (NetEnum.RTW.netIdentifier): [],
+            (NetEnum.WTR.netIdentifier): [],
+            (NetEnum.CUS.netIdentifier): [],
+            (NetEnum.NTF.netIdentifier): [],
+            (NetEnum.RPR.netIdentifier): [],
+            (NetEnum.RI.netIdentifier): [],
+            (NetEnum.VEH.netIdentifier): [],
+            (NetEnum.WH.netIdentifier): [],
+            (NetEnum.WI.netIdentifier): [],
+            (NetEnum.UM.netIdentifier): ["admin"]
+    ]
+
+
+    @Override
+    void run(String... strings) throws Exception {
+        createTimakUser()
+    }
+
+    private void createTimakUser(){
+        log.info("Creating Timak Projekt user...")
+
+        Authority adminAuthority = authorityService.getOrCreate(Authority.admin)
+
+        User user = new User()
+        user.setEmail(this.timakEmail)
+        user.setName(this.timakFirstname)
+        user.setSurname(this.timakLastname)
+        user.setPassword(this.timakPassword)
+        user.setState(UserState.ACTIVE)
+        user.setAuthorities([adminAuthority] as Set<Authority>)
+        user = userManagmentHelper.addProcessRolesToUser(this.timakRoleMapping, user)
+
+        userService.saveNew(user)
+        log.info("Created Timak Projekt user")
+    }
+
+
+
+}

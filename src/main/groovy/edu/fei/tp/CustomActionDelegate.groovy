@@ -11,19 +11,4 @@ import javax.mail.MessagingException
 
 @Component
 class CustomActionDelegate extends ActionDelegate {
-    void inviteUserForRegistration(String inviteMail){
-        log.info("Inviting new user to group.");
-        NewUserRequest newUserRequest = new NewUserRequest();
-        newUserRequest.email = inviteMail;
-        RegisteredUser regUser = registrationService.createNewUser(newUserRequest);
-        userService.save(regUser);
-
-        try {
-            mailService.sendRegistrationEmail(regUser);
-            mailAttemptService.mailAttempt(newUserRequest.email);
-        } catch (MessagingException | IOException | TemplateException e) {
-            log.error(e.getMessage());
-        }
-
-    }
 }
