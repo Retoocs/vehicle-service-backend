@@ -15,7 +15,8 @@ enum NetEnum {
     RI("repair_item.xml", "repair_item", "Repair Item", "RI"),
     VEH("vehicle.xml", "vehicle", "Vehicle", "VEH"),
     WH("warehouse.xml", "warehouse", "Warehouse", "WH"),
-    WI("warehouse_item.xml", "warehouse_item", "Warehouse Item", "WI")
+    WI("warehouse_item.xml", "warehouse_item", "Warehouse Item", "WI"),
+    UM("user_managment.xml", "user_managment", "User Managment", "UM")
 
     public static final String HELPERS_FOLDER = "helpers/"
 
