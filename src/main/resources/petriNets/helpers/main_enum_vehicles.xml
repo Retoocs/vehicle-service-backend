@@ -17,38 +17,10 @@
 	<data type="enumeration_map">
 		<id>system_manufacturers</id>
 		<title>system_manufacturers</title>
-		<options>
-<!--			<option key="skoda">Škoda</option>-->
-<!--			<option key="vw">Volkswagen</option>-->
-<!--			<option key="audi">Audi</option>-->
-<!--			<option key="seat">Seat</option>-->
-<!--			<option key="bmw">BMW</option>-->
-<!--			<option key="mercedes">Mercedes</option>-->
-		</options>
 	</data>
 	<data type="enumeration_map">
 		<id>system_models</id>
 		<title>system_models</title>
-		<options>
-<!--			<option key="skoda-oktavia">Oktavia</option>-->
-<!--			<option key="skoda-rapid">Rapid</option>-->
-<!--			<option key="skoda-superb">Superb</option>-->
-<!--			<option key="vw-golf">Golf</option>-->
-<!--			<option key="vw-passat">Passat</option>-->
-<!--			<option key="vw-polo">Polo</option>-->
-<!--			<option key="audi-a3">A3</option>-->
-<!--			<option key="audi-a4">A4</option>-->
-<!--			<option key="audi-a6">A6</option>-->
-<!--			<option key="seat-altea">Altea</option>-->
-<!--			<option key="seat-alhambra">Alhambra</option>-->
-<!--			<option key="seat-ibiza">Ibiza</option>-->
-<!--			<option key="bmw-3">rad 3</option>-->
-<!--			<option key="bmw-5">rad 5</option>-->
-<!--			<option key="bmw-7">rad 7</option>-->
-<!--			<option key="mercedes-c">trieda C</option>-->
-<!--			<option key="mercedes-e">trieda E</option>-->
-<!--			<option key="mercedes-s">trieda S</option>-->
-		</options>
 	</data>
 	<data type="text">
 		<id>status</id>
