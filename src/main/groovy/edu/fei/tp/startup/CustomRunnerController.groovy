@@ -25,11 +25,11 @@ class CustomRunnerController extends RunnerController {
             QuartzSchedulerRunner,
             PdfRunner,
             FinisherRunnerSuperCreator,
-            // ADDITIONAL CUSTOM RUNNERS
+            // ADDITIONAL CUSTOM RUNNERS - keep order
             NetImportRunner,
+            UserRunner,
             CaseImportRunner,
             CsvImportRunner,
-            UserRunner,
             // END OF ADDITIONAL CUSTOM RUNNERS
             FinisherRunner,
             VSFinisherRunner,
