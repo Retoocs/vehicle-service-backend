@@ -8,6 +8,25 @@
 	<anonymousRole>false</anonymousRole>
 	<transitionRole>false</transitionRole>
 	<caseName name="default_case_name">Repair item</caseName>
+	<caseEvents>
+		<event type="delete">
+			<id>case_delete</id>
+			<actions phase="pre">
+				<action>
+					OENumber: f.OENumber,
+					repair_id: f.repair_id;
+
+					def x = findCase({it._id.eq(repair_id.value)})
+					if(x == null)
+						return
+
+					x.dataSet.get("repair_items").choices = x.dataSet.get("repair_items").choices - useCase.stringId
+					x.dataSet.get("OENumbers").choices = x.dataSet.get("OENumbers").choices - OENumber.value
+					workflowService.save(x)
+				</action>
+			</actions>
+		</event>
+	</caseEvents>
 	<!-- TRANSACTIONS -->
 	<!-- ROLES -->
 	<role>
@@ -44,16 +63,16 @@
 			nonVatPrice: f.nonVatPrice;
 
 			if (nonVatPrice.value) {
-			if (nonVatPrice.value &lt; 0) {
-			change nonVatPrice value { return 0; }
-			return;
-			}
-			def val = nonVatPrice.value + (nonVatPrice.value * (tax.value/100)).round(2);
-			if (!vatPrice.value) {
-			change vatPrice value { return val; }
-			} else if (vatPrice.value != val) {
-			change vatPrice value { return val; }
-			}
+				if (nonVatPrice.value &lt; 0) {
+					change nonVatPrice value { return 0; }
+					return;
+				}
+				def val = nonVatPrice.value + (nonVatPrice.value * (tax.value/100)).round(2);
+				if (!vatPrice.value) {
+					change vatPrice value { return val; }
+				} else if (vatPrice.value != val) {
+					change vatPrice value { return val; }
+				}
 			}
 		</action>
 	</data>
@@ -67,16 +86,16 @@
 			nonVatPrice: f.nonVatPrice;
 
 			if (vatPrice.value) {
-			if (vatPrice.value &lt; 0) {
-			change vatPrice value { return 0; }
-			return;
-			}
-			def val = (vatPrice.value / (tax.value/100 + 1)).round(2);
-			if (!nonVatPrice.value) {
-			change nonVatPrice value { return val; }
-			} else if (nonVatPrice.value != val) {
-			change nonVatPrice value { return val; }
-			}
+				if (vatPrice.value &lt; 0) {
+					change vatPrice value { return 0; }
+					return;
+				}
+				def val = (vatPrice.value / (tax.value/100 + 1)).round(2);
+				if (!nonVatPrice.value) {
+					change nonVatPrice value { return val; }
+				} else if (nonVatPrice.value != val) {
+					change nonVatPrice value { return val; }
+				}
 			}
 		</action>
 	</data>
@@ -90,6 +109,17 @@
 				<message name="quantity_valid1">Must be greater or even than 0</message>
 			</validation>
 		</validations>
+	</data>
+	<data type="number">
+		<id>quantity_transfer_to_warehouse</id>
+		<title name="quantity_transfer_to_warehouse">Quantity to transfer</title>
+		<validations>
+			<validation>
+				<expression>inrange 1,9999999999999</expression>
+				<message name="quantity_transfer_to_warehouse_valid1">Must be greater or even than 1</message>
+			</validation>
+		</validations>
+		<init>1</init>
 	</data>
 	<data type="enumeration_map">
 		<id>unit</id>
@@ -128,16 +158,16 @@
 			nonVatPrice: f.nonVatPrice;
 
 			if (tax.value) {
-			if(tax.value &lt;= 0) {
-			change tax value { return 0; }
-			}
-			if (nonVatPrice.value &amp;&amp; !vatPrice.value) {
-			change vatPrice value { return (nonVatPrice.value + (nonVatPrice.value * (tax.value/100))).round(2); }
-			} else if (!nonVatPrice.value &amp;&amp; vatPrice.value) {
-			change nonVatPrice value { return (vatPrice.value / (tax.value/100 + 1)); }
-			} else if (nonVatPrice.value &amp;&amp; vatPrice.value) {
-			change vatPrice value { return (nonVatPrice.value + (nonVatPrice.value * (tax.value/100))).round(2); }
-			}
+				if(tax.value &lt;= 0) {
+					change tax value { return 0; }
+				}
+				if (nonVatPrice.value &amp;&amp; !vatPrice.value) {
+					change vatPrice value { return (nonVatPrice.value + (nonVatPrice.value * (tax.value/100))).round(2); }
+				} else if (!nonVatPrice.value &amp;&amp; vatPrice.value) {
+					change nonVatPrice value { return (vatPrice.value / (tax.value/100 + 1)); }
+				} else if (nonVatPrice.value &amp;&amp; vatPrice.value) {
+					change vatPrice value { return (nonVatPrice.value + (nonVatPrice.value * (tax.value/100))).round(2); }
+				}
 			}
 		</action>
 	</data>
@@ -150,6 +180,10 @@
 		<id>short_description</id>
 		<title name="short_description">Description</title>
 		<view> <htmlEditor/> </view>
+	</data>
+	<data type="text">
+		<id>repair_id</id>
+		<title>repair_id</title>
 	</data>
 	<!-- I18NS -->
 	<i18n locale="sk">
@@ -231,7 +265,7 @@
 					change status value { return "created"; }
 
 					changeCaseProperty "title" about {
-					return OENumber.value + " - " + title.value;
+						return OENumber.value + " - " + title.value;
 					}
 				</action>
 			</actions>
@@ -241,7 +275,7 @@
 			<actions phase="post">
 				<action>
 					async.run{
-					workflowService.deleteCase(useCase.stringId)
+						workflowService.deleteCase(useCase.stringId)
 					}
 				</action>
 			</actions>
@@ -266,7 +300,7 @@
 			<actions phase="post">
 				<action>
 					async.run{
-					workflowService.deleteCase(useCase.stringId);
+						workflowService.deleteCase(useCase.stringId);
 					}
 				</action>
 			</actions>
@@ -297,7 +331,7 @@
 					OENumber: f.OENumber;
 
 					changeCaseProperty "title" about {
-					return OENumber.value + " - " + title.value;
+						return OENumber.value + " - " + title.value;
 					}
 				</action>
 			</actions>
@@ -571,6 +605,79 @@
 			</dataRef>
 			<dataRef>
 				<id>quantity</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>3</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
+	</transition>
+	<transition>
+		<id>t_removal_short_description</id>
+		<x>1060</x>
+		<y>260</y>
+		<layout>
+			<offset>0</offset>
+		</layout>
+		<label>t_removal_short_description</label>
+		<dataGroup>
+			<id>dg0</id>
+			<layout>grid</layout>
+			<dataRef>
+				<id>OENumber</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>manufacturer</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>1</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>title</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>2</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>quantity_transfer_to_warehouse</id>
 				<logic>
 					<behavior>editable</behavior>
 				</logic>
