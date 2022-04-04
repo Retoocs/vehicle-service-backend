@@ -34,6 +34,19 @@
 		<title>System</title>
 	</role>
 	<!-- PROCESS ROLE REFS -->
+	<roleRef>
+		<id>default</id>
+		<caseLogic>
+			<view>true</view>
+		</caseLogic>
+	</roleRef>
+	<roleRef>
+		<id>system</id>
+		<caseLogic>
+			<create>true</create>
+			<delete>true</delete>
+		</caseLogic>
+	</roleRef>
 	<!-- PROCESS USER REFS -->
 	<!-- DATA -->
 	<data type="text">
