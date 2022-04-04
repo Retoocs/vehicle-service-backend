@@ -166,7 +166,6 @@
 		<event type="finish">
 			<id>0</id>
 			<actions phase="pre">
-				<!--				todo change group name-->
 				<action>
                     manufacturers: f.manufacturers,
                     system_models: f.system_models;
@@ -176,8 +175,8 @@
                     if(mainCase == null)
                         return
 
-                    change manufacturers options { mainCase.getField("system_manufacturers").options }
-                    change system_models options { mainCase.getField("system_models").options }
+                    change manufacturers options { mainCase.dataSet['system_manufacturers'].options }
+                    change system_models options { mainCase.dataSet['system_models'].options }
 				</action>
 			</actions>
 			<actions phase="post">
