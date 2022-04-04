@@ -70,7 +70,6 @@
 		<init>0</init>
 		<action trigger="get">
 			child_enumeration: f.child_enumeration;
-			// TODO: groupid
 			def cases = findCases( {it.processIdentifier.eq("child_enum_vehicles")} )
 			change child_enumeration value { return cases?.size(); }
 		</action>
@@ -167,6 +166,7 @@ change check_all value { false }
 				<action>
 					status: f.status,
 					initialization_date: f.initialization_date;
+
 					change initialization_date value {java.time.LocalDateTime.now(); }
 					change status value { "Created"; }
 				</action>
@@ -176,11 +176,13 @@ change check_all value { false }
 			<id>t_init_assign</id>
 			<actions phase="post">
 				<action>
+					changeCaseProperty "title" about { "Vehicle enumeration - importing data" }
+				</action>
+				<action>
 					system_manufacturers: f.system_manufacturers,
 					system_models: f.system_models;
-					setCars(system_manufacturers, system_models);
-					changeCaseProperty "title" about { "Vehicle enumeration - importing data" }
 
+					setCars(system_manufacturers, system_models);
 				</action>
 			</actions>
 		</event>
