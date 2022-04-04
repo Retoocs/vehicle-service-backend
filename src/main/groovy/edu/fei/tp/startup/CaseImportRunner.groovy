@@ -47,11 +47,14 @@ class CaseImportRunner extends AbstractOrderedCommandLineRunner{
 
     /** temporary */
     private void forTesting(){
-        def orderedCreateList = ["warehouse", "child_enum_addresses", "child_enum_vehicles", "user_managment"]
+        def orderedCreateList = ["child_enum_addresses", "child_enum_vehicles"]
 
         orderedCreateList.forEach( netId -> {
             if(!createCaseByNetId(netId, netId, "white", userService.findByEmail("super@netgrif.com", true))){
-                log.error("Could not create instance of process: " + netId)
+                log.error("Could not create instance of process: " + netId + " for user: super@netgrif.com")
+            }
+            if(!createCaseByNetId(netId, netId, "white", userService.findByEmail("timak.projekt@gmail.com", true))){
+                log.error("Could not create instance of process: " + netId + " for user: timak.projekt@gmail.com")
             }
         })
     }

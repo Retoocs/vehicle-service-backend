@@ -5,6 +5,7 @@
 	<title name="case_title">Repair item</title>
 	<icon>device_hub</icon>
 	<defaultRole>true</defaultRole>
+	<anonymousRole>false</anonymousRole>
 	<transitionRole>false</transitionRole>
 	<caseName name="default_case_name">Repair item</caseName>
 	<caseEvents>
@@ -13,7 +14,7 @@
 			<actions phase="pre">
 				<action>
 					OENumber: f.OENumber,
-					repair: f.repair_id;
+					repair_id: f.repair_id;
 
 					def x = findCase({it._id.eq(repair_id.value)})
 					if(x == null)
@@ -28,7 +29,24 @@
 	</caseEvents>
 	<!-- TRANSACTIONS -->
 	<!-- ROLES -->
+	<role>
+		<id>system</id>
+		<title>System</title>
+	</role>
 	<!-- PROCESS ROLE REFS -->
+	<roleRef>
+		<id>default</id>
+		<caseLogic>
+			<view>true</view>
+		</caseLogic>
+	</roleRef>
+	<roleRef>
+		<id>system</id>
+		<caseLogic>
+			<create>true</create>
+			<delete>true</delete>
+		</caseLogic>
+	</roleRef>
 	<!-- PROCESS USER REFS -->
 	<!-- DATA -->
 	<data type="text">
@@ -89,7 +107,7 @@
 				if (!nonVatPrice.value) {
 					change nonVatPrice value { return val; }
 				} else if (nonVatPrice.value != val) {
-					change nonVatPrice value { return val; } 
+					change nonVatPrice value { return val; }
 				}
 			}
 		</action>
@@ -155,7 +173,7 @@
 			if (tax.value) {
 				if(tax.value &lt;= 0) {
 					change tax value { return 0; }
-				} 
+				}
 				if (nonVatPrice.value &amp;&amp; !vatPrice.value) {
 					change vatPrice value { return (nonVatPrice.value + (nonVatPrice.value * (tax.value/100))).round(2); }
 				} else if (!nonVatPrice.value &amp;&amp; vatPrice.value) {
@@ -182,11 +200,11 @@
 	</data>
 	<!-- I18NS -->
 	<i18n locale="sk">
-        <i18nString name="t_create">Vytvoriť</i18nString>
+		<i18nString name="t_create">Vytvoriť</i18nString>
 		<i18nString name="t_read">Prečítať</i18nString>
 		<i18nString name="t_update">Aktualizovať</i18nString>
 		<i18nString name="t_delete">Vymazať</i18nString>
-		<i18nString name="t_input_form">Vstupný formulár</i18nString>		
+		<i18nString name="t_input_form">Vstupný formulár</i18nString>
 		<i18nString name="OENumber">(OE) Original Equipment číslo</i18nString>
 		<i18nString name="manufacturer">Výrobca</i18nString>
 		<i18nString name="description">Popis</i18nString>
@@ -200,13 +218,13 @@
 		<i18nString name="unit_l">l (Litre)</i18nString>
 		<i18nString name="status">Stav</i18nString>
 		<i18nString name="status_created">Vytvorené</i18nString>
-		<i18nString name="tax">DPH v %</i18nString>	
+		<i18nString name="tax">DPH v %</i18nString>
 		<i18nString name="image">Fotka</i18nString>
 		<i18nString name="title">Nadpis</i18nString>
 		<i18nString name="short_description">Popis</i18nString>
 	</i18n>
-    <i18n locale="de">
-        <i18nString name="t_create">Schaffen</i18nString>
+	<i18n locale="de">
+		<i18nString name="t_create">Schaffen</i18nString>
 		<i18nString name="t_read">Lesen</i18nString>
 		<i18nString name="t_update">Aktualisieren</i18nString>
 		<i18nString name="t_delete">Löschen</i18nString>
@@ -226,11 +244,11 @@
 		<i18nString name="unit_l">l (Liter)</i18nString>
 		<i18nString name="status">Zustand</i18nString>
 		<i18nString name="status_created">Erstellt</i18nString>
-		<i18nString name="tax">MwSt. in %</i18nString>	
+		<i18nString name="tax">MwSt. in %</i18nString>
 		<i18nString name="image">Foto</i18nString>
 		<i18nString name="title">Titel</i18nString>
 		<i18nString name="short_description">Beschreibung</i18nString>
-    </i18n>
+	</i18n>
 	<!-- TRANSITIONS -->
 	<transition>
 		<id>t_create</id>
@@ -284,13 +302,19 @@
 			<offset>0</offset>
 		</layout>
 		<label name="t_delete">Delete</label>
+		<roleRef>
+			<id>system</id>
+			<logic>
+				<perform>true</perform>
+			</logic>
+		</roleRef>
 		<event type="finish">
 			<id>t_delete_finish</id>
 			<actions phase="post">
 				<action>
 					async.run{
 						workflowService.deleteCase(useCase.stringId);
-					}	
+					}
 				</action>
 			</actions>
 		</event>
@@ -470,7 +494,7 @@
 					<template>material</template>
 					<appearance>outline</appearance>
 				</layout>
-			</dataRef>			
+			</dataRef>
 			<dataRef>
 				<id>tax</id>
 				<logic>
@@ -532,7 +556,7 @@
 					<template>material</template>
 					<appearance>outline</appearance>
 				</layout>
-			</dataRef>			
+			</dataRef>
 		</dataGroup>
 	</transition>
 	<transition>

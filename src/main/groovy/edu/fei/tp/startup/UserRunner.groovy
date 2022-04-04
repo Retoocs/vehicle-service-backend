@@ -1,10 +1,12 @@
 package edu.fei.tp.startup
 
 import com.netgrif.application.engine.auth.domain.Authority
+import com.netgrif.application.engine.auth.domain.IUser
 import com.netgrif.application.engine.auth.domain.User
 import com.netgrif.application.engine.auth.domain.UserState
 import com.netgrif.application.engine.auth.service.interfaces.IAuthorityService
 import com.netgrif.application.engine.auth.service.interfaces.IUserService
+import com.netgrif.application.engine.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.application.engine.startup.AbstractOrderedCommandLineRunner
 import edu.fei.tp.helpers.NetEnum
 import edu.fei.tp.helpers.VSUserManagmentHelper
@@ -24,6 +26,9 @@ class UserRunner extends AbstractOrderedCommandLineRunner{
 
     @Autowired
     private IAuthorityService authorityService
+
+    @Autowired
+    private IPetriNetService petriNetService
 
     @Autowired
     private VSUserManagmentHelper userManagmentHelper
@@ -50,13 +55,30 @@ class UserRunner extends AbstractOrderedCommandLineRunner{
             (NetEnum.VEH.netIdentifier): [],
             (NetEnum.WH.netIdentifier): [],
             (NetEnum.WI.netIdentifier): [],
-            (NetEnum.UM.netIdentifier): ["admin"]
     ]
 
 
     @Override
     void run(String... strings) throws Exception {
+        addAllRolesToSuper()
         createTimakUser()
+    }
+
+    private void addAllRolesToSuper(){
+        IUser superUser = userService.findByEmail("super@netgrif.com", true)
+
+        if (superUser == null) {
+            log.error("Could not find super user")
+            return
+        }
+
+        def rolesOfPetriNets = petriNetService.getAll().collect {it.roles.values()}
+        rolesOfPetriNets.each {roles ->
+            roles.each {superUser.addProcessRole(it)}
+        }
+        userService.save(superUser)
+
+        log.info("Added all roles to super@netgrif.com.")
     }
 
     private void createTimakUser(){
