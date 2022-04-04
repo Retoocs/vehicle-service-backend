@@ -5,29 +5,15 @@
 	<title name="case_title">Repair item</title>
 	<icon>device_hub</icon>
 	<defaultRole>true</defaultRole>
+	<anonymousRole>false</anonymousRole>
 	<transitionRole>false</transitionRole>
 	<caseName name="default_case_name">Repair item</caseName>
-	<caseEvents>
-		<event type="delete">
-			<id>case_delete</id>
-			<actions phase="pre">
-				<action>
-					OENumber: f.OENumber,
-					repair: f.repair_id;
-
-					def x = findCase({it._id.eq(repair_id.value)})
-					if(x == null)
-						return
-
-					x.dataSet.get("repair_items").choices = x.dataSet.get("repair_items").choices - useCase.stringId
-					x.dataSet.get("OENumbers").choices = x.dataSet.get("OENumbers").choices - OENumber.value
-					workflowService.save(x)
-				</action>
-			</actions>
-		</event>
-	</caseEvents>
 	<!-- TRANSACTIONS -->
 	<!-- ROLES -->
+	<role>
+		<id>system</id>
+		<title>System</title>
+	</role>
 	<!-- PROCESS ROLE REFS -->
 	<!-- PROCESS USER REFS -->
 	<!-- DATA -->
@@ -58,16 +44,16 @@
 			nonVatPrice: f.nonVatPrice;
 
 			if (nonVatPrice.value) {
-				if (nonVatPrice.value &lt; 0) {
-					change nonVatPrice value { return 0; }
-					return;
-				}
-				def val = nonVatPrice.value + (nonVatPrice.value * (tax.value/100)).round(2);
-				if (!vatPrice.value) {
-					change vatPrice value { return val; }
-				} else if (vatPrice.value != val) {
-					change vatPrice value { return val; }
-				}
+			if (nonVatPrice.value &lt; 0) {
+			change nonVatPrice value { return 0; }
+			return;
+			}
+			def val = nonVatPrice.value + (nonVatPrice.value * (tax.value/100)).round(2);
+			if (!vatPrice.value) {
+			change vatPrice value { return val; }
+			} else if (vatPrice.value != val) {
+			change vatPrice value { return val; }
+			}
 			}
 		</action>
 	</data>
@@ -81,16 +67,16 @@
 			nonVatPrice: f.nonVatPrice;
 
 			if (vatPrice.value) {
-				if (vatPrice.value &lt; 0) {
-					change vatPrice value { return 0; }
-					return;
-				}
-				def val = (vatPrice.value / (tax.value/100 + 1)).round(2);
-				if (!nonVatPrice.value) {
-					change nonVatPrice value { return val; }
-				} else if (nonVatPrice.value != val) {
-					change nonVatPrice value { return val; } 
-				}
+			if (vatPrice.value &lt; 0) {
+			change vatPrice value { return 0; }
+			return;
+			}
+			def val = (vatPrice.value / (tax.value/100 + 1)).round(2);
+			if (!nonVatPrice.value) {
+			change nonVatPrice value { return val; }
+			} else if (nonVatPrice.value != val) {
+			change nonVatPrice value { return val; }
+			}
 			}
 		</action>
 	</data>
@@ -104,17 +90,6 @@
 				<message name="quantity_valid1">Must be greater or even than 0</message>
 			</validation>
 		</validations>
-	</data>
-	<data type="number">
-		<id>quantity_transfer_to_warehouse</id>
-		<title name="quantity_transfer_to_warehouse">Quantity to transfer</title>
-		<validations>
-			<validation>
-				<expression>inrange 1,9999999999999</expression>
-				<message name="quantity_transfer_to_warehouse_valid1">Must be greater or even than 1</message>
-			</validation>
-		</validations>
-		<init>1</init>
 	</data>
 	<data type="enumeration_map">
 		<id>unit</id>
@@ -153,16 +128,16 @@
 			nonVatPrice: f.nonVatPrice;
 
 			if (tax.value) {
-				if(tax.value &lt;= 0) {
-					change tax value { return 0; }
-				} 
-				if (nonVatPrice.value &amp;&amp; !vatPrice.value) {
-					change vatPrice value { return (nonVatPrice.value + (nonVatPrice.value * (tax.value/100))).round(2); }
-				} else if (!nonVatPrice.value &amp;&amp; vatPrice.value) {
-					change nonVatPrice value { return (vatPrice.value / (tax.value/100 + 1)); }
-				} else if (nonVatPrice.value &amp;&amp; vatPrice.value) {
-					change vatPrice value { return (nonVatPrice.value + (nonVatPrice.value * (tax.value/100))).round(2); }
-				}
+			if(tax.value &lt;= 0) {
+			change tax value { return 0; }
+			}
+			if (nonVatPrice.value &amp;&amp; !vatPrice.value) {
+			change vatPrice value { return (nonVatPrice.value + (nonVatPrice.value * (tax.value/100))).round(2); }
+			} else if (!nonVatPrice.value &amp;&amp; vatPrice.value) {
+			change nonVatPrice value { return (vatPrice.value / (tax.value/100 + 1)); }
+			} else if (nonVatPrice.value &amp;&amp; vatPrice.value) {
+			change vatPrice value { return (nonVatPrice.value + (nonVatPrice.value * (tax.value/100))).round(2); }
+			}
 			}
 		</action>
 	</data>
@@ -176,17 +151,13 @@
 		<title name="short_description">Description</title>
 		<view> <htmlEditor/> </view>
 	</data>
-	<data type="text">
-		<id>repair_id</id>
-		<title>repair_id</title>
-	</data>
 	<!-- I18NS -->
 	<i18n locale="sk">
-        <i18nString name="t_create">Vytvoriť</i18nString>
+		<i18nString name="t_create">Vytvoriť</i18nString>
 		<i18nString name="t_read">Prečítať</i18nString>
 		<i18nString name="t_update">Aktualizovať</i18nString>
 		<i18nString name="t_delete">Vymazať</i18nString>
-		<i18nString name="t_input_form">Vstupný formulár</i18nString>		
+		<i18nString name="t_input_form">Vstupný formulár</i18nString>
 		<i18nString name="OENumber">(OE) Original Equipment číslo</i18nString>
 		<i18nString name="manufacturer">Výrobca</i18nString>
 		<i18nString name="description">Popis</i18nString>
@@ -200,13 +171,13 @@
 		<i18nString name="unit_l">l (Litre)</i18nString>
 		<i18nString name="status">Stav</i18nString>
 		<i18nString name="status_created">Vytvorené</i18nString>
-		<i18nString name="tax">DPH v %</i18nString>	
+		<i18nString name="tax">DPH v %</i18nString>
 		<i18nString name="image">Fotka</i18nString>
 		<i18nString name="title">Nadpis</i18nString>
 		<i18nString name="short_description">Popis</i18nString>
 	</i18n>
-    <i18n locale="de">
-        <i18nString name="t_create">Schaffen</i18nString>
+	<i18n locale="de">
+		<i18nString name="t_create">Schaffen</i18nString>
 		<i18nString name="t_read">Lesen</i18nString>
 		<i18nString name="t_update">Aktualisieren</i18nString>
 		<i18nString name="t_delete">Löschen</i18nString>
@@ -226,11 +197,11 @@
 		<i18nString name="unit_l">l (Liter)</i18nString>
 		<i18nString name="status">Zustand</i18nString>
 		<i18nString name="status_created">Erstellt</i18nString>
-		<i18nString name="tax">MwSt. in %</i18nString>	
+		<i18nString name="tax">MwSt. in %</i18nString>
 		<i18nString name="image">Foto</i18nString>
 		<i18nString name="title">Titel</i18nString>
 		<i18nString name="short_description">Beschreibung</i18nString>
-    </i18n>
+	</i18n>
 	<!-- TRANSITIONS -->
 	<transition>
 		<id>t_create</id>
@@ -260,7 +231,7 @@
 					change status value { return "created"; }
 
 					changeCaseProperty "title" about {
-						return OENumber.value + " - " + title.value;
+					return OENumber.value + " - " + title.value;
 					}
 				</action>
 			</actions>
@@ -270,7 +241,7 @@
 			<actions phase="post">
 				<action>
 					async.run{
-						workflowService.deleteCase(useCase.stringId)
+					workflowService.deleteCase(useCase.stringId)
 					}
 				</action>
 			</actions>
@@ -284,13 +255,19 @@
 			<offset>0</offset>
 		</layout>
 		<label name="t_delete">Delete</label>
+		<roleRef>
+			<id>system</id>
+			<logic>
+				<perform>true</perform>
+			</logic>
+		</roleRef>
 		<event type="finish">
 			<id>t_delete_finish</id>
 			<actions phase="post">
 				<action>
 					async.run{
-						workflowService.deleteCase(useCase.stringId);
-					}	
+					workflowService.deleteCase(useCase.stringId);
+					}
 				</action>
 			</actions>
 		</event>
@@ -320,7 +297,7 @@
 					OENumber: f.OENumber;
 
 					changeCaseProperty "title" about {
-						return OENumber.value + " - " + title.value;
+					return OENumber.value + " - " + title.value;
 					}
 				</action>
 			</actions>
@@ -470,7 +447,7 @@
 					<template>material</template>
 					<appearance>outline</appearance>
 				</layout>
-			</dataRef>			
+			</dataRef>
 			<dataRef>
 				<id>tax</id>
 				<logic>
@@ -532,7 +509,7 @@
 					<template>material</template>
 					<appearance>outline</appearance>
 				</layout>
-			</dataRef>			
+			</dataRef>
 		</dataGroup>
 	</transition>
 	<transition>
@@ -594,79 +571,6 @@
 			</dataRef>
 			<dataRef>
 				<id>quantity</id>
-				<logic>
-					<behavior>editable</behavior>
-				</logic>
-				<layout>
-					<x>3</x>
-					<y>0</y>
-					<rows>1</rows>
-					<cols>1</cols>
-					<offset>0</offset>
-					<template>material</template>
-					<appearance>outline</appearance>
-				</layout>
-			</dataRef>
-		</dataGroup>
-	</transition>
-	<transition>
-		<id>t_removal_short_description</id>
-		<x>1060</x>
-		<y>260</y>
-		<layout>
-			<offset>0</offset>
-		</layout>
-		<label>t_removal_short_description</label>
-		<dataGroup>
-			<id>dg0</id>
-			<layout>grid</layout>
-			<dataRef>
-				<id>OENumber</id>
-				<logic>
-					<behavior>visible</behavior>
-				</logic>
-				<layout>
-					<x>0</x>
-					<y>0</y>
-					<rows>1</rows>
-					<cols>1</cols>
-					<offset>0</offset>
-					<template>material</template>
-					<appearance>outline</appearance>
-				</layout>
-			</dataRef>
-			<dataRef>
-				<id>manufacturer</id>
-				<logic>
-					<behavior>visible</behavior>
-				</logic>
-				<layout>
-					<x>1</x>
-					<y>0</y>
-					<rows>1</rows>
-					<cols>1</cols>
-					<offset>0</offset>
-					<template>material</template>
-					<appearance>outline</appearance>
-				</layout>
-			</dataRef>
-			<dataRef>
-				<id>title</id>
-				<logic>
-					<behavior>visible</behavior>
-				</logic>
-				<layout>
-					<x>2</x>
-					<y>0</y>
-					<rows>1</rows>
-					<cols>1</cols>
-					<offset>0</offset>
-					<template>material</template>
-					<appearance>outline</appearance>
-				</layout>
-			</dataRef>
-			<dataRef>
-				<id>quantity_transfer_to_warehouse</id>
 				<logic>
 					<behavior>editable</behavior>
 				</logic>
