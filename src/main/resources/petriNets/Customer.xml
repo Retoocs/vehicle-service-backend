@@ -638,8 +638,8 @@
 					<behavior>visible</behavior>
 				</logic>
 				<layout>
-					<x>0</x>
-					<y>2</y>
+					<x>2</x>
+					<y>1</y>
 					<rows>1</rows>
 					<cols>1</cols>
 					<offset>0</offset>
@@ -668,8 +668,8 @@
 					<behavior>visible</behavior>
 				</logic>
 				<layout>
-					<x>1</x>
-					<y>2</y>
+					<x>3</x>
+					<y>1</y>
 					<rows>1</rows>
 					<cols>1</cols>
 					<offset>0</offset>
@@ -784,8 +784,8 @@
 					<behavior>visible</behavior>
 				</logic>
 				<layout>
-					<x>0</x>
-					<y>2</y>
+					<x>2</x>
+					<y>1</y>
 					<rows>1</rows>
 					<cols>1</cols>
 					<offset>0</offset>
@@ -814,8 +814,8 @@
 					<behavior>visible</behavior>
 				</logic>
 				<layout>
-					<x>1</x>
-					<y>2</y>
+					<x>3</x>
+					<y>1</y>
 					<rows>1</rows>
 					<cols>1</cols>
 					<offset>0</offset>
