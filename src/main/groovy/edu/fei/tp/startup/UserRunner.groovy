@@ -55,7 +55,6 @@ class UserRunner extends AbstractOrderedCommandLineRunner{
             (NetEnum.VEH.netIdentifier): [],
             (NetEnum.WH.netIdentifier): [],
             (NetEnum.WI.netIdentifier): [],
-            (NetEnum.UM.netIdentifier): ["admin"]
     ]
 
 
