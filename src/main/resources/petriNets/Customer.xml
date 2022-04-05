@@ -1055,7 +1055,10 @@
 					def cases = findCases( {it.processIdentifier.eq("vehicle").and(it.dataSet.get("actual_customer_id").value?.ne(useCase.stringId))} );
 
 					for (caze in cases) {
-						change choose_existing_car options { return choose_existing_car.options + [(caze.stringId):(caze.dataSet.get("licenceNumber").value + " - " + caze.dataSet.get("manufacturer").value + " " + caze.dataSet.get("model").value) ] }
+						def createTask = findTask( {it.caseId.eq(caze.stringId).and(it.transitionId.eq("t_create"))} )
+						if (createTask == null) {
+							change choose_existing_car options { return choose_existing_car.options + [(caze.stringId):(caze.dataSet.get("licenceNumber").value + " - " + caze.dataSet.get("manufacturer").value + " " + caze.dataSet.get("model").value) ] }
+						}
 					}
 				</action>
 			</actions>
