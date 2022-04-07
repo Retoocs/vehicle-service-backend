@@ -115,7 +115,9 @@
 	<data type="text">
 		<id>description</id>
 		<title name="description">Description</title>
-		<values>area</values>
+		<component>
+			<name>area</name>
+		</component>
 	</data>
 	<data type="number">
 		<id>nonVatPrice</id>
