@@ -195,6 +195,7 @@
 		<i18nString name="choose_existing_car">Vybrať vozidlo</i18nString>
 		<i18nString name="confirm_existing_vehicle">Zmeniť majitela</i18nString>
 		<i18nString name="add_new_vehicle">Pridať nové vozidlo</i18nString>
+		<i18nString name="company_name">Názov firmy</i18nString>
 	</i18n>
 	<i18n locale="de">
 		<i18nString name="t_create">Schaffen</i18nString>
@@ -226,6 +227,7 @@
 		<i18nString name="choose_existing_car">Wählen ein Fahrzeug</i18nString>
 		<i18nString name="confirm_existing_vehicle">Besitzerwechsel</i18nString>
 		<i18nString name="add_new_vehicle">Neues Fahrzeug hinzufügen</i18nString>
+		<i18nString name="company_name">Name des Unternehmens</i18nString>
 	</i18n>
 	<!-- TRANSITIONS -->
 	<transition>
