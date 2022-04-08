@@ -245,6 +245,10 @@
 		<id>selected_ri_taskref</id>
 		<title>selected_ri_taskref</title>
 	</data>
+	<data type="enumeration">
+		<id>OENumbers</id>
+		<title>OENumbers</title>
+	</data>
 	<!-- I18NS -->
 	<i18n locale="sk">
 		<i18nString name="case_title">Oprava</i18nString>
