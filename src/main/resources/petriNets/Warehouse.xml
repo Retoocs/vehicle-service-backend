@@ -539,7 +539,7 @@
 						if( (item_addition_taskref.value != null).and(item_addition_taskref.value != []) ){
 							def atask = findTask( {it._id.eq(item_addition_taskref.value.first())} )
 							if(atask != null){
-								async.run{ cancelTask(atask) }
+								cancelTask(atask)
 							}
 						}
 
@@ -553,19 +553,20 @@
 							if(item_task == null)
 								return
 
-							async.run{ assignTask(item_task) }
-							change item_addition_taskref value { [item_task.stringId]; }
-
-							setData(item_task, [
-								"warehouseId": [
-									"value": useCase.stringId,
-									"type" : "text"
-								],
+							assignTask(item_task)
+							setDataWithPropagation(item_task, [
 								"is_from_warehouse": [
 									"value": true,
 									"type" : "boolean"
 								],
 							])
+							setDataWithPropagation(item_task, [
+								"warehouseId": [
+									"value": useCase.stringId,
+									"type" : "text"
+								],
+							])
+							change item_addition_taskref value { [item_task.stringId]; }
 						}
 						// selected more items
 						if(select_addition_type.value == "more_items"){
@@ -616,7 +617,7 @@
 					if(atask == null)
 						return
 
-					async.run{ cancelTask(atask) }
+					cancelTask(atask)
 					change item_addition_taskref value { [] }
 				</action>
 			</actions>
@@ -667,9 +668,6 @@
 					}
 				</action>
 				<action>
-<!--					todo osetrenie duplicity pri pridavani viacerych itemov-->
-				</action>
-				<action>
 					OENumbers: f.OENumbers,
 					items: f.items,
 					is_one_item_addition: f.is_one_item_addition,
@@ -703,7 +701,7 @@
 						//todo: TBD adding OENumbers to OENumbers.choices
 					}
 
-					async.run{ finishTask(atask) }
+					finishTask(atask)
 				</action>
 			</actions>
 			<actions phase="post">
