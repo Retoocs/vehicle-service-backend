@@ -233,6 +233,9 @@
 					change items choices { [] }
 					change OENumbers choices { [] }
 				</action>
+				<action>
+					getAndSetAddressFromEnum("t_adress_form")
+				</action>
 			</actions>
 			<actions phase="post">
 				<action>                    
@@ -240,7 +243,7 @@
 					if(Case == null)
 						throw new IllegalArgumentException("Cannot find your instance of process Child addresses enumeration")
 
-					async.run{ finishTask("t_select_address", Case) }
+					finishTask("t_select_address", Case)
 				</action>
 				<action>
 					useCase.dataSet.get("t_adress_form").value = []
@@ -252,9 +255,9 @@
 			<id>t_create_cancel</id>
 			<actions phase="post">
 				<action>
-				async.run{
-					workflowService.deleteCase(useCase.stringId)
-				}
+					async.run{
+						workflowService.deleteCase(useCase.stringId)
+					}
 				</action>
 			</actions>
 		</event>
@@ -272,15 +275,14 @@
 					if(addressTask == null)
 						throw new IllegalArgumentException("Cannot find task with id t_select_address in ${Case.title}")
 
-					async.run{ assignTask(addressTask) }
-                    change t_adress_form value{ [addressTask.stringId] }
-
-                    setData("t_select_address", Case, [
+					assignTask(addressTask)
+                    setData(addressTask, [
 						"target_id": [
 							"value": useCase.stringId,
 							"type" : "text"
 						],
 					])
+					change t_adress_form value{ [addressTask.stringId] }
 			</action>
 			</actions>
 		</event>
@@ -334,22 +336,52 @@
 							throw new IllegalArgumentException("Cannot find task with id t_select_address in ${myEnumCase.title}")
 
 						async.run{ assignTask(enumTask) }
-
-						change t_adress_form value { [enumTask.stringId] }
-
-						setData("t_select_address", myEnumCase, [
+						setData(enumTask, [
 							"target_id": [
 								"value": useCase.stringId,
 								"type" : "text"
 							],
 						])
+						change t_adress_form value { [enumTask.stringId] }
 					</action>
 				</logic>
 			</dataRef>
+		</dataGroup>
+		<dataGroup>
+			<id>dg3</id>
+			<stretch>true</stretch>
 			<dataRef>
 				<id>t_adress_form</id>
 				<logic>
 					<behavior>editable</behavior>
+				</logic>
+			</dataRef>
+		</dataGroup>
+		<dataGroup>
+			<id>dg4</id>
+			<title name="dg_address">Address</title>
+			<dataRef>
+				<id>city</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+			</dataRef>
+			<dataRef>
+				<id>postal_code</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+			</dataRef>
+			<dataRef>
+				<id>street</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+			</dataRef>
+			<dataRef>
+				<id>house_number</id>
+				<logic>
+					<behavior>visible</behavior>
 				</logic>
 			</dataRef>
 		</dataGroup>
@@ -387,17 +419,19 @@
 			<id>1</id>
 			<actions phase="pre">
 				<action>
+					getAndSetAddressFromEnum("t_adress_form")
+				</action>
+			</actions>
+			<actions phase="post">
+				<action>
 					def myEnumCase = findCase( {it.processIdentifier.eq("child_enum_addresses").and(it.author.email.eq(loggedUser().email))} )
 					if(myEnumCase == null)
 						throw new IllegalArgumentException("Cannot find your instance of process Child address enumeration")
 
 					async.run{ finishTask("t_select_address", myEnumCase) }
 				</action>
-			</actions>
-			<actions phase="post">
 				<action>
 					t_adress_form: f.t_adress_form;
-
 					change t_adress_form value { [] }
 				</action>
 			</actions>
