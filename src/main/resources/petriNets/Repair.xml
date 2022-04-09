@@ -551,9 +551,11 @@
 					is_extern: f.is_extern;
 
 					if(userService.getLoggedOrSystem().email == "anonym@netgrif.com"){
-					change is_extern value { 1 }
+						change is_extern value { 1 }
 					}
-					change is_extern value { 1 }
+					else {
+						change is_intern value { 1 }
+					}
 				</action>
 			</actions>
 		</event>
@@ -585,12 +587,19 @@
 						make surname, editable on t_input_form when { natural_legal_person.value == false; }
 						make name, required on t_input_form when { natural_legal_person.value == false; }
 						make surname, required on t_input_form when { natural_legal_person.value == false; }
+
 						make company_name, hidden on t_input_form when { natural_legal_person.value == false; }
 						make taxID, hidden on t_input_form when { natural_legal_person.value == false; }
 						make businessID, hidden on t_input_form when { natural_legal_person.value == false; }
+						make company_name, optional on t_input_form when { natural_legal_person.value == false; }
+						make taxID, optional on t_input_form when { natural_legal_person.value == false; }
+						make businessID, optional on t_input_form when { natural_legal_person.value == false; }
 
 						make name, hidden on t_input_form when { natural_legal_person.value == true; }
 						make surname, hidden on t_input_form when { natural_legal_person.value == true; }
+						make name, optional on t_input_form when { natural_legal_person.value == true; }
+						make surname, optional on t_input_form when { natural_legal_person.value == true; }
+
 						make company_name, editable on t_input_form when { natural_legal_person.value == true; }
 						make businessID, editable on t_input_form when { natural_legal_person.value == true; }
 						make taxID, editable on t_input_form when { natural_legal_person.value == true; }
@@ -599,12 +608,12 @@
 						make taxID, required on t_input_form when { natural_legal_person.value == true; }
 
 						if (natural_legal_person.value == true) {
-						change name value { null; }
-						change surname value {  null; }
+							change name value { null; }
+							change surname value {  null; }
 						}else {
-						change company_name value { null; }
-						change businessID value { null; }
-						change taxID value { null; }
+							change company_name value { null; }
+							change businessID value { null; }
+							change taxID value { null; }
 						}
 					</action>
 				</logic>
@@ -852,14 +861,15 @@
 
 					def vehicle_cases = findCases( { it.processIdentifier.eq("vehicle").and(it.dataSet.get("status").value.eq("assigned")) } )
 
-					if(vehicle_cases == null || vehicle_case == [])
+					if(vehicle_cases == null || vehicle_cases == [])
 					return
 
-					change vehicles options {[]}
+					change vehicles options { [] }
+					change vehicles value { "" }
 
 					for(vehicle in vehicle_cases){
-					def val = vehicle.dataSet.get("licenceNumber").value + " - " + vehicle.dataSet.get("manufacturer").value + " " + vehicle.dataSet.get("model").value
-					change vehicles options { vehicles.options + [(vehicle.stringId): val]; }
+						def val = vehicle.dataSet.get("licenceNumber").value + " - " + vehicle.dataSet.get("manufacturer").value + " " + vehicle.dataSet.get("model").value
+						change vehicles options { vehicles.options + [(vehicle.stringId): val]; }
 					}
 				</action>
 			</actions>
@@ -879,12 +889,11 @@
 					if(vehicle == null)
 					throw new IllegalArgumentException("Vehicle with id: " + selectedVehicleId + " does not exist anymore")
 
-					// def selectedCustomerId = vehicle.dataSet.get("customer_id").value
+					def selectedCustomerId = vehicle.dataSet.get("actual_customer_id").value
 
 					change selected_vehicle_id value { selectedVehicleId }
-					// change selected_customer_id value { selectedCustomerId }
+					change selected_customer_id value { selectedCustomerId }
 				</action>
-				<!-- change status -->
 				<action>
 					status: f.status;
 
