@@ -890,7 +890,6 @@
 		<event type="finish">
 			<id>1</id>
 			<actions phase="pre">
-				<!--				todo-->
 				<action>
 					selected_vehicle_id: f.selected_vehicle_id,
 					selected_customer_id: f.selected_customer_id,
