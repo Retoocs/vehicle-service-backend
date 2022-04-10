@@ -22,22 +22,22 @@
 		<id>system_cities</id>
 		<title>system_cities</title>
 		<options>
-			<option key="90023">Viničné</option>
-			<option key="90201">Pezinok</option>
-			<option key="01401">Bytča</option>
+<!--			<option key="90023">Viničné</option>-->
+<!--			<option key="90201">Pezinok</option>-->
+<!--			<option key="01401">Bytča</option>-->
 		</options>
 	</data>
 	<data type="enumeration_map">
 		<id>system_streets</id>
 		<title>system_streets</title>
 		<options>
-			<option key="0-90023">Brezová</option>
-			<option key="1-90023">Hlavná</option>
-			<option key="2-90201">Trnavská</option>
-			<option key="3-90201">Viničiarska</option>
-			<option key="4-90201">Bratislavská</option>
-      	  	<option key="5-01401">Smetankova</option>
-			<option key="6-01401">Marianova</option>
+<!--			<option key="0-90023">Brezová</option>-->
+<!--			<option key="1-90023">Hlavná</option>-->
+<!--			<option key="2-90201">Trnavská</option>-->
+<!--			<option key="3-90201">Viničiarska</option>-->
+<!--			<option key="4-90201">Bratislavská</option>-->
+<!--      	  	<option key="5-01401">Smetankova</option>-->
+<!--			<option key="6-01401">Marianova</option>-->
 		</options>
 	</data>
 	<data type="number">
@@ -227,7 +227,11 @@
 			<id>t_init_assign</id>
 			<actions phase="post">
 				<action>
+					system_cities: f.system_cities,
+					system_streets: f.system_streets;
+
 					changeCaseProperty "title" about { "Addresses enumeration – importing data" }
+					setAddresses(system_cities, system_streets);
 				</action>
 			</actions>
 		</event>

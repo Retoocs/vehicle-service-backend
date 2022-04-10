@@ -10,7 +10,6 @@ import org.springframework.stereotype.Component
 @Component
 class CustomActionDelegate extends ActionDelegate {
     public static final Logger log = LoggerFactory.getLogger(CustomActionDelegate.class)
-
     static private String pathToCarsCsv = "src/main/resources/csv/cars.csv"
     static private String csvSplitter = ","
 
