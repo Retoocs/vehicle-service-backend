@@ -253,25 +253,6 @@
 		<id>OENumbers</id>
 		<title>OENumbers</title>
 	</data>
-	<data type="taskRef">
-		<id>create_extern_taskref</id>
-		<title/>
-		<init>t2</init>
-	</data>
-	<data type="enumeration">
-		<id>approve_extern_repair</id>
-		<title/>
-		<options>
-			<option key="apply">apply</option>
-			<option key="deny">deny</option>
-		</options>
-		<init>apply</init>
-	</data>
-	<data type="taskRef">
-		<id>complex_creation_taskref</id>
-		<title/>
-		<init>t_complex_creation</init>
-	</data>
 	<!-- I18NS -->
 	<i18n locale="sk">
 		<i18nString name="case_title">Oprava</i18nString>
@@ -930,55 +911,6 @@
 			<offset>0</offset>
 		</layout>
 		<label>Validate</label>
-		<dataGroup>
-			<id>t4_0</id>
-			<cols>4</cols>
-			<layout>grid</layout>
-			<dataRef>
-				<id>create_extern_taskref</id>
-				<logic>
-					<behavior>editable</behavior>
-				</logic>
-				<layout>
-					<x>0</x>
-					<y>0</y>
-					<rows>1</rows>
-					<cols>4</cols>
-					<template>material</template>
-					<appearance>outline</appearance>
-				</layout>
-			</dataRef>
-			<dataRef>
-				<id>approve_extern_repair</id>
-				<logic>
-					<behavior>editable</behavior>
-				</logic>
-				<layout>
-					<x>0</x>
-					<y>1</y>
-					<rows>1</rows>
-					<cols>4</cols>
-					<template>material</template>
-					<appearance>outline</appearance>
-				</layout>
-			</dataRef>
-		</dataGroup>
-		<event type="finish">
-			<id>t4_finish</id>
-			<actions phase="pre">
-				<action id="1">
-					approve_extern_repair: f.approve_extern_repair,
-					val_accept: f.val_accept,
-					val_deny: f.val_deny;
-
-					if(approve_extern_repair.value == "apply"){
-						change val_accept value { 1 }
-					} else {
-						change val_deny value { 1 }
-					}
-				</action>
-			</actions>
-		</event>
 	</transition>
 	<transition>
 		<id>t5</id>
@@ -1004,25 +936,6 @@
 			<offset>0</offset>
 		</layout>
 		<label>Finish creating</label>
-		<dataGroup>
-			<id>t8_0</id>
-			<cols>4</cols>
-			<layout>grid</layout>
-			<dataRef>
-				<id>complex_creation_taskref</id>
-				<logic>
-					<behavior>editable</behavior>
-				</logic>
-				<layout>
-					<x>0</x>
-					<y>0</y>
-					<rows>1</rows>
-					<cols>4</cols>
-					<template>material</template>
-					<appearance>outline</appearance>
-				</layout>
-			</dataRef>
-		</dataGroup>
 	</transition>
 	<transition>
 		<id>t_complex_creation</id>
