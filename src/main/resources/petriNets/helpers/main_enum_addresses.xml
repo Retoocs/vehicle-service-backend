@@ -11,12 +11,8 @@
 	<!-- PROCESS USER REFS -->
 	<!-- DATA -->
 	<data type="file">
-		<id>import_file_cities</id>
-		<title name="import_file_cities">Import a file of cities to process</title>
-	</data>
-	<data type="file">
-		<id>import_file_streets</id>
-		<title name="import_file_streets">Import a file of streets to process</title>
+		<id>import_file</id>
+		<title name="import_file">Import a CSV file</title>
 	</data>
 	<data type="enumeration_map">
 		<id>system_cities</id>
@@ -75,8 +71,7 @@
 	</data>
 	<!-- I18NS -->
 	<i18n locale="sk">
-		<i18nString name="import_file_cities">Vlož súbor miest</i18nString>
-		<i18nString name="import_file_streets">Vlož súbor ulíc</i18nString>
+		<i18nString name="import_file">Vlož CSV súbor</i18nString>
 		<i18nString name="status">Stav</i18nString>
 		<i18nString name="initialization_date">Dátum inicializácie inštancie</i18nString>
 		<i18nString name="last_imported_file">Dátum poslednej zmeny</i18nString>
@@ -87,8 +82,7 @@
 		<i18nString name="t_status">Pozri stav</i18nString>
 	</i18n>
 	<i18n locale="de">
-		<i18nString name="import_file_cities">Eine Datei einfügen</i18nString>
-		<i18nString name="import_file_streets">Eine Datei einfügen</i18nString>
+		<i18nString name="import_file">Eine CSV Datei einfügen</i18nString>
 		<i18nString name="status">Status</i18nString>
 		<i18nString name="initialization_date">Datum der Instanzinitialisierung</i18nString>
 		<i18nString name="last_imported_file">Datum der letzten Änderung</i18nString>
@@ -260,17 +254,7 @@
 			<id>dg1</id>
 			<stretch>true</stretch>
 			<dataRef>
-				<id>import_file_cities</id>
-				<logic>
-					<behavior>editable</behavior>
-				</logic>
-			</dataRef>
-		</dataGroup>
-		<dataGroup>
-			<id>dg2</id>
-			<stretch>true</stretch>
-			<dataRef>
-				<id>import_file_streets</id>
+				<id>import_file</id>
 				<logic>
 					<behavior>editable</behavior>
 				</logic>
