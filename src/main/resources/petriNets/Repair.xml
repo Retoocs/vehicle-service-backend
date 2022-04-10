@@ -15,12 +15,12 @@
 
 					//Creation of new vehicle is open
 					if ((creation_new_vehicle_taskref.value != null).and(creation_new_vehicle_taskref.value != [])) {
-					clear_and_cancel_taskref(creation_new_vehicle_taskref)
+						clear_and_cancel_taskref(creation_new_vehicle_taskref)
 					}
 
 					//Creation of new customer is open
 					if ((creation_new_customer_taskref.value != null).and(creation_new_customer_taskref.value != [])) {
-					clear_and_cancel_taskref(creation_new_customer_taskref)
+						clear_and_cancel_taskref(creation_new_customer_taskref)
 					}
 				</action>
 			</actions>
@@ -29,11 +29,11 @@
 	<!-- FUNCTIONS -->
 	<function scope="process" name="clear_and_cancel_taskref">
 		{ aTaskref ->
-		def toCancel  = findTask( {it._id.eq(aTaskref.value.first())} )
-		if(toCancel == null)
-		return
-		cancelTask(toCancel)
-		change aTaskref value { [] }
+			def toCancel  = findTask( {it._id.eq(aTaskref.value.first())} )
+			if(toCancel == null)
+				return
+			cancelTask(toCancel)
+			change aTaskref value { [] }
 		}
 	</function>
 	<!-- TRANSACTIONS -->
@@ -218,7 +218,7 @@
 	</data>
 	<data type="boolean">
 		<id>public_remove_check</id>
-		<title></title>
+		<title/>
 		<init>false</init>
 	</data>
 	<data type="enumeration_map">
@@ -408,29 +408,29 @@
 					warehouses: f.warehouses_for_removal;
 
 					for(repairItemId in repairItems.value){
-					def rtwCase = createCase("ri_to_wi")
+						def rtwCase = createCase("ri_to_wi")
 
-					def initTask = assignTask("t_initialize", rtwCase)
-					setData(initTask, [
-					"origin_ri_id": [
-					"type": "text",
-					"value": repairItemId
-					],
-					"origin_repair_id": [
-					"type": "text",
-					"value": useCase.stringId
-					],
-					"target_wh_id": [
-					"type": "text",
-					"value": warehouses.value
-					]
-					])
-					finishTask(initTask)
+						def initTask = assignTask("t_initialize", rtwCase)
+						setData(initTask, [
+							"origin_ri_id": [
+								"type": "text",
+								"value": repairItemId
+							],
+							"origin_repair_id": [
+								"type": "text",
+								"value": useCase.stringId
+							],
+							"target_wh_id": [
+								"type": "text",
+								"value": warehouses.value
+							]
+						])
+						finishTask(initTask)
 
-					async.run{
-					def doTask = assignTask("t_do_ri_to_wi", rtwCase)
-					finishTask(doTask)
-					}
+						async.run{
+							def doTask = assignTask("t_do_ri_to_wi", rtwCase)
+							finishTask(doTask)
+						}
 					}
 				</action>
 			</actions>
@@ -471,11 +471,11 @@
 						change selected_ri_taskref value { [] }
 
 						for(riId in repair_items_for_removal.value){
-						def riTask = findTask( {it.caseId.eq(riId).and(it.transitionId.eq("t_removal_short_description"))} )
-						if(riTask == null)
-						return
+							def riTask = findTask( {it.caseId.eq(riId).and(it.transitionId.eq("t_removal_short_description"))} )
+							if(riTask == null)
+								return
 
-						change selected_ri_taskref value { selected_ri_taskref.value + [riTask.stringId] }
+							change selected_ri_taskref value { selected_ri_taskref.value + [riTask.stringId] }
 						}
 					</action>
 				</logic>
@@ -506,7 +506,7 @@
 
 					def foundWarehouses = findCases({ it.processIdentifier.eq("warehouse") })
 					if (foundWarehouses == null)
-					return
+						return
 
 					change warehouses_for_removal options { foundWarehouses.collectEntries{ [(it.stringId): it.dataSet.get("warehouse_name").value] } }
 				</action>
@@ -516,11 +516,11 @@
 
 					def tmpMap = [:]
 					for(itemId in repair_items.choices){
-					def riCase = findCase( {it._id.eq(itemId.defaultValue)} )
-					if(riCase != null){
-					def itemTitle = riCase.dataSet.get("title").value
-					tmpMap = tmpMap + [(itemId.defaultValue): itemTitle]
-					}
+						def riCase = findCase( {it._id.eq(itemId.defaultValue)} )
+						if(riCase != null){
+							def itemTitle = riCase.dataSet.get("title").value
+							tmpMap = tmpMap + [(itemId.defaultValue): itemTitle]
+						}
 					}
 
 					change repair_items_for_removal options { tmpMap }
@@ -587,7 +587,8 @@
 				<id>public_natural_legal_person</id>
 				<logic>
 					<behavior>editable</behavior>
-					<action trigger="set"> name: f.public_name,
+					<action trigger="set">
+						name: f.public_name,
 						taxID: f.public_taxID,
 						businessID: f.public_businessID,
 						natural_legal_person: f.public_natural_legal_person,
@@ -899,7 +900,7 @@
 					def vehicle = findCase( {it._id.eq(selectedVehicleId)} )
 
 					if(vehicle == null)
-					throw new IllegalArgumentException("Vehicle with id: " + selectedVehicleId + " does not exist anymore")
+						throw new IllegalArgumentException("Vehicle with id: " + selectedVehicleId + " does not exist anymore")
 
 					def selectedCustomerId = vehicle.dataSet.get("actual_customer_id").value
 
@@ -966,15 +967,17 @@
 		<event type="finish">
 			<id>t4_finish</id>
 			<actions phase="pre">
-				<action id="1">approve_extern_repair: f.approve_extern_repair,
+				<action id="1">
+					approve_extern_repair: f.approve_extern_repair,
 					val_accept: f.val_accept,
 					val_deny: f.val_deny;
 
 					if(approve_extern_repair.value == "apply"){
-					change val_accept value { 1 }
+						change val_accept value { 1 }
 					} else {
-					change val_deny value { 1 }
-					}</action>
+						change val_deny value { 1 }
+					}
+				</action>
 			</actions>
 		</event>
 	</transition>
@@ -1045,14 +1048,14 @@
 
 						def vehicleCase = findCase( {it._id.eq(vehicles.value)} )
 						if(vehicleCase == null)
-						return
+							return
 
 						def cusId = vehicleCase.getFieldValue("actual_customer_id") as String
 						if(cusId == null)
-						return
+							return
 
 						if(customers.options?.containsKey(cusId)){
-						change customers value { cusId }
+							change customers value { cusId }
 						}
 					</action>
 				</logic>
@@ -1108,20 +1111,20 @@
 
 						// not creating new vehicle - clear the taskref value
 						if(!btn.value &amp;&amp; veh_taskref.value != null &amp;&amp; veh_taskref.value != []){
-						clear_and_cancel_taskref(veh_taskref)
-						return
+							clear_and_cancel_taskref(veh_taskref)
+							return
 						}
 
 						// creating, but previous value present - clear the taskref value
 						if(btn.value &amp;&amp; veh_taskref.value != null &amp;&amp; veh_taskref.value != []){
-						clear_and_cancel_taskref(veh_taskref)
+							clear_and_cancel_taskref(veh_taskref)
 						}
 
 						// creating - reference creation form of new vehicle instance
 						if(btn.value){
-						def vehicleCase = createCase("vehicle")
-						def creationTask = assignTask("t_create", vehicleCase)
-						change veh_taskref value { [creationTask?.stringId] }
+							def vehicleCase = createCase("vehicle")
+							def creationTask = assignTask("t_create", vehicleCase)
+							change veh_taskref value { [creationTask?.stringId] }
 						}
 					</action>
 				</logic>
@@ -1217,20 +1220,20 @@
 
 						// not creating new vehicle - clear the taskref value
 						if(!btn.value &amp;&amp; cus_taskref.value != null &amp;&amp; cus_taskref.value != []){
-						clear_and_cancel_taskref(cus_taskref)
-						return
+							clear_and_cancel_taskref(cus_taskref)
+							return
 						}
 
 						// creating, but previous value present - clear the taskref value
 						if(btn.value &amp;&amp; cus_taskref.value != null &amp;&amp; cus_taskref.value != []){
-						clear_and_cancel_taskref(cus_taskref)
+							clear_and_cancel_taskref(cus_taskref)
 						}
 
 						// creating - reference creation form of new vehicle instance
 						if(btn.value){
-						def customerCase = createCase("customer")
-						def creationTask = assignTask("t_create", customerCase)
-						change cus_taskref value { [creationTask?.stringId] }
+							def customerCase = createCase("customer")
+							def creationTask = assignTask("t_create", customerCase)
+							change cus_taskref value { [creationTask?.stringId] }
 						}
 					</action>
 				</logic>
@@ -1293,14 +1296,14 @@
 					def vehicle_cases = findCases( { it.processIdentifier.eq("vehicle").and(it.dataSet.get("status").value.eq("assigned")) } )
 
 					if(vehicle_cases == null || vehicle_cases == [])
-					return
+						return
 
 					change vehicles options { [] }
 					change vehicles value { "" }
 
 					for(vehicle in vehicle_cases){
-					def val = vehicle.dataSet.get("licenceNumber").value + " - " + vehicle.dataSet.get("manufacturer").value + " " + vehicle.dataSet.get("model").value
-					change vehicles options { vehicles.options + [(vehicle.stringId): val] }
+						def val = vehicle.dataSet.get("licenceNumber").value + " - " + vehicle.dataSet.get("manufacturer").value + " " + vehicle.dataSet.get("model").value
+						change vehicles options { vehicles.options + [(vehicle.stringId): val] }
 					}
 				</action>
 				<!--				customers initialization-->
@@ -1309,20 +1312,20 @@
 
 					def customers_cases = findCases( { it.processIdentifier.eq("customer") } )
 					if(customers_cases == null || customers_cases == [])
-					return
+						return
 
 					change customers options { [] }
 					change customers value { "" }
 
 					for(customer in customers_cases){
-					def val
-					if(!customer.getFieldValue("natural_legal_person")){
-					val = customer.dataSet.get("surname").value + " " + customer.dataSet.get("name").value + "; " + customer.dataSet.get("city").value + ", " + customer.dataSet.get("street").value
-					}
-					else {
-					val = customer.dataSet.get("company_name").value + ", " + customer.dataSet.get("businessID").value
-					}
-					change customers options { customers.options + [(customer.stringId): val] }
+						def val
+						if(!customer.getFieldValue("natural_legal_person")){
+							val = customer.dataSet.get("surname").value + " " + customer.dataSet.get("name").value + "; " + customer.dataSet.get("city").value + ", " + customer.dataSet.get("street").value
+						}
+						else {
+							val = customer.dataSet.get("company_name").value + ", " + customer.dataSet.get("businessID").value
+						}
+						change customers options { customers.options + [(customer.stringId): val] }
 					}
 				</action>
 			</actions>
@@ -1338,16 +1341,16 @@
 					newlyCreated: f.creation_new_customer;
 
 					if(!newlyCreated.value){
-					change selected_customer_id value { customers.value }
+						change selected_customer_id value { customers.value }
 					}
 					// needed caseId is "in" taskref
 					else {
-					def creationTask = findTask( { it._id.eq(newlyCreatedTaskref.value.first()) } )
-					if(creationTask == null)
-					throw new IllegalArgumentException("Could not set the customer id for current repair: cannot find the creation task")
-					change selected_customer_id value { creationTask.caseId }
+						def creationTask = findTask( { it._id.eq(newlyCreatedTaskref.value.first()) } )
+						if(creationTask == null)
+							throw new IllegalArgumentException("Could not set the customer id for current repair: cannot find the creation task")
+						change selected_customer_id value { creationTask.caseId }
 
-					finishTask(creationTask)
+						finishTask(creationTask)
 					}
 				</action>
 				<!-- save selected vehicle (existing / newly created)-->
@@ -1359,26 +1362,26 @@
 					newlyCreated: f.creation_new_vehicle;
 
 					if(!newlyCreated.value){
-					change selected_vehicle_id value { vehicles.value }
+						change selected_vehicle_id value { vehicles.value }
 					}
 					else {
-					def creationTask = findTask( { it._id.eq(newlyCreatedTaskref.value.first()) } )
-					if(creationTask == null)
-					throw new IllegalArgumentException("Could not set the vehicle id for current repair: cannot find the creation task")
-					change selected_vehicle_id value { creationTask.caseId }
+						def creationTask = findTask( { it._id.eq(newlyCreatedTaskref.value.first()) } )
+						if(creationTask == null)
+							throw new IllegalArgumentException("Could not set the vehicle id for current repair: cannot find the creation task")
+						change selected_vehicle_id value { creationTask.caseId }
 
-					setData(creationTask, [
-					"status" : [
-					"type": "enumeration_map",
-					"value": "assigned"
-					],
-					"actual_customer_id" : [
-					"type": "text",
-					"value": selected_customer_id.value
-					],
-					])
+						setData(creationTask, [
+							"status" : [
+								"type": "enumeration_map",
+								"value": "assigned"
+							],
+							"actual_customer_id" : [
+								"type": "text",
+								"value": selected_customer_id.value
+							],
+						])
 
-					finishTask(creationTask)
+						finishTask(creationTask)
 					}
 				</action>
 				<!-- if customer is newly created, add selected_vehicle_id to his vehicles enumeration if: the vehicle is unassigned
@@ -1392,26 +1395,26 @@
 
 					def selectedVehicle = findCase( {it._id.eq(selected_vehicle_id.value)} )
 					if(selectedVehicle == null)
-					return
+						return
 
 					def vehicleStatus = selectedVehicle.getFieldValue("status") as String
 					if(vehicleStatus == "unassigned")
-					canAddVehicle = true
+						canAddVehicle = true
 					else if(vehicleStatus == "assigned" &amp;&amp; isNewlyCreatedVehicle.value)
-					canAddVehicle = true
+						canAddVehicle = true
 
 					if(canAddVehicle){
-					def selectedCustomer = findCase( {it._id.eq(selected_customer_id.value)} )
-					if(selectedCustomer == null)
-					return
+						def selectedCustomer = findCase( {it._id.eq(selected_customer_id.value)} )
+						if(selectedCustomer == null)
+							return
 
-					def customerVehicles = selectedCustomer.dataSet.get("vehicles").choices
-					def selectedVehicleId = new com.netgrif.application.engine.petrinet.domain.I18nString(selected_vehicle_id.value)
-					if(customerVehicles == null)
-					selectedCustomer.dataSet.get("vehicles").choices = [selectedVehicleId]
-					else
-					selectedCustomer.dataSet.get("vehicles").choices = customerVehicles + [selectedVehicleId]
-					workflowService.save(selectedCustomer)
+						def customerVehicles = selectedCustomer.dataSet.get("vehicles").choices
+						def selectedVehicleId = new com.netgrif.application.engine.petrinet.domain.I18nString(selected_vehicle_id.value)
+						if(customerVehicles == null)
+							selectedCustomer.dataSet.get("vehicles").choices = [selectedVehicleId]
+						else
+							selectedCustomer.dataSet.get("vehicles").choices = customerVehicles + [selectedVehicleId]
+						workflowService.save(selectedCustomer)
 					}
 					else return
 				</action>
@@ -1513,9 +1516,7 @@
 
 						make remove2,hidden on thisTask when { true }
 						make remove3,visible on thisTask when { true }
-						change check value {return true}
-
-
+						change check value { return true }
 					</action>
 
 				</logic>
@@ -1549,12 +1550,11 @@
 				<action>
 					check: f.public_remove_check;
 					if(check.value){
-					async.run{
-					assignTask("t5")
-					finishTask("t5")
+						async.run{
+							assignTask("t5")
+							finishTask("t5")
+						}
 					}
-					}
-
 				</action>
 			</actions>
 		</event>
@@ -1584,19 +1584,19 @@
 
 						def selectedWarehouse = findCase( {it._id.eq(warehouses.value)} )
 						if(selectedWarehouse == null)
-						return
+							return
 
 						def itemIds = selectedWarehouse.dataSet.get("items").choices
 						if(itemIds == null || itemIds == [])
-						return
+							return
 
 						def tmpMap = [:]
 						for(itemId in itemIds){
-						def itemCase = findCase( {it._id.eq(itemId.defaultValue)} )
-						if(itemCase != null){
-						def itemTitle = itemCase.dataSet.get("title").value
-						tmpMap = tmpMap + [(itemId.defaultValue): itemTitle]
-						}
+							def itemCase = findCase( {it._id.eq(itemId.defaultValue)} )
+								if(itemCase != null){
+							def itemTitle = itemCase.dataSet.get("title").value
+								tmpMap = tmpMap + [(itemId.defaultValue): itemTitle]
+							}
 						}
 
 						change warehouse_items options { tmpMap }
@@ -1615,11 +1615,11 @@
 						change selected_wi_taskref value { [] }
 
 						for(wiId in warehouse_items.value){
-						def wiTask = findTask( {it.caseId.eq(wiId).and(it.transitionId.eq("t_repair_short_description"))} )
-						if(wiTask == null)
-						return
+							def wiTask = findTask( {it.caseId.eq(wiId).and(it.transitionId.eq("t_repair_short_description"))} )
+							if(wiTask == null)
+								return
 
-						change selected_wi_taskref value { selected_wi_taskref.value + [wiTask.stringId] }
+							change selected_wi_taskref value { selected_wi_taskref.value + [wiTask.stringId] }
 						}
 					</action>
 				</logic>
@@ -1643,7 +1643,7 @@
 
 					def foundWarehouses = findCases({ it.processIdentifier.eq("warehouse") })
 					if (foundWarehouses == null)
-					return
+						return
 
 					change warehouses options { foundWarehouses.collectEntries{ [(it.stringId): it.dataSet.get("warehouse_name").value] } }
 				</action>
@@ -1679,29 +1679,29 @@
 					warehouse_items: f.warehouse_items;
 
 					for(wiId in warehouse_items.value){
-					def wtrCase = createCase("wi_to_ri")
+						def wtrCase = createCase("wi_to_ri")
 
-					def initTask = assignTask("t_initialize", wtrCase)
-					setData(initTask, [
-					"origin_wi_id": [
-					"type": "text",
-					"value": wiId
-					],
-					"origin_wh_id": [
-					"type": "text",
-					"value": warehouses.value
-					],
-					"target_repair_id": [
-					"type": "text",
-					"value": useCase.stringId
-					]
-					])
-					finishTask(initTask)
+						def initTask = assignTask("t_initialize", wtrCase)
+						setData(initTask, [
+							"origin_wi_id": [
+								"type": "text",
+								"value": wiId
+							],
+							"origin_wh_id": [
+								"type": "text",
+								"value": warehouses.value
+							],
+							"target_repair_id": [
+								"type": "text",
+								"value": useCase.stringId
+							]
+						])
+						finishTask(initTask)
 
-					async.run{
-					def doTask = assignTask("t_do_wi_to_ri", wtrCase)
-					finishTask(doTask)
-					}
+						async.run{
+							def doTask = assignTask("t_do_wi_to_ri", wtrCase)
+							finishTask(doTask)
+						}
 					}
 				</action>
 			</actions>
@@ -1777,22 +1777,22 @@
 						is_finished: f.is_finished;
 
 						if(is_finished.value) {
-						def t_finish_repairTask = findTask( { it.caseId.eq(useCase.stringId).and(it.transitionId.eq("t_finish_repair")) } )
-						if (t_finish_repairTask != null) {
-						async.run{
-						assignTask(t_finish_repairTask)
-						finishTask(t_finish_repairTask)
-						}
-						}
+							def t_finish_repairTask = findTask( { it.caseId.eq(useCase.stringId).and(it.transitionId.eq("t_finish_repair")) } )
+							if (t_finish_repairTask != null) {
+								async.run{
+									assignTask(t_finish_repairTask)
+									finishTask(t_finish_repairTask)
+								}
+							}
 						}
 						else if (!is_finished.value) {
-						def t_reopen_repairTask = findTask( { it.caseId.eq(useCase.stringId).and(it.transitionId.eq("t_reopen_repair")) } )
-						if (t_reopen_repairTask != null) {
-						async.run{
-						assignTask(t_reopen_repairTask)
-						finishTask(t_reopen_repairTask)
-						}
-						}
+							def t_reopen_repairTask = findTask( { it.caseId.eq(useCase.stringId).and(it.transitionId.eq("t_reopen_repair")) } )
+							if (t_reopen_repairTask != null) {
+								async.run{
+									assignTask(t_reopen_repairTask)
+									finishTask(t_reopen_repairTask)
+								}
+							}
 						}
 					</action>
 				</logic>
