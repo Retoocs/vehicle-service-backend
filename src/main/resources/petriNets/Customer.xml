@@ -272,6 +272,11 @@
 		</dataGroup>
 		<event type="finish">
 			<id>0</id>
+			<actions phase="pre">
+				<action>
+					getAndSetAddressFromEnum("adress_form")
+				</action>
+			</actions>
 			<actions phase="post">
 				<action>
 					company_name: f.company_name,
@@ -297,7 +302,7 @@
 					if(Case == null)
 						throw new IllegalArgumentException("Cannot find your instance of process Child addresses enumeration")
 
-					async.run{ finishTask("t_select_address", Case) }
+					finishTask("t_select_address", Case)
 				</action>
 				<action>
 					useCase.dataSet.get("adress_form").value = []
@@ -329,15 +334,14 @@
 					if(addressTask == null)
 						throw new IllegalArgumentException("Cannot find task with id t_select_address in ${Case.title}")
 
-					async.run{ assignTask(addressTask) }
-                    change adress_form value{ [addressTask.stringId] }
-
-                    setData("t_select_address", Case, [
+					assignTask(addressTask)
+                    setData(addressTask, [
 						"target_id": [
 							"value": useCase.stringId,
 							"type" : "text"
 						],
 					])
+					change adress_form value{ [addressTask.stringId] }
 				</action>
 			</actions>
 		</event>
@@ -587,7 +591,7 @@
 							if(adress_form.value == null || adress_form.value == [])
 								return
 							def tazk = findTask( {it._id.eq(adress_form.value[0])} )
-							async.run{ cancelTask(tazk) }
+							async.run { cancelTask(tazk) }
 							change adress_form value { [] }
 
 							return
@@ -601,16 +605,14 @@
 						if(enumTask == null)
 							throw new IllegalArgumentException("Cannot find task with id t_select_address in ${myEnumCase.title}")
 
-						async.run{ assignTask(enumTask) }
-
-						change adress_form value { [enumTask.stringId] }
-
-						setData("t_select_address", myEnumCase, [
+						async.run { assignTask(enumTask) }
+						setData(enumTask, [
 							"target_id": [
 								"value": useCase.stringId,
 								"type" : "text"
 							],
 						])
+						change adress_form value { [enumTask.stringId] }
 					</action>
 				</logic>
 			</dataRef>
@@ -710,8 +712,8 @@
 					def exists = false
 					for(taskpair in cea.tasks){
 						if(taskpair.transition == "t_select_address"){
-						exists = true
-						break
+							exists = true
+							break
 						}
 					}
 
@@ -724,19 +726,10 @@
 			<id>t_update_finish</id>
 			<actions phase="pre">
 				<action>
-					def myEnumCase = findCase( {it.processIdentifier.eq("child_enum_addresses").and(it.author.email.eq(loggedUser().email))} )
-					if(myEnumCase == null)
-						throw new IllegalArgumentException("Cannot find your instance of process Child address enumeration")
-
-					async.run{ finishTask("t_select_address", myEnumCase) }
+					getAndSetAddressFromEnum("adress_form")
 				</action>
 			</actions>
 			<actions phase="post">
-				<action>
-					adress_form: f.adress_form;
-
-					change adress_form value { [] }
-				</action>
 				<action>
 					company_name: f.company_name,
 					surname: f.surname,
@@ -750,6 +743,17 @@
 							return company_name.value;
 						}
 					}
+				</action>
+				<action>
+					def myEnumCase = findCase( {it.processIdentifier.eq("child_enum_addresses").and(it.author.email.eq(loggedUser().email))} )
+					if(myEnumCase == null)
+						throw new IllegalArgumentException("Cannot find your instance of process Child address enumeration")
+
+					finishTask("t_select_address", myEnumCase)
+				</action>
+				<action>
+					adress_form: f.adress_form;
+					change adress_form value { [] }
 				</action>
 			</actions>
 		</event>
@@ -1185,15 +1189,15 @@
 					def new_vehicle_instance = findCase( { it._id.eq(new_created_vehicle_task.caseId) } )
 
 					setData("t_synchronize", new_vehicle_instance, [
-								"actual_customer_id": [
-									"value": useCase.stringId,
-									"type" : "text"
-								],
-								"status": [
-									"value": "assigned",
-									"type" : "enumeration_map"
-								],
-							])
+						"actual_customer_id": [
+							"value": useCase.stringId,
+							"type" : "text"
+						],
+						"status": [
+							"value": "assigned",
+							"type" : "enumeration_map"
+						],
+					])
 
 					change vehicles choices { return vehicles.choices + [new_created_vehicle_task.caseId] }
 

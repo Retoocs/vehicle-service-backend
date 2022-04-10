@@ -119,9 +119,8 @@
 		<desc name="list_actualization_date_cities_desc">Date when last change in list of cities has been made</desc>
 		<action trigger="get">
 			list_actualization_date_cities: f.list_actualization_date_cities;
-			//TODO: Groupid
-			//def mainCase = findCase( {it.processIdentifier.eq("main_enum_addresses")} );
-			//change list_actualization_date_cities value { mainCase?.dataSet.get("last_imported_file_cities")?.value; }
+			def mainCase = findCase( {it.processIdentifier.eq("main_enum_addresses")} );
+			change list_actualization_date_cities value { mainCase?.dataSet.get("last_imported_file")?.value; }
 		</action>
 	</data>
 	<data type="dateTime">
@@ -130,9 +129,8 @@
 		<desc name="list_actualization_date_streets_desc">Date when last change in list of streets has been made</desc>
 		<action trigger="get">
 			list_actualization_date_streets: f.list_actualization_date_streets;
-			//TODO: Groupid
-			//def mainCase = findCase( {it.processIdentifier.eq("main_enum_addresses")} );
-			//change list_actualization_date_streets value { mainCase?.dataSet.get("last_imported_file_streets")?.value; }
+			def mainCase = findCase( {it.processIdentifier.eq("main_enum_addresses")} );
+			change list_actualization_date_streets value { mainCase?.dataSet.get("last_imported_file")?.value; }
 		</action>
 	</data>
 	<data type="dateTime">
@@ -246,111 +244,6 @@
 		</event>
 		<event type="delegate">
 			<title></title>
-		</event>
-	</transition>
-	<transition>
-		<id>t_process_selection</id>
-		<x>740</x>
-		<y>380</y>
-		<layout>
-			<offset>0</offset>
-		</layout>
-		<label>Process the selection [auto]</label>
-		<trigger type="auto"/>
-		<event type="assign">
-			<id>0</id>
-			<actions phase="pre">
-				<action>
-					status: f.status;
-					change status value {"Processing in progress"; }
-				</action>
-			</actions>
-			<actions phase="post">
-				<action>
-					cities: f.cities,
-					filtered_streets: f.filtered_streets,
-					undefined_city: f.undefined_city,
-					undefined_street: f.undefined_street,
-					is_undefined_city: f.is_undefined_city,
-					is_undefined_street: f.is_undefined_street,
-					house_number: f.house_number,
-					postal_code: f.postal_code,
-					target_id: f.target_id;
-
-					if(target_id.value == null)
-						return
-
-					def targetCase = findCase( {it._id.eq(target_id.value)} )
-					if(targetCase == null)
-						return
-
-					String tmpCity, tmpStreet
-
-					if(is_undefined_city.value)
-						tmpCity = undefined_city.value
-					else
-						tmpCity = cities.options?.get(cities.value)?.defaultValue
-
-					if(is_undefined_street.value)
-						tmpStreet = undefined_street.value
-					else
-						tmpStreet = filtered_streets.options?.get(filtered_streets.value)?.defaultValue
-
-					setData("t_synchronize", targetCase, [
-						"postal_code": [
-							"value": postal_code.value,
-							"type" : "text"
-						],
-						"city": [
-							"value": tmpCity,
-							"type" : "text"
-						],
-						"street": [
-							"value": tmpStreet,
-							"type" : "text"
-						],
-						"house_number": [
-							"value": house_number.value,
-							"type" : "text"
-						],
-					])
-				</action>
-			</actions>
-		</event>
-		<event type="finish">
-			<id>1</id>
-			<actions phase="pre">
-				<action>
-					trans: t.t_select_address,
-					cities: f.cities,
-					postal_code: f.postal_code,
-					filtered_streets: f.filtered_streets,
-					undefined_city: f.undefined_city,
-					undefined_street: f.undefined_street,
-					is_undefined_city: f.is_undefined_city,
-					is_undefined_street: f.is_undefined_street,
-					house_number: f.house_number,
-					flag_city_no_action_trigger: f.flag_city_no_action_trigger,
-					flag_street_no_action_trigger: f.flag_street_no_action_trigger,
-					target_id: f.target_id;
-
-					clear_selection(
-						cities, postal_code, filtered_streets, undefined_city,
-						undefined_street, is_undefined_city, is_undefined_street, house_number,
-						flag_city_no_action_trigger, flag_street_no_action_trigger, target_id, trans
-					)
-				</action>
-			</actions>
-			<actions phase="post">
-				<action>
-					requests_processed: f.requests_processed;
-					change requests_processed value { requests_processed.value+1; }
-				</action>
-				<action>
-					status: f.status;
-					change status value { "Waiting to start selection"; }
-				</action>
-			</actions>
 		</event>
 	</transition>
 	<transition>
@@ -700,8 +593,32 @@
 			<id>2</id>
 			<actions phase="post">
 				<action>
+					trans: t.t_select_address,
+					cities: f.cities,
+					postal_code: f.postal_code,
+					filtered_streets: f.filtered_streets,
+					undefined_city: f.undefined_city,
+					undefined_street: f.undefined_street,
+					is_undefined_city: f.is_undefined_city,
+					is_undefined_street: f.is_undefined_street,
+					house_number: f.house_number,
+					flag_city_no_action_trigger: f.flag_city_no_action_trigger,
+					flag_street_no_action_trigger: f.flag_street_no_action_trigger,
+					target_id: f.target_id;
+
+					clear_selection(
+						cities, postal_code, filtered_streets, undefined_city,
+						undefined_street, is_undefined_city, is_undefined_street, house_number,
+						flag_city_no_action_trigger, flag_street_no_action_trigger, target_id, trans
+					)
+				</action>
+				<action>
+					requests_processed: f.requests_processed;
+					change requests_processed value { requests_processed.value+1; }
+				</action>
+				<action>
 					status: f.status;
-					change status value { "Address selected"; }
+					change status value { "Waiting to start selection"; }
 				</action>
 			</actions>
 		</event>
@@ -723,12 +640,11 @@
 					system_streets: f.system_streets;
 
 					def mainCase = findCase( {it.processIdentifier.eq("main_enum_addresses")} )
-
 					if(mainCase == null)
 						return
 
-					change cities options { mainCase.dataSet['system_cities'].options }
-					change system_streets options { mainCase.dataSet['system_streets'].options }
+					change cities options { mainCase.getField('system_cities').options }
+					change system_streets options { mainCase.getField('system_streets').options }
 				</action>
 			</actions>
 			<actions phase="post">
@@ -756,14 +672,6 @@
 		<x>500</x>
 		<y>380</y>
 		<label>created</label>
-		<tokens>0</tokens>
-		<static>false</static>
-	</place>
-	<place>
-		<id>p3</id>
-		<x>940</x>
-		<y>380</y>
-		<label>address selected</label>
 		<tokens>0</tokens>
 		<static>false</static>
 	</place>
@@ -809,20 +717,6 @@
 		<id>a4</id>
 		<type>regular</type>
 		<sourceId>t_select_address</sourceId>
-		<destinationId>p3</destinationId>
-		<multiplicity>1</multiplicity>
-	</arc>
-	<arc>
-		<id>a5</id>
-		<type>regular</type>
-		<sourceId>p3</sourceId>
-		<destinationId>t_process_selection</destinationId>
-		<multiplicity>1</multiplicity>
-	</arc>
-	<arc>
-		<id>a6</id>
-		<type>regular</type>
-		<sourceId>t_process_selection</sourceId>
 		<destinationId>p2</destinationId>
 		<multiplicity>1</multiplicity>
 	</arc>

@@ -252,7 +252,6 @@ change check_all value { false }
 system_manufacturers: f.system_manufacturers,
 system_models: f.system_models;
 
-// todo: change group id
 def childEnums = findCases( {it.processIdentifier.eq("child_enum_vehicles")} )
 if(childEnums == null)
     return
