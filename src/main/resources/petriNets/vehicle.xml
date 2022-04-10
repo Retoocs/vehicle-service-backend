@@ -55,6 +55,7 @@
 	<data type="text">
 		<id>vin</id>
 		<title name="vin">VIN</title>
+<!--		<valid>regex("^[A-HJ-NPR-Za-hj-npr-z\d]{8}[\dX][A-HJ-NPR-Za-hj-npr-z\d]{2}\d{6}$")</valid>-->
 	</data>
 	<data type="text">
 		<id>manufacturer</id>
@@ -63,6 +64,7 @@
 	<data type="text">
 		<id>licenceNumber</id>
 		<title name="licenceNumber">Licence munber</title>
+<!--		<valid>regex("^[0-9a-zA-Z]{4,9}$")</valid>-->
 	</data>
 	<data type="text">
 		<id>model</id>
@@ -80,10 +82,13 @@
 	<data type="number">
 		<id>kilometers</id>
 		<title name="kilometers">Number of KM</title>
+		<valid>positive</valid>
 	</data>
 	<data type="number">
 		<id>manufactureYear</id>
 		<title name="manufactureYear">Year of manufacture</title>
+<!--		<valid>regex("^(19|[2-9][0-9])\d{2}$")</valid>-->
+		<valid>positive</valid>
 	</data>
 	<data type="enumeration_map">
 		<id>status</id>
@@ -155,10 +160,12 @@
 		<id>oilChangeKM</id>
 		<title name="oilChangeKM">Number of kilomenters when last oil change was made</title>
 		<init>0</init>
+		<valid>positive</valid>
 	</data>
 	<data type="text">
 		<id>carDescription</id>
 		<title name="carDescription">Car description</title>
+		<valid>minLength 2</valid>
 	</data>
 	<data type="button">
 		<id>remove_from_customer_1</id>
