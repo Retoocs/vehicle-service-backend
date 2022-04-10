@@ -54,14 +54,17 @@
 	<data type="text">
 		<id>warehouse_name</id>
 		<title name="warehouse_name">Warehouse name</title>
+		<valid>minLength 2</valid>
 	</data>
 	<data type="text">
 		<id>location</id>
 		<title name="location">Location</title>
+<!--		<valid>minLength 2</valid>-->
 	</data>
 	<data type="text">
 		<id>description</id>
 		<title name="description">Description</title>
+<!--		<valid>minLength 2</valid>-->
 		<component>
 			<name>area</name>
 		</component>
@@ -108,14 +111,17 @@
 	<data type="text">
 		<id>postal_code</id>
 		<title name="postal_code">Postal code</title>
+<!--		<valid>regex("^\d{3} ?\d{2}$")</valid>-->
 	</data>
 	<data type="text">
 		<id>city</id>
 		<title name="city">City</title>
+<!--		<valid>minLength 2</valid>-->
 	</data>
 	<data type="text">
 		<id>street</id>
 		<title name="street">Street</title>
+<!--		<valid>minLength 2</valid>-->
 	</data>
 	<data type="text">
 		<id>house_number</id>

@@ -59,34 +59,42 @@
 	<data type="text">
 		<id>name</id>
 		<title name="name">Name</title>
+		<valid>minLength 2</valid>
 	</data>
 	<data type="text">
 		<id>surname</id>
 		<title name="surname">Surname</title>
+		<valid>minLength 2</valid>
 	</data>
 	<data type="text">
 		<id>company_name</id>
 		<title name="company_name">Company name</title>
+		<valid>minLength 2</valid>
 	</data>
 	<data type="text">
 		<id>email</id>
 		<title name="email">E-mail</title>
+		<valid>email</valid>
 	</data>
 	<data type="text">
 		<id>businessID</id>
 		<title name="businessID">Business ID</title>
+<!--		<valid>regex("^[A-Z]{2}[0-9]{10}$")</valid>-->
 	</data>
 	<data type="text">
 		<id>taxID</id>
 		<title name="taxID">Tax ID</title>
+<!--		<valid>regex("^[0-9]{10}$")</valid>-->
 	</data>
 	<data type="text">
 		<id>phone_number</id>
 		<title name="phone_number">Phone number</title>
+<!--		<valid>regex("^\+?[0-9]{7,14}$")</valid>-->
 	</data>
 	<data type="text">
 		<id>street</id>
 		<title name="street">Street</title>
+		<!--		<valid>minLength 2</valid>-->
 	</data>
 	<data type="text">
 		<id>house_number</id>
@@ -95,10 +103,12 @@
 	<data type="text">
 		<id>city</id>
 		<title name="city">City</title>
+		<!--		<valid>minLength 2</valid>-->
 	</data>
 	<data type="text">
 		<id>postal_code</id>
 		<title name="postal_code">Postal code</title>
+		<!--		<valid>regex("^\d{3} ?\d{2}$")</valid>-->
 	</data>
 	<data type="boolean">
 		<id>natural_legal_person</id>
