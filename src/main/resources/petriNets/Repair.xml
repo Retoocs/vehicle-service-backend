@@ -239,7 +239,7 @@
 	</data>
 	<data type="multichoice_map">
 		<id>repair_items_for_removal</id>
-		<title name="repair_items_for_removal">Repair items</title>
+		<title name="repair_items_for_removal">Repaired items for removal</title>
 	</data>
 	<data type="taskRef">
 		<id>selected_wi_taskref</id>
@@ -317,6 +317,12 @@
 		<i18nString name="remove_from_warehouse_1">Vymazať</i18nString>
 		<i18nString name="remove_from_warehouse_2">Potvrdiť vymazanie</i18nString>
 		<i18nString name="remove_from_warehouse_3">Kliknite na dokončiť pre vymazanie žiadosti</i18nString>
+		<i18nString name="repair_items_for_removal">Opravené položky na odstránenie</i18nString>
+		<i18nString name="repair_items">Položky na opravu</i18nString>
+		<i18nString name="warehouse_items">Položky skladu</i18nString>
+		<i18nString name="warehouses_for_removal">Vyberte cieľový sklad</i18nString>
+		<i18nString name="warehouses">Sklady</i18nString>
+		<i18nString name="company_name">Názov firmy</i18nString>
 	</i18n>
 	<i18n locale="de">
 		<i18nString name="case_title">Reparatur</i18nString>
@@ -362,6 +368,12 @@
 		<i18nString name="remove_from_warehouse_1">Löschen</i18nString>
 		<i18nString name="remove_from_warehouse_2">Löschung bestätigen</i18nString>
 		<i18nString name="remove_from_warehouse_3">Klicken Sie auf Fertig stellen, um das Entfernen zu akzeptieren</i18nString>
+		<i18nString name="repair_items_for_removal">Berichtigte Einträge zu entfernen</i18nString>
+		<i18nString name="repair_items">Gegenstände zur Reparatur</i18nString>
+		<i18nString name="warehouse_items">Lagerartikel</i18nString>
+		<i18nString name="warehouses_for_removal">Wählen Sie das Ziellager</i18nString>
+		<i18nString name="warehouses">Lagerhäuser</i18nString>
+		<i18nString name="company_name">Name des Unternehmens</i18nString>
 
 	</i18n>
 	<!-- TRANSITIONS -->
