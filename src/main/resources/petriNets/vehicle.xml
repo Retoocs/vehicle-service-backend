@@ -723,7 +723,7 @@
 			<dataRef>
 				<id>manufacturer</id>
 				<logic>
-					<behavior>hidden</behavior>
+					<behavior>visible</behavior>
 				</logic>
 				<layout>
 					<x>0</x>
@@ -738,7 +738,7 @@
 			<dataRef>
 				<id>model</id>
 				<logic>
-					<behavior>hidden</behavior>
+					<behavior>visible</behavior>
 				</logic>
 				<layout>
 					<x>2</x>
