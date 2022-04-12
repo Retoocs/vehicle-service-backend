@@ -376,6 +376,18 @@
 				<id>manufacturer</id>
 				<logic>
 					<behavior>visible</behavior>
+					<action trigger="set">
+						model: f.model,
+						manufacturer: f.manufacturer,
+						licenceNumber: f.licenceNumber;
+
+						changeCaseProperty "title" about {
+							def stringModel = (model.value != null) ? model.value : "Model"
+							def stringManufacturer = (manufacturer.value != null) ? manufacturer.value : "Manufacturer"
+							def stringLicenceNumber = (licenceNumber.value != null) ? licenceNumber.value : "Licence Number"
+							"${stringLicenceNumber} - ${stringManufacturer} ${stringModel}"
+						}
+					</action>
 				</logic>
 				<layout>
 					<x>0</x>
@@ -391,6 +403,18 @@
 				<id>model</id>
 				<logic>
 					<behavior>visible</behavior>
+					<action trigger="set">
+						model: f.model,
+						manufacturer: f.manufacturer,
+						licenceNumber: f.licenceNumber;
+
+						changeCaseProperty "title" about {
+							def stringModel = (model.value != null) ? model.value : "Model"
+							def stringManufacturer = (manufacturer.value != null) ? manufacturer.value : "Manufacturer"
+							def stringLicenceNumber = (licenceNumber.value != null) ? licenceNumber.value : "Licence Number"
+							"${stringLicenceNumber} - ${stringManufacturer} ${stringModel}"
+						}
+					</action>
 				</logic>
 				<layout>
 					<x>2</x>
@@ -422,76 +446,25 @@
 				</layout>
 			</dataRef>
 			<dataRef>
-				<id>manufacturer</id>
-				<logic>
-					<behavior>visible</behavior>
-					<action trigger="set">model: f.model,
-						manufacturer: f.manufacturer,
-						licenceNumber: f.licenceNumber;
-
-						changeCaseProperty "title" about {
-						def stringModel = (model.value != null) ? model.value : "Model"
-						def stringManufacturer = (manufacturer.value != null) ? manufacturer.value : "Manufacturer"
-						def stringLicenceNumber = (licenceNumber.value != null) ? licenceNumber.value : "Licence Number"
-						"${stringLicenceNumber} - ${stringManufacturer} ${stringModel}"
-						}
-					</action>
-				</logic>
-				<layout>
-					<x>0</x>
-					<y>1</y>
-					<rows>1</rows>
-					<cols>2</cols>
-					<offset>0</offset>
-					<template>material</template>
-					<appearance>outline</appearance>
-				</layout>
-			</dataRef>
-			<dataRef>
 				<id>licenceNumber</id>
 				<logic>
 					<behavior>visible</behavior>
-					<action trigger="set">model: f.model,
+					<action trigger="set">
+						model: f.model,
 						manufacturer: f.manufacturer,
 						licenceNumber: f.licenceNumber;
 
 						changeCaseProperty "title" about {
-						def stringModel = (model.value != null) ? model.value : "Model"
-						def stringManufacturer = (manufacturer.value != null) ? manufacturer.value : "Manufacturer"
-						def stringLicenceNumber = (licenceNumber.value != null) ? licenceNumber.value : "Licence Number"
-						"${stringLicenceNumber} - ${stringManufacturer} ${stringModel}"
+							def stringModel = (model.value != null) ? model.value : "Model"
+							def stringManufacturer = (manufacturer.value != null) ? manufacturer.value : "Manufacturer"
+							def stringLicenceNumber = (licenceNumber.value != null) ? licenceNumber.value : "Licence Number"
+							"${stringLicenceNumber} - ${stringManufacturer} ${stringModel}"
 						}
 					</action>
 				</logic>
 				<layout>
 					<x>2</x>
 					<y>0</y>
-					<rows>1</rows>
-					<cols>2</cols>
-					<offset>0</offset>
-					<template>material</template>
-					<appearance>outline</appearance>
-				</layout>
-			</dataRef>
-			<dataRef>
-				<id>model</id>
-				<logic>
-					<behavior>visible</behavior>
-					<action trigger="set">model: f.model,
-						manufacturer: f.manufacturer,
-						licenceNumber: f.licenceNumber;
-
-						changeCaseProperty "title" about {
-						def stringModel = (model.value != null) ? model.value : "Model"
-						def stringManufacturer = (manufacturer.value != null) ? manufacturer.value : "Manufacturer"
-						def stringLicenceNumber = (licenceNumber.value != null) ? licenceNumber.value : "Licence Number"
-						"${stringLicenceNumber} - ${stringManufacturer} ${stringModel}"
-						}
-					</action>
-				</logic>
-				<layout>
-					<x>2</x>
-					<y>1</y>
 					<rows>1</rows>
 					<cols>2</cols>
 					<offset>0</offset>
