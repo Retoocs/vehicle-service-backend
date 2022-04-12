@@ -249,6 +249,25 @@
 		<id>OENumbers</id>
 		<title>OENumbers</title>
 	</data>
+	<data type="taskRef">
+		<id>create_extern_taskref</id>
+		<title/>
+		<init>t25</init>
+	</data>
+	<data type="enumeration">
+		<id>approve_extern_repair</id>
+		<title/>
+		<options>
+			<option key="apply">apply</option>
+			<option key="deny">deny</option>
+		</options>
+		<init>apply</init>
+	</data>
+	<data type="taskRef">
+		<id>complex_creation_taskref</id>
+		<title/>
+		<init>t26</init>
+	</data>
 	<!-- I18NS -->
 	<i18n locale="sk">
 		<i18nString name="case_title">Oprava</i18nString>
@@ -527,11 +546,8 @@
 					is_intern: f.is_intern,
 					is_extern: f.is_extern;
 
-					if(userService.getLoggedOrSystem().email == "anonym@netgrif.com"){
+					if(userService.getLoggedOrSystem().email == "super@netgrif.com"){
 						change is_extern value { 1 }
-					}
-					else {
-						change is_intern value { 1 }
 					}
 				</action>
 			</actions>
@@ -546,6 +562,193 @@
 		</layout>
 		<label>Create - extern</label>
 		<dataGroup>
+			<id>t2_0</id>
+			<cols>4</cols>
+			<layout>grid</layout>
+			<dataRef>
+				<id>create_extern_taskref</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
+	</transition>
+	<transition>
+		<id>t_quick_create</id>
+		<x>820</x>
+		<y>580</y>
+		<layout>
+			<offset>0</offset>
+		</layout>
+		<label name="t_quick_create">Quick creation</label>
+		<dataGroup>
+			<id>dg0</id>
+			<stretch>true</stretch>
+			<dataRef>
+				<id>vehicles</id>
+				<logic>
+					<behavior>editable</behavior>
+					<behavior>required</behavior>
+				</logic>
+			</dataRef>
+			<dataRef>
+				<id>priority</id>
+				<logic>
+					<behavior>editable</behavior>
+					<behavior>required</behavior>
+				</logic>
+			</dataRef>
+			<dataRef>
+				<id>description</id>
+				<logic>
+					<behavior>editable</behavior>
+					<behavior>required</behavior>
+				</logic>
+			</dataRef>
+		</dataGroup>
+		<event type="assign">
+			<id>0</id>
+			<actions phase="pre">
+				<action>
+					vehicles: f.vehicles;
+
+					def vehicle_cases = findCases( { it.processIdentifier.eq("vehicle").and(it.dataSet.get("status").value.eq("assigned")) } )
+
+					if(vehicle_cases == null || vehicle_case == [])
+						return
+
+					change vehicles options {[]}
+
+					for(vehicle in vehicle_cases){
+						def val = vehicle.dataSet.get("licenceNumber").value + " - " + vehicle.dataSet.get("manufacturer").value + " " + vehicle.dataSet.get("model").value
+						change vehicles options { vehicles.options + [(vehicle.stringId): val]; }
+					}
+				</action>
+			</actions>
+		</event>
+		<event type="finish">
+			<id>1</id>
+			<actions phase="pre">
+<!--				todo-->
+				<action>
+					selected_vehicle_id: f.selected_vehicle_id,
+					selected_customer_id: f.selected_customer_id,
+					vehicles: f.vehicles;
+
+					def selectedVehicleId = vehicles.value
+					def vehicle = findCase( {it._id.eq(selectedVehicleId)} )
+
+					if(vehicle == null)
+						throw new IllegalArgumentException("Vehicle with id: " + selectedVehicleId + " does not exist anymore")
+
+					// def selectedCustomerId = vehicle.dataSet.get("customer_id").value
+
+					change selected_vehicle_id value { selectedVehicleId }
+					// change selected_customer_id value { selectedCustomerId }
+				</action>
+				<!-- change status -->
+				<action>
+					status: f.status;
+
+					change status value { return "started"; }
+				</action>
+			</actions>
+			<actions phase="post">
+				<action>
+					vehicles: f.vehicles;
+
+					change vehicles value { null }
+					change vehicles options { [:] }
+				</action>
+			</actions>
+		</event>
+	</transition>
+	<transition>
+		<id>t4</id>
+		<x>1060</x>
+		<y>180</y>
+		<layout>
+			<offset>0</offset>
+		</layout>
+		<label>Validate</label>
+		<dataGroup>
+			<id>t4_0</id>
+			<cols>4</cols>
+			<layout>grid</layout>
+			<dataRef>
+				<id>create_extern_taskref</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>approve_extern_repair</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
+		<event type="finish">
+			<id>t4_finish</id>
+			<actions phase="pre">
+				<action id="1">approve_extern_repair: f.approve_extern_repair,
+val_accept: f.val_accept,
+val_deny: f.val_deny;
+
+if(approve_extern_repair.value == "apply"){
+    change val_accept value { 1 }
+} else {
+    change val_deny value { 1 }
+}</action>
+			</actions>
+		</event>
+	</transition>
+	<transition>
+		<id>t5</id>
+		<x>460</x>
+		<y>100</y>
+		<layout>
+			<offset>0</offset>
+		</layout>
+		<label>Delete</label>
+		<event type="finish">
+			<actions phase="post">
+				<action>
+				async.run{ workflowService.deleteCase(useCase.stringId) }
+				</action>
+			</actions>
+		</event>
+	</transition>
+	<transition>
+		<id>t25</id>
+		<x>260</x>
+		<y>500</y>
+		<label/>
+		<dataGroup>
 			<id>DataGroup</id>
 			<layout>grid</layout>
 			<dataRef>
@@ -553,38 +756,38 @@
 				<logic>
 					<behavior>editable</behavior>
 					<action trigger="set"> name: f.public_name,
-					taxID: f.public_taxID,
-					businessID: f.public_businessID,
-					natural_legal_person: f.public_natural_legal_person,
-					t_input_form: t.t2,
-					company_name: f.public_company_name,
-					surname: f.public_surname;
+						taxID: f.public_taxID,
+						businessID: f.public_businessID,
+						natural_legal_person: f.public_natural_legal_person,
+						t_input_form: t.t25,
+						company_name: f.public_company_name,
+						surname: f.public_surname;
 
-					make name, editable on t_input_form when { natural_legal_person.value == false; }
-					make surname, editable on t_input_form when { natural_legal_person.value == false; }
-					make name, required on t_input_form when { natural_legal_person.value == false; }
-					make surname, required on t_input_form when { natural_legal_person.value == false; }
-					make company_name, hidden on t_input_form when { natural_legal_person.value == false; }
-					make taxID, hidden on t_input_form when { natural_legal_person.value == false; }
-					make businessID, hidden on t_input_form when { natural_legal_person.value == false; }
+						make name, editable on t_input_form when { natural_legal_person.value == false; }
+						make surname, editable on t_input_form when { natural_legal_person.value == false; }
+						make name, required on t_input_form when { natural_legal_person.value == false; }
+						make surname, required on t_input_form when { natural_legal_person.value == false; }
+						make company_name, hidden on t_input_form when { natural_legal_person.value == false; }
+						make taxID, hidden on t_input_form when { natural_legal_person.value == false; }
+						make businessID, hidden on t_input_form when { natural_legal_person.value == false; }
 
-					make name, hidden on t_input_form when { natural_legal_person.value == true; }
-					make surname, hidden on t_input_form when { natural_legal_person.value == true; }
-					make company_name, editable on t_input_form when { natural_legal_person.value == true; }
-					make businessID, editable on t_input_form when { natural_legal_person.value == true; }
-					make taxID, editable on t_input_form when { natural_legal_person.value == true; }
-					make company_name, required on t_input_form when { natural_legal_person.value == true; }
-					make businessID, required on t_input_form when { natural_legal_person.value == true; }
-					make taxID, required on t_input_form when { natural_legal_person.value == true; }
+						make name, hidden on t_input_form when { natural_legal_person.value == true; }
+						make surname, hidden on t_input_form when { natural_legal_person.value == true; }
+						make company_name, editable on t_input_form when { natural_legal_person.value == true; }
+						make businessID, editable on t_input_form when { natural_legal_person.value == true; }
+						make taxID, editable on t_input_form when { natural_legal_person.value == true; }
+						make company_name, required on t_input_form when { natural_legal_person.value == true; }
+						make businessID, required on t_input_form when { natural_legal_person.value == true; }
+						make taxID, required on t_input_form when { natural_legal_person.value == true; }
 
-					if (natural_legal_person.value == true) {
+						if (natural_legal_person.value == true) {
 						change name value { null; }
 						change surname value {  null; }
-					}else {
-							change company_name value { null; }
-							change businessID value { null; }
-							change taxID value { null; }
-					}
+						}else {
+						change company_name value { null; }
+						change businessID value { null; }
+						change taxID value { null; }
+						}
 					</action>
 				</logic>
 				<layout>
@@ -791,137 +994,10 @@
 		</dataGroup>
 	</transition>
 	<transition>
-		<id>t_quick_create</id>
-		<x>820</x>
-		<y>580</y>
-		<layout>
-			<offset>0</offset>
-		</layout>
-		<label name="t_quick_create">Quick creation</label>
-		<dataGroup>
-			<id>dg0</id>
-			<stretch>true</stretch>
-			<dataRef>
-				<id>vehicles</id>
-				<logic>
-					<behavior>editable</behavior>
-					<behavior>required</behavior>
-				</logic>
-			</dataRef>
-			<dataRef>
-				<id>priority</id>
-				<logic>
-					<behavior>editable</behavior>
-					<behavior>required</behavior>
-				</logic>
-			</dataRef>
-			<dataRef>
-				<id>description</id>
-				<logic>
-					<behavior>editable</behavior>
-					<behavior>required</behavior>
-				</logic>
-			</dataRef>
-		</dataGroup>
-		<event type="assign">
-			<id>0</id>
-			<actions phase="pre">
-				<action>
-					vehicles: f.vehicles;
-
-					def vehicle_cases = findCases( { it.processIdentifier.eq("vehicle").and(it.dataSet.get("status").value.eq("assigned")) } )
-
-					if(vehicle_cases == null || vehicle_case == [])
-						return
-
-					change vehicles options {[]}
-
-					for(vehicle in vehicle_cases){
-						def val = vehicle.dataSet.get("licenceNumber").value + " - " + vehicle.dataSet.get("manufacturer").value + " " + vehicle.dataSet.get("model").value
-						change vehicles options { vehicles.options + [(vehicle.stringId): val]; }
-					}
-				</action>
-			</actions>
-		</event>
-		<event type="finish">
-			<id>1</id>
-			<actions phase="pre">
-<!--				todo-->
-				<action>
-					selected_vehicle_id: f.selected_vehicle_id,
-					selected_customer_id: f.selected_customer_id,
-					vehicles: f.vehicles;
-
-					def selectedVehicleId = vehicles.value
-					def vehicle = findCase( {it._id.eq(selectedVehicleId)} )
-
-					if(vehicle == null)
-						throw new IllegalArgumentException("Vehicle with id: " + selectedVehicleId + " does not exist anymore")
-
-					// def selectedCustomerId = vehicle.dataSet.get("customer_id").value
-
-					change selected_vehicle_id value { selectedVehicleId }
-					// change selected_customer_id value { selectedCustomerId }
-				</action>
-				<!-- change status -->
-				<action>
-					status: f.status;
-
-					change status value { return "started"; }
-				</action>
-			</actions>
-			<actions phase="post">
-				<action>
-					vehicles: f.vehicles;
-
-					change vehicles value { null }
-					change vehicles options { [:] }
-				</action>
-			</actions>
-		</event>
-	</transition>
-	<transition>
-		<id>t4</id>
-		<x>1060</x>
-		<y>180</y>
-		<layout>
-			<offset>0</offset>
-		</layout>
-		<label>Validate</label>
-	</transition>
-	<transition>
-		<id>t5</id>
-		<x>460</x>
-		<y>100</y>
-		<layout>
-			<offset>0</offset>
-		</layout>
-		<label>Delete</label>
-		<event type="finish">
-			<actions phase="post">
-				<action>
-				async.run{ workflowService.deleteCase(useCase.stringId) }
-				</action>
-			</actions>
-		</event>
-	</transition>
-	<transition>
-		<id>t8</id>
-		<x>820</x>
-		<y>380</y>
-		<layout>
-			<offset>0</offset>
-		</layout>
-		<label>Finish creating</label>
-	</transition>
-	<transition>
-		<id>t_complex_creation</id>
-		<x>820</x>
-		<y>740</y>
-		<layout>
-			<offset>0</offset>
-		</layout>
-		<label name="t_complex_creation">Complex creation</label>
+		<id>t26</id>
+		<x>260</x>
+		<y>550</y>
+		<label/>
 		<dataGroup>
 			<id>vehicle_part1</id>
 			<title name="t_complex_creation_vehicle_part">Vehicle</title>
@@ -937,14 +1013,14 @@
 
 						def vehicleCase = findCase( {it._id.eq(vehicles.value)} )
 						if(vehicleCase == null)
-							return
+						return
 
 						def cusId = vehicleCase.getFieldValue("actual_customer_id") as String
 						if(cusId == null)
-							return
+						return
 
 						if(customers.options?.containsKey(cusId)){
-							change customers value { cusId }
+						change customers value { cusId }
 						}
 					</action>
 				</logic>
@@ -1000,20 +1076,20 @@
 
 						// not creating new vehicle - clear the taskref value
 						if(!btn.value &amp;&amp; veh_taskref.value != null &amp;&amp; veh_taskref.value != []){
-							clear_and_cancel_taskref(veh_taskref)
-							return
+						clear_and_cancel_taskref(veh_taskref)
+						return
 						}
 
 						// creating, but previous value present - clear the taskref value
 						if(btn.value &amp;&amp; veh_taskref.value != null &amp;&amp; veh_taskref.value != []){
-							clear_and_cancel_taskref(veh_taskref)
+						clear_and_cancel_taskref(veh_taskref)
 						}
 
 						// creating - reference creation form of new vehicle instance
 						if(btn.value){
-							def vehicleCase = createCase("vehicle")
-							def creationTask = assignTask("t_create", vehicleCase)
-							change veh_taskref value { [creationTask?.stringId] }
+						def vehicleCase = createCase("vehicle")
+						def creationTask = assignTask("t_create", vehicleCase)
+						change veh_taskref value { [creationTask?.stringId] }
 						}
 					</action>
 				</logic>
@@ -1109,20 +1185,20 @@
 
 						// not creating new vehicle - clear the taskref value
 						if(!btn.value &amp;&amp; cus_taskref.value != null &amp;&amp; cus_taskref.value != []){
-							clear_and_cancel_taskref(cus_taskref)
-							return
+						clear_and_cancel_taskref(cus_taskref)
+						return
 						}
 
 						// creating, but previous value present - clear the taskref value
 						if(btn.value &amp;&amp; cus_taskref.value != null &amp;&amp; cus_taskref.value != []){
-							clear_and_cancel_taskref(cus_taskref)
+						clear_and_cancel_taskref(cus_taskref)
 						}
 
 						// creating - reference creation form of new vehicle instance
 						if(btn.value){
-							def customerCase = createCase("customer")
-							def creationTask = assignTask("t_create", customerCase)
-							change cus_taskref value { [creationTask?.stringId] }
+						def customerCase = createCase("customer")
+						def creationTask = assignTask("t_create", customerCase)
+						change cus_taskref value { [creationTask?.stringId] }
 						}
 					</action>
 				</logic>
@@ -1178,14 +1254,14 @@
 		<event type="assign">
 			<id>0</id>
 			<actions phase="pre">
-<!--				vehicles initialization-->
+				<!--				vehicles initialization-->
 				<action>
 					vehicles: f.vehicles;
 
 					def vehicle_cases = findCases( { it.processIdentifier.eq("vehicle").and(it.dataSet.get("status").value.eq("assigned")) } )
 
 					if(vehicle_cases == null || vehicle_cases == [])
-						return
+					return
 
 					change vehicles options { [] }
 					change vehicles value { "" }
@@ -1195,26 +1271,26 @@
 						change vehicles options { vehicles.options + [(vehicle.stringId): val] }
 					}
 				</action>
-<!--				customers initialization-->
+				<!--				customers initialization-->
 				<action>
 					customers: f.customers;
 
 					def customers_cases = findCases( { it.processIdentifier.eq("customer") } )
 					if(customers_cases == null || customers_cases == [])
-						return
+					return
 
 					change customers options { [] }
 					change customers value { "" }
 
 					for(customer in customers_cases){
-						def val
-						if(!customer.getFieldValue("natural_legal_person")){
-							val = customer.dataSet.get("surname").value + " " + customer.dataSet.get("name").value + "; " + customer.dataSet.get("city").value + ", " + customer.dataSet.get("street").value
-						}
-						else {
-							val = customer.dataSet.get("company_name").value + ", " + customer.dataSet.get("businessID").value
-						}
-						change customers options { customers.options + [(customer.stringId): val] }
+					def val
+					if(!customer.getFieldValue("natural_legal_person")){
+					val = customer.dataSet.get("surname").value + " " + customer.dataSet.get("name").value + "; " + customer.dataSet.get("city").value + ", " + customer.dataSet.get("street").value
+					}
+					else {
+					val = customer.dataSet.get("company_name").value + ", " + customer.dataSet.get("businessID").value
+					}
+					change customers options { customers.options + [(customer.stringId): val] }
 					}
 				</action>
 			</actions>
@@ -1230,16 +1306,16 @@
 					newlyCreated: f.creation_new_customer;
 
 					if(!newlyCreated.value){
-						change selected_customer_id value { customers.value }
+					change selected_customer_id value { customers.value }
 					}
 					// needed caseId is "in" taskref
 					else {
-						def creationTask = findTask( { it._id.eq(newlyCreatedTaskref.value.first()) } )
-						if(creationTask == null)
-							throw new IllegalArgumentException("Could not set the customer id for current repair: cannot find the creation task")
-						change selected_customer_id value { creationTask.caseId }
+					def creationTask = findTask( { it._id.eq(newlyCreatedTaskref.value.first()) } )
+					if(creationTask == null)
+					throw new IllegalArgumentException("Could not set the customer id for current repair: cannot find the creation task")
+					change selected_customer_id value { creationTask.caseId }
 
-						finishTask(creationTask)
+					finishTask(creationTask)
 					}
 				</action>
 				<!-- save selected vehicle (existing / newly created)-->
@@ -1251,26 +1327,26 @@
 					newlyCreated: f.creation_new_vehicle;
 
 					if(!newlyCreated.value){
-						change selected_vehicle_id value { vehicles.value }
+					change selected_vehicle_id value { vehicles.value }
 					}
 					else {
-						def creationTask = findTask( { it._id.eq(newlyCreatedTaskref.value.first()) } )
-						if(creationTask == null)
-							throw new IllegalArgumentException("Could not set the vehicle id for current repair: cannot find the creation task")
-						change selected_vehicle_id value { creationTask.caseId }
+					def creationTask = findTask( { it._id.eq(newlyCreatedTaskref.value.first()) } )
+					if(creationTask == null)
+					throw new IllegalArgumentException("Could not set the vehicle id for current repair: cannot find the creation task")
+					change selected_vehicle_id value { creationTask.caseId }
 
-						setData(creationTask, [
-							"status" : [
-								"type": "enumeration_map",
-								"value": "assigned"
-							],
-							"actual_customer_id" : [
-								"type": "text",
-								"value": selected_customer_id.value
-							],
-						])
+					setData(creationTask, [
+					"status" : [
+					"type": "enumeration_map",
+					"value": "assigned"
+					],
+					"actual_customer_id" : [
+					"type": "text",
+					"value": selected_customer_id.value
+					],
+					])
 
-						finishTask(creationTask)
+					finishTask(creationTask)
 					}
 				</action>
 				<!-- if customer is newly created, add selected_vehicle_id to his vehicles enumeration if: the vehicle is unassigned
@@ -1284,26 +1360,26 @@
 
 					def selectedVehicle = findCase( {it._id.eq(selected_vehicle_id.value)} )
 					if(selectedVehicle == null)
-						return
+					return
 
 					def vehicleStatus = selectedVehicle.getFieldValue("status") as String
 					if(vehicleStatus == "unassigned")
-						canAddVehicle = true
+					canAddVehicle = true
 					else if(vehicleStatus == "assigned" &amp;&amp; isNewlyCreatedVehicle.value)
-						canAddVehicle = true
+					canAddVehicle = true
 
 					if(canAddVehicle){
-						def selectedCustomer = findCase( {it._id.eq(selected_customer_id.value)} )
-						if(selectedCustomer == null)
-							return
+					def selectedCustomer = findCase( {it._id.eq(selected_customer_id.value)} )
+					if(selectedCustomer == null)
+					return
 
-						def customerVehicles = selectedCustomer.dataSet.get("vehicles").choices
-						def selectedVehicleId = new com.netgrif.application.engine.petrinet.domain.I18nString(selected_vehicle_id.value)
-						if(customerVehicles == null)
-							selectedCustomer.dataSet.get("vehicles").choices = [selectedVehicleId]
-						else
-							selectedCustomer.dataSet.get("vehicles").choices = customerVehicles + [selectedVehicleId]
-						workflowService.save(selectedCustomer)
+					def customerVehicles = selectedCustomer.dataSet.get("vehicles").choices
+					def selectedVehicleId = new com.netgrif.application.engine.petrinet.domain.I18nString(selected_vehicle_id.value)
+					if(customerVehicles == null)
+					selectedCustomer.dataSet.get("vehicles").choices = [selectedVehicleId]
+					else
+					selectedCustomer.dataSet.get("vehicles").choices = customerVehicles + [selectedVehicleId]
+					workflowService.save(selectedCustomer)
 					}
 					else return
 				</action>
@@ -1315,6 +1391,98 @@
 				</action>
 			</actions>
 		</event>
+	</transition>
+	<transition>
+		<id>t8</id>
+		<x>820</x>
+		<y>380</y>
+		<layout>
+			<offset>0</offset>
+		</layout>
+		<label>Finish creating</label>
+		<dataGroup>
+			<id>t8_0</id>
+			<cols>4</cols>
+			<layout>grid</layout>
+			<dataRef>
+				<id>complex_creation_taskref</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
+		<event type="assign">
+			<id>t8_assign</id>
+			<actions phase="pre">
+				<action id="t8_assign_pre_1">
+					vehicles: f.vehicles,
+					public_licenseNumber: f.public_licenseNumber;
+
+					def vehicle_case = findCase( { it.processIdentifier.eq("vehicle").and(it.dataSet.get("licenceNumber").value.eq(public_licenseNumber.value)) } )
+
+					if(vehicle_case == null || vehicle_case == [])
+					return
+
+					change vehicles value { vehicle_case.stringId }
+				</action>
+				<action id="t8_assign_pre_2">
+					customers: f.customers,
+					public_mail: f.public_mail;
+
+					def customers_case = findCase( { it.processIdentifier.eq("customer").and(it.dataSet.get("email").value.eq(public_mail.value)) } )
+
+					if(customers_cases == null || customers_cases == [])
+					return
+
+					change customers value { customers_case.stringId }
+				</action>
+				<action id="t8_assign_pre_3">
+					description: f.description,
+					public_description: f.public_description;
+
+					if(public_description.value == null || public_description.value == [] || public_description.value == "")
+						return
+
+					change description value { public_description.value }
+				</action>
+			</actions>
+		</event>
+	</transition>
+	<transition>
+		<id>t_complex_creation</id>
+		<x>820</x>
+		<y>740</y>
+		<layout>
+			<offset>0</offset>
+		</layout>
+		<label name="t_complex_creation">Complex creation</label>
+		<dataGroup>
+			<id>t2_0</id>
+			<cols>4</cols>
+			<layout>grid</layout>
+			<dataRef>
+				<id>complex_creation_taskref</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>4</cols>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
 	</transition>
 	<transition>
 		<id>t10</id>
@@ -1662,6 +1830,21 @@
 				</layout>
 			</dataRef>
 			<dataRef>
+				<id>vehicles</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>3</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
 				<id>is_finished</id>
 				<logic>
 					<behavior>editable</behavior>
@@ -1689,7 +1872,7 @@
 					</action>
 				</logic>
 				<layout>
-					<x>3</x>
+					<x>4</x>
 					<y>0</y>
 					<rows>1</rows>
 					<cols>1</cols>
