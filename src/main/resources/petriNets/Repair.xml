@@ -142,9 +142,20 @@
 		<title name="is_finished">Is Finished</title>
 		<init>false</init>
 	</data>
-	<data type="text">
+	<data type="enumeration_map">
 		<id>public_status_extern_text</id>
 		<title name="status">Status</title>
+		<options>
+			<option key="sent" name="sent">Request sent</option>
+			<option key="accepted" name="accepted">Request accepted</option>
+			<option key="denied" name="denied">Request denied</option>
+			<option key="started" name="started">Started</option>
+			<option key="finished" name="finished">Finished</option>
+		</options>
+		<view>
+			<autocomplete/>
+		</view>
+		<init>not_started</init>
 	</data>
 	<data type="button">
 		<id>public_remove_1</id>
@@ -214,7 +225,7 @@
 	</data>
 	<data type="boolean">
 		<id>public_remove_check</id>
-		<title></title>
+		<title/>
 		<init>false</init>
 	</data>
 	<data type="enumeration_map">
@@ -258,8 +269,8 @@
 		<id>approve_extern_repair</id>
 		<title/>
 		<options>
-			<option key="apply">apply</option>
-			<option key="deny">deny</option>
+			<option name="apply" key="apply">Apply</option>
+			<option name="deny" key="deny">Deny</option>
 		</options>
 		<init>apply</init>
 	</data>
@@ -313,6 +324,13 @@
 		<i18nString name="remove_from_warehouse_1">Vymazať</i18nString>
 		<i18nString name="remove_from_warehouse_2">Potvrdiť vymazanie</i18nString>
 		<i18nString name="remove_from_warehouse_3">Kliknite na dokončiť pre vymazanie žiadosti</i18nString>
+		<i18nString name="apply">Schváliť</i18nString>
+		<i18nString name="deny">Zamietnuť</i18nString>
+		<i18nString name="sent">Požiadavka odoslaná</i18nString>
+		<i18nString name="accepted">Požiadavka schválená</i18nString>
+		<i18nString name="denied">Požiadavka zamietnutá</i18nString>
+		<i18nString name="started">Oprava začatá</i18nString>
+		<i18nString name="finished">Oprava dokončená</i18nString>
 	</i18n>
 	<i18n locale="de">
 		<i18nString name="case_title">Reparatur</i18nString>
@@ -358,7 +376,13 @@
 		<i18nString name="remove_from_warehouse_1">Löschen</i18nString>
 		<i18nString name="remove_from_warehouse_2">Löschung bestätigen</i18nString>
 		<i18nString name="remove_from_warehouse_3">Klicken Sie auf Fertig stellen, um das Entfernen zu akzeptieren</i18nString>
-
+		<i18nString name="apply">Annehmen</i18nString>
+		<i18nString name="deny">Leugnen</i18nString>
+		<i18nString name="sent">Anfrage eingereicht</i18nString>
+		<i18nString name="accepted">Anfrage genehmigt</i18nString>
+		<i18nString name="denied">Anfrage abgelehnt</i18nString>
+		<i18nString name="started">Angefangen</i18nString>
+		<i18nString name="finished">Fertig</i18nString>
 	</i18n>
 	<!-- TRANSITIONS -->
 	<transition>
@@ -580,6 +604,15 @@
 				</layout>
 			</dataRef>
 		</dataGroup>
+		<event type="finish">
+			<id>0</id>
+			<actions phase="post">
+				<action>
+					public_status_extern_text: f.public_status_extern_text;
+					change public_status_extern_text value { "sent" }
+				</action>
+			</actions>
+		</event>
 	</transition>
 	<transition>
 		<id>t_quick_create</id>
@@ -715,15 +748,20 @@
 		<event type="finish">
 			<id>t4_finish</id>
 			<actions phase="pre">
-				<action id="1">approve_extern_repair: f.approve_extern_repair,
-val_accept: f.val_accept,
-val_deny: f.val_deny;
+				<action>
+					approve_extern_repair: f.approve_extern_repair,
+					val_accept: f.val_accept,
+					public_status_extern_text: f.public_status_extern_text,
+					val_deny: f.val_deny;
 
-if(approve_extern_repair.value == "apply"){
-    change val_accept value { 1 }
-} else {
-    change val_deny value { 1 }
-}</action>
+					if(approve_extern_repair.value == "apply"){
+						change val_accept value { 1 }
+						change public_status_extern_text value { "accepted" }
+					} else {
+						change val_deny value { 1 }
+						change public_status_extern_text value { "denied" }
+					}
+				</action>
 			</actions>
 		</event>
 	</transition>
@@ -738,7 +776,7 @@ if(approve_extern_repair.value == "apply"){
 		<event type="finish">
 			<actions phase="post">
 				<action>
-				async.run{ workflowService.deleteCase(useCase.stringId) }
+					async.run{ workflowService.deleteCase(useCase.stringId) }
 				</action>
 			</actions>
 		</event>
@@ -781,12 +819,12 @@ if(approve_extern_repair.value == "apply"){
 						make taxID, required on t_input_form when { natural_legal_person.value == true; }
 
 						if (natural_legal_person.value == true) {
-						change name value { null; }
-						change surname value {  null; }
+							change name value { null; }
+							change surname value {  null; }
 						}else {
-						change company_name value { null; }
-						change businessID value { null; }
-						change taxID value { null; }
+							change company_name value { null; }
+							change businessID value { null; }
+							change taxID value { null; }
 						}
 					</action>
 				</logic>
@@ -1013,14 +1051,14 @@ if(approve_extern_repair.value == "apply"){
 
 						def vehicleCase = findCase( {it._id.eq(vehicles.value)} )
 						if(vehicleCase == null)
-						return
+							return
 
 						def cusId = vehicleCase.getFieldValue("actual_customer_id") as String
 						if(cusId == null)
-						return
+							return
 
 						if(customers.options?.containsKey(cusId)){
-						change customers value { cusId }
+							change customers value { cusId }
 						}
 					</action>
 				</logic>
@@ -1076,20 +1114,20 @@ if(approve_extern_repair.value == "apply"){
 
 						// not creating new vehicle - clear the taskref value
 						if(!btn.value &amp;&amp; veh_taskref.value != null &amp;&amp; veh_taskref.value != []){
-						clear_and_cancel_taskref(veh_taskref)
-						return
+							clear_and_cancel_taskref(veh_taskref)
+							return
 						}
 
 						// creating, but previous value present - clear the taskref value
 						if(btn.value &amp;&amp; veh_taskref.value != null &amp;&amp; veh_taskref.value != []){
-						clear_and_cancel_taskref(veh_taskref)
+							clear_and_cancel_taskref(veh_taskref)
 						}
 
 						// creating - reference creation form of new vehicle instance
 						if(btn.value){
-						def vehicleCase = createCase("vehicle")
-						def creationTask = assignTask("t_create", vehicleCase)
-						change veh_taskref value { [creationTask?.stringId] }
+							def vehicleCase = createCase("vehicle")
+							def creationTask = assignTask("t_create", vehicleCase)
+							change veh_taskref value { [creationTask?.stringId] }
 						}
 					</action>
 				</logic>
@@ -1185,20 +1223,20 @@ if(approve_extern_repair.value == "apply"){
 
 						// not creating new vehicle - clear the taskref value
 						if(!btn.value &amp;&amp; cus_taskref.value != null &amp;&amp; cus_taskref.value != []){
-						clear_and_cancel_taskref(cus_taskref)
-						return
+							clear_and_cancel_taskref(cus_taskref)
+							return
 						}
 
 						// creating, but previous value present - clear the taskref value
 						if(btn.value &amp;&amp; cus_taskref.value != null &amp;&amp; cus_taskref.value != []){
-						clear_and_cancel_taskref(cus_taskref)
+							clear_and_cancel_taskref(cus_taskref)
 						}
 
 						// creating - reference creation form of new vehicle instance
 						if(btn.value){
-						def customerCase = createCase("customer")
-						def creationTask = assignTask("t_create", customerCase)
-						change cus_taskref value { [creationTask?.stringId] }
+							def customerCase = createCase("customer")
+							def creationTask = assignTask("t_create", customerCase)
+							change cus_taskref value { [creationTask?.stringId] }
 						}
 					</action>
 				</logic>
@@ -1277,20 +1315,20 @@ if(approve_extern_repair.value == "apply"){
 
 					def customers_cases = findCases( { it.processIdentifier.eq("customer") } )
 					if(customers_cases == null || customers_cases == [])
-					return
+						return
 
 					change customers options { [] }
 					change customers value { "" }
 
 					for(customer in customers_cases){
-					def val
-					if(!customer.getFieldValue("natural_legal_person")){
-					val = customer.dataSet.get("surname").value + " " + customer.dataSet.get("name").value + "; " + customer.dataSet.get("city").value + ", " + customer.dataSet.get("street").value
-					}
-					else {
-					val = customer.dataSet.get("company_name").value + ", " + customer.dataSet.get("businessID").value
-					}
-					change customers options { customers.options + [(customer.stringId): val] }
+						def val
+						if(!customer.getFieldValue("natural_legal_person")){
+							val = customer.dataSet.get("surname").value + " " + customer.dataSet.get("name").value + "; " + customer.dataSet.get("city").value + ", " + customer.dataSet.get("street").value
+						}
+						else {
+							val = customer.dataSet.get("company_name").value + ", " + customer.dataSet.get("businessID").value
+						}
+						change customers options { customers.options + [(customer.stringId): val] }
 					}
 				</action>
 			</actions>
@@ -1306,16 +1344,16 @@ if(approve_extern_repair.value == "apply"){
 					newlyCreated: f.creation_new_customer;
 
 					if(!newlyCreated.value){
-					change selected_customer_id value { customers.value }
+						change selected_customer_id value { customers.value }
 					}
 					// needed caseId is "in" taskref
 					else {
-					def creationTask = findTask( { it._id.eq(newlyCreatedTaskref.value.first()) } )
-					if(creationTask == null)
-					throw new IllegalArgumentException("Could not set the customer id for current repair: cannot find the creation task")
-					change selected_customer_id value { creationTask.caseId }
+						def creationTask = findTask( { it._id.eq(newlyCreatedTaskref.value.first()) } )
+						if(creationTask == null)
+							throw new IllegalArgumentException("Could not set the customer id for current repair: cannot find the creation task")
+						change selected_customer_id value { creationTask.caseId }
 
-					finishTask(creationTask)
+						finishTask(creationTask)
 					}
 				</action>
 				<!-- save selected vehicle (existing / newly created)-->
@@ -1327,26 +1365,26 @@ if(approve_extern_repair.value == "apply"){
 					newlyCreated: f.creation_new_vehicle;
 
 					if(!newlyCreated.value){
-					change selected_vehicle_id value { vehicles.value }
+						change selected_vehicle_id value { vehicles.value }
 					}
 					else {
-					def creationTask = findTask( { it._id.eq(newlyCreatedTaskref.value.first()) } )
-					if(creationTask == null)
-					throw new IllegalArgumentException("Could not set the vehicle id for current repair: cannot find the creation task")
-					change selected_vehicle_id value { creationTask.caseId }
+						def creationTask = findTask( { it._id.eq(newlyCreatedTaskref.value.first()) } )
+						if(creationTask == null)
+							throw new IllegalArgumentException("Could not set the vehicle id for current repair: cannot find the creation task")
+						change selected_vehicle_id value { creationTask.caseId }
 
-					setData(creationTask, [
-					"status" : [
-					"type": "enumeration_map",
-					"value": "assigned"
-					],
-					"actual_customer_id" : [
-					"type": "text",
-					"value": selected_customer_id.value
-					],
-					])
+						setData(creationTask, [
+							"status" : [
+								"type": "enumeration_map",
+								"value": "assigned"
+							],
+							"actual_customer_id" : [
+								"type": "text",
+								"value": selected_customer_id.value
+							],
+						])
 
-					finishTask(creationTask)
+						finishTask(creationTask)
 					}
 				</action>
 				<!-- if customer is newly created, add selected_vehicle_id to his vehicles enumeration if: the vehicle is unassigned
@@ -1360,26 +1398,26 @@ if(approve_extern_repair.value == "apply"){
 
 					def selectedVehicle = findCase( {it._id.eq(selected_vehicle_id.value)} )
 					if(selectedVehicle == null)
-					return
+						return
 
 					def vehicleStatus = selectedVehicle.getFieldValue("status") as String
 					if(vehicleStatus == "unassigned")
-					canAddVehicle = true
+						canAddVehicle = true
 					else if(vehicleStatus == "assigned" &amp;&amp; isNewlyCreatedVehicle.value)
-					canAddVehicle = true
+						canAddVehicle = true
 
 					if(canAddVehicle){
-					def selectedCustomer = findCase( {it._id.eq(selected_customer_id.value)} )
-					if(selectedCustomer == null)
-					return
+						def selectedCustomer = findCase( {it._id.eq(selected_customer_id.value)} )
+						if(selectedCustomer == null)
+							return
 
-					def customerVehicles = selectedCustomer.dataSet.get("vehicles").choices
-					def selectedVehicleId = new com.netgrif.application.engine.petrinet.domain.I18nString(selected_vehicle_id.value)
-					if(customerVehicles == null)
-					selectedCustomer.dataSet.get("vehicles").choices = [selectedVehicleId]
-					else
-					selectedCustomer.dataSet.get("vehicles").choices = customerVehicles + [selectedVehicleId]
-					workflowService.save(selectedCustomer)
+						def customerVehicles = selectedCustomer.dataSet.get("vehicles").choices
+						def selectedVehicleId = new com.netgrif.application.engine.petrinet.domain.I18nString(selected_vehicle_id.value)
+						if(customerVehicles == null)
+							selectedCustomer.dataSet.get("vehicles").choices = [selectedVehicleId]
+						else
+							selectedCustomer.dataSet.get("vehicles").choices = customerVehicles + [selectedVehicleId]
+						workflowService.save(selectedCustomer)
 					}
 					else return
 				</action>
@@ -1400,6 +1438,20 @@ if(approve_extern_repair.value == "apply"){
 			<offset>0</offset>
 		</layout>
 		<label>Finish creating</label>
+		<dataRef>
+			<id>create_extern_taskref</id>
+			<logic>
+				<behavior>visible</behavior>
+			</logic>
+			<layout>
+				<x>0</x>
+				<y>0</y>
+				<rows>1</rows>
+				<cols>4</cols>
+				<template>material</template>
+				<appearance>outline</appearance>
+			</layout>
+		</dataRef>
 		<dataGroup>
 			<id>t8_0</id>
 			<cols>4</cols>
@@ -1429,7 +1481,7 @@ if(approve_extern_repair.value == "apply"){
 					def vehicle_case = findCase( { it.processIdentifier.eq("vehicle").and(it.dataSet.get("licenceNumber").value.eq(public_licenseNumber.value)) } )
 
 					if(vehicle_case == null || vehicle_case == [])
-					return
+						return
 
 					change vehicles value { vehicle_case.stringId }
 				</action>
@@ -1437,19 +1489,16 @@ if(approve_extern_repair.value == "apply"){
 					customers: f.customers,
 					public_mail: f.public_mail;
 
-					def customers_case = findCase( { it.processIdentifier.eq("customer").and(it.dataSet.get("email").value.eq(public_mail.value)) } )
+					def customer_case = findCase( { it.processIdentifier.eq("customer").and(it.dataSet.get("email").value.eq(public_mail.value)) } )
 
-					if(customers_cases == null || customers_cases == [])
-					return
+					if(customer_case == null || customer_case == [])
+						return
 
-					change customers value { customers_case.stringId }
+					change customers value { customer_case.stringId }
 				</action>
 				<action id="t8_assign_pre_3">
 					description: f.description,
 					public_description: f.public_description;
-
-					if(public_description.value == null || public_description.value == [] || public_description.value == "")
-						return
 
 					change description value { public_description.value }
 				</action>
@@ -1499,7 +1548,7 @@ if(approve_extern_repair.value == "apply"){
 		<event type="finish">
 			<actions phase="post">
 				<action>
-				async.run{ workflowService.deleteCase(useCase.stringId) }
+					async.run{ workflowService.deleteCase(useCase.stringId) }
 				</action>
 			</actions>
 		</event>
@@ -1519,14 +1568,14 @@ if(approve_extern_repair.value == "apply"){
 				<id>public_status_extern_text</id>
 				<logic>
 					<behavior>editable</behavior>
-						<action trigger="get">
+					<action trigger="get">
 						thisTask: t.t11,
 						remove2: f.public_remove_2,
 						remove1: f.public_remove_1;
 
 						make remove1,editable on thisTask when { true }
 						make remove2,hidden on thisTask when { true }
-						</action>
+					</action>
 				</logic>
 				<layout>
 					<x>0</x>
@@ -1543,14 +1592,13 @@ if(approve_extern_repair.value == "apply"){
 				<logic>
 					<behavior>editable</behavior>
 					<action trigger="set">
-										thisTask: t.t11,
-										remove2: f.public_remove_2,
-										remove1: f.public_remove_1;
+						thisTask: t.t11,
+						remove2: f.public_remove_2,
+						remove1: f.public_remove_1;
 
-										make remove1,hidden on thisTask when { true }
-										make remove2,editable on thisTask when { true }
+						make remove1,hidden on thisTask when { true }
+						make remove2,editable on thisTask when { true }
 					</action>
-
 				</logic>
 				<layout>
 					<x>3</x>
@@ -1566,18 +1614,15 @@ if(approve_extern_repair.value == "apply"){
 				<logic>
 					<behavior>hidden</behavior>
 					<action trigger="set">
-					thisTask: t.t11,
-					remove2: f.public_remove_2,
-					remove3: f.public_remove_3,
-					check: f.public_remove_check;
+						thisTask: t.t11,
+						remove2: f.public_remove_2,
+						remove3: f.public_remove_3,
+						check: f.public_remove_check;
 
-					make remove2,hidden on thisTask when { true }
-					make remove3,visible on thisTask when { true }
-					change check value {return true}
-
-
+						make remove2,hidden on thisTask when { true }
+						make remove3,visible on thisTask when { true }
+						change check value {return true}
 					</action>
-
 				</logic>
 				<layout>
 					<x>3</x>
@@ -1614,7 +1659,6 @@ if(approve_extern_repair.value == "apply"){
 							finishTask("t5")
 						}
 					}
-
 				</action>
 			</actions>
 		</event>
