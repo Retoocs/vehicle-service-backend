@@ -14,7 +14,9 @@
 	<data type="text">
 		<id>message</id>
 		<title name="message">Message</title>
-		<values>area</values>
+		<component>
+			<name>area</name>
+		</component>
 	</data>
 	<data type="text">
 		<id>title</id>

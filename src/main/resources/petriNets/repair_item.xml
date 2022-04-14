@@ -56,15 +56,20 @@
 	<data type="text">
 		<id>manufacturer</id>
 		<title name="manufacturer">Manufacturer</title>
+		<valid>minLength 2</valid>
 	</data>
 	<data type="text">
 		<id>title</id>
 		<title name="title">title</title>
+		<valid>minLength 2</valid>
 	</data>
 	<data type="text">
 		<id>description</id>
 		<title name="description">Description</title>
-		<values>area</values>
+		<valid>minLength 2</valid>
+		<component>
+			<name>area</name>
+		</component>
 	</data>
 	<data type="number">
 		<id>nonVatPrice</id>
@@ -133,6 +138,17 @@
 			</validation>
 		</validations>
 		<init>1</init>
+				<event type="set">
+			<id>quantity_transfer_to_warehouse_set</id>
+			<actions phase="post">
+				<action id="1">quantity_transfer_to_warehouse: f.quantity_transfer_to_warehouse,
+quantity: f.quantity;
+if (quantity.value &lt; quantity_transfer_to_warehouse.value) {
+	change quantity_transfer_to_warehouse value { quantity.value; }
+}</action>
+			</actions>
+		</event>
+		
 	</data>
 	<data type="enumeration_map">
 		<id>unit</id>
@@ -165,6 +181,12 @@
 		<id>tax</id>
 		<title name="tax">Tax (in %)</title>
 		<init>20</init>
+		<validations>
+			<validation>
+				<expression>inrange 0,100</expression>
+				<message name="tax_valid">Must be 0-100</message>
+			</validation>
+		</validations>
 		<action trigger="set">
 			tax: f.tax,
 			vatPrice: f.vatPrice,
@@ -193,6 +215,7 @@
 		<id>short_description</id>
 		<title name="short_description">Description</title>
 		<view> <htmlEditor/> </view>
+<!--		<valid>minLength 2</valid>-->
 	</data>
 	<data type="text">
 		<id>repair_id</id>
@@ -212,6 +235,7 @@
 		<i18nString name="vatPrice">Cena s daňou</i18nString>
 		<i18nString name="quantity">Kvantita</i18nString>
 		<i18nString name="quantity_valid1">Musi byť väčšie alebo rovné ako 0</i18nString>
+		<i18nString name="tax_valid">Musi byť 0-100</i18nString>
 		<i18nString name="unit">Jednotka kvantity</i18nString>
 		<i18nString name="unit_kg">kg (Kilogram)</i18nString>
 		<i18nString name="unit_pcs">ks (Kusy)</i18nString>
@@ -238,6 +262,7 @@
 		<i18nString name="vatPrice">Preis mit MwSt.</i18nString>
 		<i18nString name="quantity">Menge</i18nString>
 		<i18nString name="quantity_valid1">Must sein 0+</i18nString>
+		<i18nString name="tax_valid">Must sein 0-100</i18nString>
 		<i18nString name="unit">Mengeneinheit</i18nString>
 		<i18nString name="unit_kg">kg (Kilogramm)</i18nString>
 		<i18nString name="unit_pcs">stk (Stücke)</i18nString>

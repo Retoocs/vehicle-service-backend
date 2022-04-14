@@ -54,15 +54,20 @@
 	<data type="text">
 		<id>warehouse_name</id>
 		<title name="warehouse_name">Warehouse name</title>
+		<valid>minLength 2</valid>
 	</data>
 	<data type="text">
 		<id>location</id>
 		<title name="location">Location</title>
+<!--		<valid>minLength 2</valid>-->
 	</data>
 	<data type="text">
 		<id>description</id>
 		<title name="description">Description</title>
-		<values>area</values>
+<!--		<valid>minLength 2</valid>-->
+		<component>
+			<name>area</name>
+		</component>
 	</data>
 	<data type="enumeration">
 		<id>items</id>
@@ -106,14 +111,17 @@
 	<data type="text">
 		<id>postal_code</id>
 		<title name="postal_code">Postal code</title>
+<!--		<valid>regex("^\d{3} ?\d{2}$")</valid>-->
 	</data>
 	<data type="text">
 		<id>city</id>
 		<title name="city">City</title>
+<!--		<valid>minLength 2</valid>-->
 	</data>
 	<data type="text">
 		<id>street</id>
 		<title name="street">Street</title>
+<!--		<valid>minLength 2</valid>-->
 	</data>
 	<data type="text">
 		<id>house_number</id>
@@ -231,6 +239,9 @@
 					change items choices { [] }
 					change OENumbers choices { [] }
 				</action>
+				<action>
+					getAndSetAddressFromEnum("t_adress_form")
+				</action>
 			</actions>
 			<actions phase="post">
 				<action>                    
@@ -238,7 +249,7 @@
 					if(Case == null)
 						throw new IllegalArgumentException("Cannot find your instance of process Child addresses enumeration")
 
-					async.run{ finishTask("t_select_address", Case) }
+					finishTask("t_select_address", Case)
 				</action>
 				<action>
 					useCase.dataSet.get("t_adress_form").value = []
@@ -250,9 +261,9 @@
 			<id>t_create_cancel</id>
 			<actions phase="post">
 				<action>
-				async.run{
-					workflowService.deleteCase(useCase.stringId)
-				}
+					async.run{
+						workflowService.deleteCase(useCase.stringId)
+					}
 				</action>
 			</actions>
 		</event>
@@ -270,15 +281,14 @@
 					if(addressTask == null)
 						throw new IllegalArgumentException("Cannot find task with id t_select_address in ${Case.title}")
 
-					async.run{ assignTask(addressTask) }
-                    change t_adress_form value{ [addressTask.stringId] }
-
-                    setData("t_select_address", Case, [
+					assignTask(addressTask)
+                    setData(addressTask, [
 						"target_id": [
 							"value": useCase.stringId,
 							"type" : "text"
 						],
 					])
+					change t_adress_form value{ [addressTask.stringId] }
 			</action>
 			</actions>
 		</event>
@@ -332,22 +342,52 @@
 							throw new IllegalArgumentException("Cannot find task with id t_select_address in ${myEnumCase.title}")
 
 						async.run{ assignTask(enumTask) }
-
-						change t_adress_form value { [enumTask.stringId] }
-
-						setData("t_select_address", myEnumCase, [
+						setData(enumTask, [
 							"target_id": [
 								"value": useCase.stringId,
 								"type" : "text"
 							],
 						])
+						change t_adress_form value { [enumTask.stringId] }
 					</action>
 				</logic>
 			</dataRef>
+		</dataGroup>
+		<dataGroup>
+			<id>dg3</id>
+			<stretch>true</stretch>
 			<dataRef>
 				<id>t_adress_form</id>
 				<logic>
 					<behavior>editable</behavior>
+				</logic>
+			</dataRef>
+		</dataGroup>
+		<dataGroup>
+			<id>dg4</id>
+			<title name="dg_address">Address</title>
+			<dataRef>
+				<id>city</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+			</dataRef>
+			<dataRef>
+				<id>postal_code</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+			</dataRef>
+			<dataRef>
+				<id>street</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+			</dataRef>
+			<dataRef>
+				<id>house_number</id>
+				<logic>
+					<behavior>visible</behavior>
 				</logic>
 			</dataRef>
 		</dataGroup>
@@ -385,17 +425,19 @@
 			<id>1</id>
 			<actions phase="pre">
 				<action>
+					getAndSetAddressFromEnum("t_adress_form")
+				</action>
+			</actions>
+			<actions phase="post">
+				<action>
 					def myEnumCase = findCase( {it.processIdentifier.eq("child_enum_addresses").and(it.author.email.eq(loggedUser().email))} )
 					if(myEnumCase == null)
 						throw new IllegalArgumentException("Cannot find your instance of process Child address enumeration")
 
 					async.run{ finishTask("t_select_address", myEnumCase) }
 				</action>
-			</actions>
-			<actions phase="post">
 				<action>
 					t_adress_form: f.t_adress_form;
-
 					change t_adress_form value { [] }
 				</action>
 			</actions>
@@ -503,7 +545,7 @@
 						if( (item_addition_taskref.value != null).and(item_addition_taskref.value != []) ){
 							def atask = findTask( {it._id.eq(item_addition_taskref.value.first())} )
 							if(atask != null){
-								async.run{ cancelTask(atask) }
+								cancelTask(atask)
 							}
 						}
 
@@ -517,19 +559,20 @@
 							if(item_task == null)
 								return
 
-							async.run{ assignTask(item_task) }
-							change item_addition_taskref value { [item_task.stringId]; }
-
-							setData(item_task, [
-								"warehouseId": [
-									"value": useCase.stringId,
-									"type" : "text"
-								],
+							assignTask(item_task)
+							setDataWithPropagation(item_task, [
 								"is_from_warehouse": [
 									"value": true,
 									"type" : "boolean"
 								],
 							])
+							setDataWithPropagation(item_task, [
+								"warehouseId": [
+									"value": useCase.stringId,
+									"type" : "text"
+								],
+							])
+							change item_addition_taskref value { [item_task.stringId]; }
 						}
 						// selected more items
 						if(select_addition_type.value == "more_items"){
@@ -580,7 +623,7 @@
 					if(atask == null)
 						return
 
-					async.run{ cancelTask(atask) }
+					cancelTask(atask)
 					change item_addition_taskref value { [] }
 				</action>
 			</actions>
@@ -631,9 +674,6 @@
 					}
 				</action>
 				<action>
-<!--					todo osetrenie duplicity pri pridavani viacerych itemov-->
-				</action>
-				<action>
 					OENumbers: f.OENumbers,
 					items: f.items,
 					is_one_item_addition: f.is_one_item_addition,
@@ -667,7 +707,7 @@
 						//todo: TBD adding OENumbers to OENumbers.choices
 					}
 
-					async.run{ finishTask(atask) }
+					finishTask(atask)
 				</action>
 			</actions>
 			<actions phase="post">
