@@ -115,7 +115,9 @@
 	<data type="text">
 		<id>description</id>
 		<title name="description">Description</title>
-		<values>area</values>
+		<component>
+			<name>area</name>
+		</component>
 	</data>
 	<data type="number">
 		<id>nonVatPrice</id>
@@ -184,6 +186,16 @@
 			</validation>
 		</validations>
 		<init>1</init>
+		<event type="set">
+			<id>quantity_transfer_to_repair_set</id>
+			<actions phase="post">
+				<action id="1">quantity_transfer_to_repair: f.quantity_transfer_to_repair,
+quantity: f.quantity;
+if (quantity.value &lt; quantity_transfer_to_repair.value) {
+	change quantity_transfer_to_repair value { quantity.value; }
+}</action>
+			</actions>
+		</event>
 	</data>
 	<data type="enumeration_map">
 		<id>unit</id>

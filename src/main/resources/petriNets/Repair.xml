@@ -70,7 +70,9 @@
 	<data type="text">
 		<id>description</id>
 		<title name="description">Description</title>
-		<values>area</values>
+		<component>
+			<name>area</name>
+		</component>
 	</data>
 	<data type="enumeration_map">
 		<id>priority</id>
@@ -210,11 +212,13 @@
 	<data type="text">
 		<id>public_description</id>
 		<title name="problem_description">Problem description</title>
-		<values>area</values>
+		<component>
+			<name>area</name>
+		</component>
 	</data>
 	<data type="boolean">
 		<id>public_remove_check</id>
-		<title></title>
+		<title/>
 		<init>false</init>
 	</data>
 	<data type="enumeration_map">
@@ -564,39 +568,47 @@
 				<id>public_natural_legal_person</id>
 				<logic>
 					<behavior>editable</behavior>
-					<action trigger="set"> name: f.public_name,
-					taxID: f.public_taxID,
-					businessID: f.public_businessID,
-					natural_legal_person: f.public_natural_legal_person,
-					t_input_form: t.t2,
-					company_name: f.public_company_name,
-					surname: f.public_surname;
+					<action trigger="set">
+						name: f.public_name,
+						taxID: f.public_taxID,
+						businessID: f.public_businessID,
+						natural_legal_person: f.public_natural_legal_person,
+						t_input_form: t.t2,
+						company_name: f.public_company_name,
+						surname: f.public_surname;
 
-					make name, editable on t_input_form when { natural_legal_person.value == false; }
-					make surname, editable on t_input_form when { natural_legal_person.value == false; }
-					make name, required on t_input_form when { natural_legal_person.value == false; }
-					make surname, required on t_input_form when { natural_legal_person.value == false; }
-					make company_name, hidden on t_input_form when { natural_legal_person.value == false; }
-					make taxID, hidden on t_input_form when { natural_legal_person.value == false; }
-					make businessID, hidden on t_input_form when { natural_legal_person.value == false; }
+						make name, editable on t_input_form when { natural_legal_person.value == false; }
+						make surname, editable on t_input_form when { natural_legal_person.value == false; }
+						make name, required on t_input_form when { natural_legal_person.value == false; }
+						make surname, required on t_input_form when { natural_legal_person.value == false; }
 
-					make name, hidden on t_input_form when { natural_legal_person.value == true; }
-					make surname, hidden on t_input_form when { natural_legal_person.value == true; }
-					make company_name, editable on t_input_form when { natural_legal_person.value == true; }
-					make businessID, editable on t_input_form when { natural_legal_person.value == true; }
-					make taxID, editable on t_input_form when { natural_legal_person.value == true; }
-					make company_name, required on t_input_form when { natural_legal_person.value == true; }
-					make businessID, required on t_input_form when { natural_legal_person.value == true; }
-					make taxID, required on t_input_form when { natural_legal_person.value == true; }
+						make company_name, hidden on t_input_form when { natural_legal_person.value == false; }
+						make taxID, hidden on t_input_form when { natural_legal_person.value == false; }
+						make businessID, hidden on t_input_form when { natural_legal_person.value == false; }
+						make company_name, optional on t_input_form when { natural_legal_person.value == false; }
+						make taxID, optional on t_input_form when { natural_legal_person.value == false; }
+						make businessID, optional on t_input_form when { natural_legal_person.value == false; }
 
-					if (natural_legal_person.value == true) {
-						change name value { null; }
-						change surname value {  null; }
-					}else {
+						make name, hidden on t_input_form when { natural_legal_person.value == true; }
+						make surname, hidden on t_input_form when { natural_legal_person.value == true; }
+						make name, optional on t_input_form when { natural_legal_person.value == true; }
+						make surname, optional on t_input_form when { natural_legal_person.value == true; }
+
+						make company_name, editable on t_input_form when { natural_legal_person.value == true; }
+						make businessID, editable on t_input_form when { natural_legal_person.value == true; }
+						make taxID, editable on t_input_form when { natural_legal_person.value == true; }
+						make company_name, required on t_input_form when { natural_legal_person.value == true; }
+						make businessID, required on t_input_form when { natural_legal_person.value == true; }
+						make taxID, required on t_input_form when { natural_legal_person.value == true; }
+
+						if (natural_legal_person.value == true) {
+							change name value { null; }
+							change surname value {  null; }
+						}else {
 							change company_name value { null; }
 							change businessID value { null; }
 							change taxID value { null; }
-					}
+						}
 					</action>
 				</logic>
 				<layout>
@@ -843,10 +855,11 @@
 
 					def vehicle_cases = findCases( { it.processIdentifier.eq("vehicle").and(it.dataSet.get("status").value.eq("assigned")) } )
 
-					if(vehicle_cases == null || vehicle_case == [])
-						return
+					if(vehicle_cases == null || vehicle_cases == [])
+					return
 
-					change vehicles options {[]}
+					change vehicles options { [] }
+					change vehicles value { "" }
 
 					for(vehicle in vehicle_cases){
 						def val = vehicle.dataSet.get("licenceNumber").value + " - " + vehicle.dataSet.get("manufacturer").value + " " + vehicle.dataSet.get("model").value
@@ -858,7 +871,6 @@
 		<event type="finish">
 			<id>1</id>
 			<actions phase="pre">
-<!--				todo-->
 				<action>
 					selected_vehicle_id: f.selected_vehicle_id,
 					selected_customer_id: f.selected_customer_id,
@@ -870,12 +882,11 @@
 					if(vehicle == null)
 						throw new IllegalArgumentException("Vehicle with id: " + selectedVehicleId + " does not exist anymore")
 
-					// def selectedCustomerId = vehicle.dataSet.get("customer_id").value
+					def selectedCustomerId = vehicle.dataSet.get("actual_customer_id").value
 
 					change selected_vehicle_id value { selectedVehicleId }
-					// change selected_customer_id value { selectedCustomerId }
+					change selected_customer_id value { selectedCustomerId }
 				</action>
-				<!-- change status -->
 				<action>
 					status: f.status;
 
@@ -912,7 +923,7 @@
 		<event type="finish">
 			<actions phase="post">
 				<action>
-				async.run{ workflowService.deleteCase(useCase.stringId) }
+					async.run{ workflowService.deleteCase(useCase.stringId) }
 				</action>
 			</actions>
 		</event>
@@ -1190,7 +1201,7 @@
 		<event type="assign">
 			<id>0</id>
 			<actions phase="pre">
-<!--				vehicles initialization-->
+				<!--				vehicles initialization-->
 				<action>
 					vehicles: f.vehicles;
 
@@ -1207,7 +1218,7 @@
 						change vehicles options { vehicles.options + [(vehicle.stringId): val] }
 					}
 				</action>
-<!--				customers initialization-->
+				<!--				customers initialization-->
 				<action>
 					customers: f.customers;
 
@@ -1337,13 +1348,13 @@
 		</layout>
 		<label>System delete [time]</label>
 		<trigger type="time">
-				<delay>P7D</delay>
+			<delay>P7D</delay>
 		</trigger>
 
 		<event type="finish">
 			<actions phase="post">
 				<action>
-				async.run{ workflowService.deleteCase(useCase.stringId) }
+					async.run{ workflowService.deleteCase(useCase.stringId) }
 				</action>
 			</actions>
 		</event>
@@ -1363,14 +1374,14 @@
 				<id>public_status_extern_text</id>
 				<logic>
 					<behavior>editable</behavior>
-						<action trigger="get">
+					<action trigger="get">
 						thisTask: t.t11,
 						remove2: f.public_remove_2,
 						remove1: f.public_remove_1;
 
 						make remove1,editable on thisTask when { true }
 						make remove2,hidden on thisTask when { true }
-						</action>
+					</action>
 				</logic>
 				<layout>
 					<x>0</x>
@@ -1387,12 +1398,12 @@
 				<logic>
 					<behavior>editable</behavior>
 					<action trigger="set">
-										thisTask: t.t11,
-										remove2: f.public_remove_2,
-										remove1: f.public_remove_1;
+						thisTask: t.t11,
+						remove2: f.public_remove_2,
+						remove1: f.public_remove_1;
 
-										make remove1,hidden on thisTask when { true }
-										make remove2,editable on thisTask when { true }
+						make remove1,hidden on thisTask when { true }
+						make remove2,editable on thisTask when { true }
 					</action>
 
 				</logic>
@@ -1410,16 +1421,14 @@
 				<logic>
 					<behavior>hidden</behavior>
 					<action trigger="set">
-					thisTask: t.t11,
-					remove2: f.public_remove_2,
-					remove3: f.public_remove_3,
-					check: f.public_remove_check;
+						thisTask: t.t11,
+						remove2: f.public_remove_2,
+						remove3: f.public_remove_3,
+						check: f.public_remove_check;
 
-					make remove2,hidden on thisTask when { true }
-					make remove3,visible on thisTask when { true }
-					change check value {return true}
-
-
+						make remove2,hidden on thisTask when { true }
+						make remove3,visible on thisTask when { true }
+						change check value { return true }
 					</action>
 
 				</logic>
@@ -1458,7 +1467,6 @@
 							finishTask("t5")
 						}
 					}
-
 				</action>
 			</actions>
 		</event>
@@ -1484,7 +1492,7 @@
 						warehouse_items: f.warehouse_items;
 
 						if(warehouses.value == null)
-							return
+						return
 
 						def selectedWarehouse = findCase( {it._id.eq(warehouses.value)} )
 						if(selectedWarehouse == null)
@@ -1497,8 +1505,8 @@
 						def tmpMap = [:]
 						for(itemId in itemIds){
 							def itemCase = findCase( {it._id.eq(itemId.defaultValue)} )
-							if(itemCase != null){
-								def itemTitle = itemCase.dataSet.get("title").value
+								if(itemCase != null){
+							def itemTitle = itemCase.dataSet.get("title").value
 								tmpMap = tmpMap + [(itemId.defaultValue): itemTitle]
 							}
 						}

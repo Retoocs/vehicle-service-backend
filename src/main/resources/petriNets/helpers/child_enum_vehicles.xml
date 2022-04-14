@@ -109,7 +109,6 @@
 		<desc name="list_actualization_date_desc">Date when last change in lists has been made</desc>
 		<action trigger="get">
 			lists_actualization_date: f.lists_actualization_date;
-			//TODO: Groupid
 			def mainCase = findCase( {it.processIdentifier.eq("main_enum_vehicles")} );
 			change lists_actualization_date value { mainCase?.dataSet.get("last_imported_file")?.value; }
 		</action>
@@ -528,75 +527,6 @@
 			<id>t_select_vehicle_finish</id>
 			<actions phase="post">
 				<action>
-					status: f.status;
-					change status value { "Vehicle selected"; }
-				</action>
-			</actions>
-		</event>
-	</transition>
-	<transition>
-		<id>t_process_selection</id>
-		<x>660</x>
-		<y>460</y>
-		<layout>
-			<offset>0</offset>
-		</layout>
-		<label>Process the selection [auto]</label>
-		<trigger type="auto"/>
-		<event type="assign">
-			<id>0</id>
-			<actions phase="pre">
-				<action>
-					status: f.status;
-					change status value {"Processing in progress"; }
-				</action>
-			</actions>
-			<actions phase="post">
-				<action>
-					manufacturers: f.manufacturers,
-					filtered_models: f.filtered_models,
-					undefined_manufacturer: f.undefined_manufacturer,
-					undefined_model: f.undefined_model,
-					is_undefined_manufacturer: f.is_undefined_manufacturer,
-					is_undefined_model: f.is_undefined_model,
-					vehicle_id: f.vehicle_id;
-
-					if(vehicle_id.value == null)
-						return
-
-					def vehicleCase = findCase( {it._id.eq(vehicle_id.value)} )
-					if(vehicleCase == null)
-						return
-
-					String tmpManufacturer, tmpModel
-
-					if(is_undefined_manufacturer.value)
-						tmpManufacturer = undefined_manufacturer.value
-					else
-						tmpManufacturer = manufacturers.options?.get(manufacturers.value)?.defaultValue
-
-					if(is_undefined_model.value)
-						tmpModel = undefined_model.value
-					else
-						tmpModel = filtered_models.options?.get(filtered_models.value)?.defaultValue
-
-					setData("t_form", vehicleCase, [
-						"manufacturer": [
-							"value": tmpManufacturer,
-							"type" : "text"
-						],
-						"model": [
-							"value": tmpModel,
-							"type" : "text"
-						],
-					])
-				</action>
-			</actions>
-		</event>
-		<event type="finish">
-			<id>1</id>
-			<actions phase="pre">
-				<action>
 					trans: t.t_select_vehicle,
 					manufacturers: f.manufacturers,
 					filtered_models: f.filtered_models,
@@ -614,8 +544,6 @@
 						vehicle_id, trans
 					)
 				</action>
-			</actions>
-			<actions phase="post">
 				<action>
 					requests_processed: f.requests_processed;
 					change requests_processed value { requests_processed.value+1; }
@@ -641,14 +569,6 @@
 		<x>660</x>
 		<y>300</y>
 		<label>initialized</label>
-		<tokens>0</tokens>
-		<static>false</static>
-	</place>
-	<place>
-		<id>p7</id>
-		<x>900</x>
-		<y>460</y>
-		<label>vehicle selected</label>
 		<tokens>0</tokens>
 		<static>false</static>
 	</place>
@@ -686,20 +606,6 @@
 		<id>a11</id>
 		<type>regular</type>
 		<sourceId>t_select_vehicle</sourceId>
-		<destinationId>p7</destinationId>
-		<multiplicity>1</multiplicity>
-	</arc>
-	<arc>
-		<id>a12</id>
-		<type>regular</type>
-		<sourceId>p7</sourceId>
-		<destinationId>t_process_selection</destinationId>
-		<multiplicity>1</multiplicity>
-	</arc>
-	<arc>
-		<id>a13</id>
-		<type>regular</type>
-		<sourceId>t_process_selection</sourceId>
 		<destinationId>p2</destinationId>
 		<multiplicity>1</multiplicity>
 	</arc>

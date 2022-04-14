@@ -55,6 +55,7 @@
 	<data type="text">
 		<id>vin</id>
 		<title name="vin">VIN</title>
+<!--		<valid>regex("^[A-HJ-NPR-Za-hj-npr-z\d]{8}[\dX][A-HJ-NPR-Za-hj-npr-z\d]{2}\d{6}$")</valid>-->
 	</data>
 	<data type="text">
 		<id>manufacturer</id>
@@ -63,6 +64,7 @@
 	<data type="text">
 		<id>licenceNumber</id>
 		<title name="licenceNumber">Licence munber</title>
+<!--		<valid>regex("^[0-9a-zA-Z]{4,9}$")</valid>-->
 	</data>
 	<data type="text">
 		<id>model</id>
@@ -80,10 +82,13 @@
 	<data type="number">
 		<id>kilometers</id>
 		<title name="kilometers">Number of KM</title>
+		<valid>positive</valid>
 	</data>
 	<data type="number">
 		<id>manufactureYear</id>
 		<title name="manufactureYear">Year of manufacture</title>
+<!--		<valid>regex("^(19|[2-9][0-9])\d{2}$")</valid>-->
+		<valid>positive</valid>
 	</data>
 	<data type="enumeration_map">
 		<id>status</id>
@@ -155,10 +160,12 @@
 		<id>oilChangeKM</id>
 		<title name="oilChangeKM">Number of kilomenters when last oil change was made</title>
 		<init>0</init>
+		<valid>positive</valid>
 	</data>
 	<data type="text">
 		<id>carDescription</id>
 		<title name="carDescription">Car description</title>
+		<valid>minLength 2</valid>
 	</data>
 	<data type="button">
 		<id>remove_from_customer_1</id>
@@ -300,16 +307,15 @@
 					if(enumTask == null)
 						throw new IllegalArgumentException("Cannot find task with id t_select_vehicle in ${myEnumCase.title}")
 
-					async.run{ assignTask(enumTask) }
-
-					change enum_form value { [enumTask.stringId] }
-
-					setData("t_select_vehicle", myEnumCase, [
+					assignTask(enumTask)
+					setData(enumTask, [
 						"vehicle_id": [
 							"value": useCase.stringId,
 							"type" : "text"
 						],
 					])
+
+					change enum_form value { [enumTask.stringId] }
 				</action>
 			</actions>
 		</event>
@@ -317,20 +323,10 @@
 			<id>t_create_finish</id>
 			<actions phase="pre">
 				<action>
-					def myEnumCase = findCase( {it.processIdentifier.eq("child_enum_vehicles").and(it.author.email.eq(loggedUser().email))} )
-					if(myEnumCase == null)
-						throw new IllegalArgumentException("Cannot find your instance of process Child vehicles enumeration")
-
-					async.run{ finishTask("t_select_vehicle", myEnumCase) }
+					getAndSetVehicleManufacturerAndModel()
 				</action>
 			</actions>
 			<actions phase="post">
-				<action>
-					enum_form: f.enum_form;
-
-					useCase.dataSet.get("enum_form").value = []
-					workflowService.save(useCase)
-				</action>
 				<action>
 					model: f.model,
 					manufacturer: f.manufacturer,
@@ -341,12 +337,23 @@
 						def stringModel = (model.value != null) ? model.value : "Model"
 						def stringManufacturer = (manufacturer.value != null) ? manufacturer.value : "Manufacturer"
 						def stringLicenceNumber = (licenceNumber.value != null) ? licenceNumber.value : "Licence Number"
-						"${stringLicenceNumber} - ${stringManufacturer} ${stringModel}"
+							"${stringLicenceNumber} - ${stringManufacturer} ${stringModel}"
 					}
 				</action>
 				<action>
-                    moreData: f.moreData;
-                    change moreData value { false; }
+					def myEnumCase = findCase( {it.processIdentifier.eq("child_enum_vehicles").and(it.author.email.eq(loggedUser().email))} )
+					if(myEnumCase == null)
+						throw new IllegalArgumentException("Cannot find your instance of process Child vehicles enumeration")
+
+					finishTask("t_select_vehicle", myEnumCase)
+				</action>
+				<action>
+					moreData: f.moreData;
+					change moreData value { false; }
+				</action>
+				<action>
+					useCase.dataSet.get("enum_form").value = []
+					workflowService.save(useCase)
 				</action>
 			</actions>
 		</event>
@@ -354,9 +361,9 @@
 			<id>t_create_cancel</id>
 			<actions phase="post">
 				<action>
-				async.run{
-					workflowService.deleteCase(useCase.stringId)
-				}
+					async.run{
+						workflowService.deleteCase(useCase.stringId)
+					}
 				</action>
 			</actions>
 		</event>
@@ -376,6 +383,18 @@
 				<id>manufacturer</id>
 				<logic>
 					<behavior>visible</behavior>
+					<action trigger="set">
+						model: f.model,
+						manufacturer: f.manufacturer,
+						licenceNumber: f.licenceNumber;
+
+						changeCaseProperty "title" about {
+							def stringModel = (model.value != null) ? model.value : "Model"
+							def stringManufacturer = (manufacturer.value != null) ? manufacturer.value : "Manufacturer"
+							def stringLicenceNumber = (licenceNumber.value != null) ? licenceNumber.value : "Licence Number"
+							"${stringLicenceNumber} - ${stringManufacturer} ${stringModel}"
+						}
+					</action>
 				</logic>
 				<layout>
 					<x>0</x>
@@ -391,6 +410,18 @@
 				<id>model</id>
 				<logic>
 					<behavior>visible</behavior>
+					<action trigger="set">
+						model: f.model,
+						manufacturer: f.manufacturer,
+						licenceNumber: f.licenceNumber;
+
+						changeCaseProperty "title" about {
+							def stringModel = (model.value != null) ? model.value : "Model"
+							def stringManufacturer = (manufacturer.value != null) ? manufacturer.value : "Manufacturer"
+							def stringLicenceNumber = (licenceNumber.value != null) ? licenceNumber.value : "Licence Number"
+							"${stringLicenceNumber} - ${stringManufacturer} ${stringModel}"
+						}
+					</action>
 				</logic>
 				<layout>
 					<x>2</x>
@@ -422,76 +453,25 @@
 				</layout>
 			</dataRef>
 			<dataRef>
-				<id>manufacturer</id>
-				<logic>
-					<behavior>hidden</behavior>
-					<action trigger="set">model: f.model,
-						manufacturer: f.manufacturer,
-						licenceNumber: f.licenceNumber;
-
-						changeCaseProperty "title" about {
-						def stringModel = (model.value != null) ? model.value : "Model"
-						def stringManufacturer = (manufacturer.value != null) ? manufacturer.value : "Manufacturer"
-						def stringLicenceNumber = (licenceNumber.value != null) ? licenceNumber.value : "Licence Number"
-						"${stringLicenceNumber} - ${stringManufacturer} ${stringModel}"
-						}
-					</action>
-				</logic>
-				<layout>
-					<x>0</x>
-					<y>1</y>
-					<rows>1</rows>
-					<cols>2</cols>
-					<offset>0</offset>
-					<template>material</template>
-					<appearance>outline</appearance>
-				</layout>
-			</dataRef>
-			<dataRef>
 				<id>licenceNumber</id>
 				<logic>
 					<behavior>visible</behavior>
-					<action trigger="set">model: f.model,
+					<action trigger="set">
+						model: f.model,
 						manufacturer: f.manufacturer,
 						licenceNumber: f.licenceNumber;
 
 						changeCaseProperty "title" about {
-						def stringModel = (model.value != null) ? model.value : "Model"
-						def stringManufacturer = (manufacturer.value != null) ? manufacturer.value : "Manufacturer"
-						def stringLicenceNumber = (licenceNumber.value != null) ? licenceNumber.value : "Licence Number"
-						"${stringLicenceNumber} - ${stringManufacturer} ${stringModel}"
+							def stringModel = (model.value != null) ? model.value : "Model"
+							def stringManufacturer = (manufacturer.value != null) ? manufacturer.value : "Manufacturer"
+							def stringLicenceNumber = (licenceNumber.value != null) ? licenceNumber.value : "Licence Number"
+							"${stringLicenceNumber} - ${stringManufacturer} ${stringModel}"
 						}
 					</action>
 				</logic>
 				<layout>
 					<x>2</x>
 					<y>0</y>
-					<rows>1</rows>
-					<cols>2</cols>
-					<offset>0</offset>
-					<template>material</template>
-					<appearance>outline</appearance>
-				</layout>
-			</dataRef>
-			<dataRef>
-				<id>model</id>
-				<logic>
-					<behavior>hidden</behavior>
-					<action trigger="set">model: f.model,
-						manufacturer: f.manufacturer,
-						licenceNumber: f.licenceNumber;
-
-						changeCaseProperty "title" about {
-						def stringModel = (model.value != null) ? model.value : "Model"
-						def stringManufacturer = (manufacturer.value != null) ? manufacturer.value : "Manufacturer"
-						def stringLicenceNumber = (licenceNumber.value != null) ? licenceNumber.value : "Licence Number"
-						"${stringLicenceNumber} - ${stringManufacturer} ${stringModel}"
-						}
-					</action>
-				</logic>
-				<layout>
-					<x>2</x>
-					<y>1</y>
 					<rows>1</rows>
 					<cols>2</cols>
 					<offset>0</offset>
@@ -706,7 +686,7 @@
 							if(enum_form.value == null || enum_form.value == [])
 								return
 							def tazk = findTask( {it._id.eq(enum_form.value[0])} )
-							async.run{ cancelTask(tazk) }
+							async.run { cancelTask(tazk) }
 							change enum_form value { [] }
 
 							return
@@ -720,16 +700,14 @@
 						if(enumTask == null)
 							throw new IllegalArgumentException("Cannot find task with id t_select_vehicle in ${myEnumCase.title}")
 
-						async.run{ assignTask(enumTask) }
-
-						change enum_form value { [enumTask.stringId] }
-
-						setData("t_select_vehicle", myEnumCase, [
+						async.run { assignTask(enumTask) }
+						setData(enumTask, [
 							"vehicle_id": [
 								"value": useCase.stringId,
 								"type" : "text"
 							],
 						])
+						change enum_form value { [enumTask.stringId] }
 					</action>
 				</logic>
 			</dataRef>
@@ -802,35 +780,36 @@
 			<id>1</id>
 			<actions phase="pre">
 				<action>
-					def myEnumCase = findCase( {it.processIdentifier.eq("child_enum_vehicles").and(it.author.email.eq(loggedUser().email))} )
-					if(myEnumCase == null)
-						throw new IllegalArgumentException("Cannot find your instance of process Child vehicles enumeration")
-
-					async.run{ finishTask("t_select_vehicle", myEnumCase) }
+					getAndSetVehicleManufacturerAndModel()
 				</action>
 			</actions>
 			<actions phase="post">
 				<action>
-					enum_form: f.enum_form;
+					model: f.model,
+					manufacturer: f.manufacturer,
+					licenceNumber: f.licenceNumber;
 
-					change enum_form value { [] }
+					changeCaseProperty "title" about {
+						def stringModel = (model.value != null) ? model.value : "Model"
+						def stringManufacturer = (manufacturer.value != null) ? manufacturer.value : "Manufacturer"
+						def stringLicenceNumber = (licenceNumber.value != null) ? licenceNumber.value : "Licence Number"
+						"${stringLicenceNumber} - ${stringManufacturer} ${stringModel}"
+					}
 				</action>
 				<action>
-                model: f.model,
-                manufacturer: f.manufacturer,
-                licenceNumber: f.licenceNumber;
+					def myEnumCase = findCase( {it.processIdentifier.eq("child_enum_vehicles").and(it.author.email.eq(loggedUser().email))} )
+					if(myEnumCase == null)
+						throw new IllegalArgumentException("Cannot find your instance of process Child vehicles enumeration")
 
-                changeCaseProperty "title" about {
-                    def stringModel = (model.value != null) ? model.value : "Model"
-                    def stringManufacturer = (manufacturer.value != null) ? manufacturer.value : "Manufacturer"
-                    def stringLicenceNumber = (licenceNumber.value != null) ? licenceNumber.value : "Licence Number"
-                    "${stringLicenceNumber} - ${stringManufacturer} ${stringModel}"
-                }
-
+					finishTask("t_select_vehicle", myEnumCase)
 				</action>
 				<action>
                     moreData: f.moreData;
                     change moreData value { false; }
+				</action>
+				<action>
+					useCase.dataSet.get("enum_form").value = []
+					workflowService.save(useCase)
 				</action>
 			</actions>
 		</event>
