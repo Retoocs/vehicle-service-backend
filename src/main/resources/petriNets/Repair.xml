@@ -70,6 +70,7 @@
 	<data type="text">
 		<id>description</id>
 		<title name="description">Description</title>
+		<valid>minLength 2</valid>
 		<component>
 			<name>area</name>
 		</component>
@@ -121,10 +122,12 @@
 	<data type="text">
 		<id>info_text_new_vehicle</id>
 		<title name="info_text_new_vehicle">Fill the fields below to create a new vehicle and use it in this repair.</title>
+		<valid>minLength 2</valid>
 	</data>
 	<data type="text">
 		<id>info_text_new_customer</id>
 		<title name="info_text_new_customer">Fill the fields below to create a new customer and use it in this repair.</title>
+		<valid>minLength 2</valid>
 	</data>
 	<data type="enumeration_map">
 		<id>status</id>
@@ -168,22 +171,27 @@
 	<data type="text">
 		<id>public_name</id>
 		<title name="name">Name</title>
+		<valid>minLength 2</valid>
 	</data>
 	<data type="text">
 		<id>public_surname</id>
 		<title name="surname">Surname</title>
+		<valid>minLength 2</valid>
 	</data>
 	<data type="text">
 		<id>public_company_name</id>
 		<title name="company_name">Company name</title>
+		<valid>minLength 2</valid>
 	</data>
 	<data type="text">
 		<id>public_phone</id>
 		<title name="phone_number">Phone number</title>
+		<!--		<valid>regex("^\+?[0-9]{7,14}$")</valid>-->
 	</data>
 	<data type="text">
 		<id>public_mail</id>
 		<title name="email">E-mail</title>
+		<valid>email</valid>
 	</data>
 	<data type="text">
 		<id>public_businessID</id>
@@ -200,6 +208,7 @@
 	<data type="text">
 		<id>public_licenseNumber</id>
 		<title name="licenceNumber">License number</title>
+		<!--		<valid>regex("^[0-9a-zA-Z]{4,9}$")</valid>-->
 	</data>
 	<data type="text">
 		<id>public_model</id>
@@ -208,10 +217,18 @@
 	<data type="number">
 		<id>public_manufactureYear</id>
 		<title name="manufactureYear">Manufacture Year</title>
+		<validations>
+			<validation>
+				<expression>inrange 1900,2100</expression>
+				<message name="manufactureYear_valid">Must be greater or even than 1900</message>
+			</validation>
+		</validations>
+		<!--		<valid>regex("^(19|[2-9][0-9])\d{2}$")</valid>-->
 	</data>
 	<data type="text">
 		<id>public_description</id>
 		<title name="problem_description">Problem description</title>
+		<valid>minLength 2</valid>
 		<component>
 			<name>area</name>
 		</component>
@@ -304,6 +321,8 @@
 		<i18nString name="warehouses_for_removal">Vyberte cieľový sklad</i18nString>
 		<i18nString name="warehouses">Sklady</i18nString>
 		<i18nString name="company_name">Názov firmy</i18nString>
+		<i18nString name="manufactureYear_valid">Musi byť väčšie alebo rovné ako 1900</i18nString>
+
 	</i18n>
 	<i18n locale="de">
 		<i18nString name="case_title">Reparatur</i18nString>
@@ -355,6 +374,7 @@
 		<i18nString name="warehouses_for_removal">Wählen Sie das Ziellager</i18nString>
 		<i18nString name="warehouses">Lagerhäuser</i18nString>
 		<i18nString name="company_name">Name des Unternehmens</i18nString>
+		<i18nString name="manufactureYear_valid">Must sein 1900+</i18nString>
 
 	</i18n>
 	<!-- TRANSITIONS -->

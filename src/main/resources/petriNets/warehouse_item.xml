@@ -38,6 +38,7 @@
 	<data type="text">
 		<id>manufacturer</id>
 		<title name="manufacturer">Manufacturer</title>
+		<valid>minLength 2</valid>
 	</data>
 	<data type="text">
 		<id>warehouseId</id>
@@ -101,6 +102,7 @@
 	<data type="text">
 		<id>title</id>
 		<title name="title">title</title>
+		<valid>minLength 2</valid>
 	</data>
 	<data type="boolean">
 		<id>is_event_from_warehouseId</id>
@@ -118,6 +120,7 @@
 		<component>
 			<name>area</name>
 		</component>
+		<valid>minLength 2</valid>
 	</data>
 	<data type="number">
 		<id>nonVatPrice</id>
@@ -228,6 +231,12 @@ if (quantity.value &lt; quantity_transfer_to_repair.value) {
 		<id>tax</id>
 		<title name="tax">Tax (in %)</title>
 		<init>20</init>
+		<validations>
+			<validation>
+				<expression>inrange 0,100</expression>
+				<message name="tax_valid">Must be 0-100</message>
+			</validation>
+		</validations>
 		<action trigger="set">
 			tax: f.tax,
 			vatPrice: f.vatPrice,
@@ -255,6 +264,7 @@ if (quantity.value &lt; quantity_transfer_to_repair.value) {
 	<data type="text">
 		<id>short_description</id>
 		<title name="short_description">Description</title>
+<!--		<valid>minLength 2</valid>-->
 		<view> <htmlEditor/> </view>
 	</data>
 	<data type="button">
@@ -292,6 +302,7 @@ if (quantity.value &lt; quantity_transfer_to_repair.value) {
 		<i18nString name="quantity_valid1">Musi byť väčšie alebo rovné ako 0</i18nString>
 		<i18nString name="quantity_transfer_to_repair">Presúvaná kvantita</i18nString>
 		<i18nString name="quantity_transfer_to_repair_valid1">Musi byť väčšie alebo rovné ako 1</i18nString>
+		<i18nString name="tax_valid">Musi byť 0-100</i18nString>
 		<i18nString name="unit">Jednotka kvantity</i18nString>
 		<i18nString name="unit_kg">kg (Kilogram)</i18nString>
 		<i18nString name="unit_pcs">ks (Kusy)</i18nString>
@@ -325,6 +336,7 @@ if (quantity.value &lt; quantity_transfer_to_repair.value) {
 		<i18nString name="quantity_valid1">Must sein 0+</i18nString>
 		<i18nString name="quantity_transfer_to_repair">übertragene Menge</i18nString>
 		<i18nString name="quantity_transfer_to_repair_valid1">Must sein 1+</i18nString>
+		<i18nString name="tax_valid">Must sein 0-100</i18nString>
 		<i18nString name="unit">Mengeneinheit</i18nString>
 		<i18nString name="unit_kg">kg (Kilogramm)</i18nString>
 		<i18nString name="unit_pcs">stk (Stücke)</i18nString>
