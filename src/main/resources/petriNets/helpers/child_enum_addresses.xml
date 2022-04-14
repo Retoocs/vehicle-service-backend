@@ -119,7 +119,6 @@
 		<desc name="list_actualization_date_cities_desc">Date when last change in list of cities has been made</desc>
 		<action trigger="get">
 			list_actualization_date_cities: f.list_actualization_date_cities;
-			//TODO: Groupid
 			//def mainCase = findCase( {it.processIdentifier.eq("main_enum_addresses")} );
 			//change list_actualization_date_cities value { mainCase?.dataSet.get("last_imported_file_cities")?.value; }
 		</action>
@@ -130,7 +129,6 @@
 		<desc name="list_actualization_date_streets_desc">Date when last change in list of streets has been made</desc>
 		<action trigger="get">
 			list_actualization_date_streets: f.list_actualization_date_streets;
-			//TODO: Groupid
 			//def mainCase = findCase( {it.processIdentifier.eq("main_enum_addresses")} );
 			//change list_actualization_date_streets value { mainCase?.dataSet.get("last_imported_file_streets")?.value; }
 		</action>
