@@ -895,6 +895,17 @@
 
                     change description value { public_description.value }
                 </action>
+                <action>
+                    assignTask("t26")
+                </action>
+            </actions>
+        </event>
+        <event type="finish">
+            <id>0</id>
+            <actions phase="pre">
+                <action>
+                    finishTask("t26")
+                </action>
             </actions>
         </event>
     </transition>
@@ -925,6 +936,22 @@
                 </layout>
             </dataRef>
         </dataGroup>
+        <event type="assign">
+            <id>0</id>
+            <actions phase="pre">
+                <action>
+                    assignTask("t26")
+                </action>
+            </actions>
+        </event>
+        <event type="finish">
+            <id>0</id>
+            <actions phase="pre">
+                <action>
+                    finishTask("t26")
+                </action>
+            </actions>
+        </event>
     </transition>
     <transition>
         <id>t10</id>
@@ -1259,7 +1286,7 @@
                     <behavior>visible</behavior>
                 </logic>
                 <layout>
-                    <x>2</x>
+                    <x>1</x>
                     <y>0</y>
                     <rows>1</rows>
                     <cols>1</cols>
@@ -1274,7 +1301,7 @@
                     <behavior>visible</behavior>
                 </logic>
                 <layout>
-                    <x>3</x>
+                    <x>2</x>
                     <y>0</y>
                     <rows>1</rows>
                     <cols>1</cols>
