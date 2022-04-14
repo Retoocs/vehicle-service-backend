@@ -87,8 +87,12 @@
 	<data type="number">
 		<id>manufactureYear</id>
 		<title name="manufactureYear">Year of manufacture</title>
-<!--		<valid>regex("^(19|[2-9][0-9])\d{2}$")</valid>-->
-		<valid>positive</valid>
+		<validations>
+			<validation>
+				<expression>inrange 1900,2100</expression>
+				<message name="manufactureYear_valid">Must be greater or even than 1900</message>
+			</validation>
+		</validations>
 	</data>
 	<data type="enumeration_map">
 		<id>status</id>
@@ -212,6 +216,7 @@
 		<i18nString name="oilChangeDate">Dátum poslednej zmeny oleja</i18nString>
 		<i18nString name="oilChangeKM">Počet najazdených kilometrov</i18nString>
 		<i18nString name="carDescription">Popis auta</i18nString>
+		<i18nString name="manufactureYear_valid">Musi byť väčšie alebo rovné ako 1900</i18nString>
 	</i18n>
 	<i18n locale="de">
 		<i18nString name="create">Schaffen</i18nString>
@@ -242,6 +247,7 @@
 		<i18nString name="oilChangeDate">Datum des letzten Ölwechsels</i18nString>
 		<i18nString name="oilChangeKM">Kilometerstand</i18nString>
 		<i18nString name="carDescription">Fahrzeugbeschreibung</i18nString>
+		<i18nString name="manufactureYear_valid">Must sein 1900+</i18nString>
 	</i18n>
 	<!-- TRANSITIONS -->
 	<transition>
