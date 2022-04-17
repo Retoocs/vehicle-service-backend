@@ -643,8 +643,8 @@
 					if(mainCase == null)
 						return
 
-					change cities options { mainCase.getField('system_cities').options }
-					change system_streets options { mainCase.getField('system_streets').options }
+					change cities options { mainCase.dataSet['system_cities'].options }
+					change system_streets options { mainCase.dataSet['system_streets'].options }
 				</action>
 			</actions>
 			<actions phase="post">
