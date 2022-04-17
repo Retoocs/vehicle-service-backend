@@ -3,6 +3,7 @@
 	<id>warehouse</id>
 	<initials>WH</initials>
 	<title name="case_title">Warehouse</title>
+	<caseName name="case_title">Warehouse</caseName>
 	<defaultRole>true</defaultRole>
 	<transitionRole>false</transitionRole>
 	<caseEvents>

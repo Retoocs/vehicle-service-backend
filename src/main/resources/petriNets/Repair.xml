@@ -5,6 +5,7 @@
     <title name="case_title">Repair</title>
     <defaultRole>true</defaultRole>
     <transitionRole>false</transitionRole>
+    <caseName name="case_title">Repair</caseName>
     <caseEvents>
         <event type="delete">
             <id>case_delete</id>
