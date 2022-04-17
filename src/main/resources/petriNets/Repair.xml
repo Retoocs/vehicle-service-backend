@@ -5,6 +5,7 @@
     <title name="case_title">Repair</title>
     <defaultRole>true</defaultRole>
     <transitionRole>false</transitionRole>
+    <caseName name="case_title">Repair</caseName>
     <caseEvents>
         <event type="delete">
             <id>case_delete</id>
@@ -88,10 +89,54 @@
     <data type="text">
         <id>selected_vehicle_id</id>
         <title>selected_vehicle_id</title>
+        <action trigger="set">
+            selected_vehicle_id: f.selected_vehicle_id,
+            selected_vehicle_title: f.selected_vehicle_title;
+
+            if(selected_vehicle_id.value == null)
+                return
+
+            def aCase = workflowService.findOne(selected_vehicle_id.value)
+            if(aCase == null)
+                return
+
+            def title = aCase.dataSet['manufacturer'].value + " " + aCase.dataSet['model'].value
+
+            change selected_vehicle_title value { title }
+        </action>
+    </data>
+    <data type="text" immediate="true">
+        <id>selected_vehicle_title</id>
+        <title name="selected_vehicle_title">Vehicle</title>
     </data>
     <data type="text">
         <id>selected_customer_id</id>
         <title>selected_customer_id</title>
+        <action trigger="set">
+            selected_customer_id: f.selected_customer_id,
+            selected_customer_title: f.selected_customer_title;
+
+            if(selected_vehicle_id.value == null)
+                return
+
+            def aCase = workflowService.findOne(selected_customer_id.value)
+            if(aCase == null)
+                return
+
+            def title
+            if(aCase.dataSet['natural_legal_person'].value){
+                title = aCase.dataSet['name'].value + " " + aCase.dataSet['surname'].value
+            }
+            else {
+                title = aCase.dataSet['company_name'].value
+            }
+
+            change selected_customer_title value { title }
+        </action>
+    </data>
+    <data type="text" immediate="true">
+        <id>selected_customer_title</id>
+        <title name="selected_customer_title">Customer</title>
     </data>
     <data type="number">
         <id>val_deny</id>
@@ -359,6 +404,8 @@
         <i18nString name="denied">Požiadavka zamietnutá</i18nString>
         <i18nString name="started">Oprava začatá</i18nString>
         <i18nString name="finished">Oprava dokončená</i18nString>
+        <i18nString name="selected_vehicle_title">Vozidlo</i18nString>
+        <i18nString name="selected_customer_title">Zákazník</i18nString>
     </i18n>
     <i18n locale="de">
         <i18nString name="case_title">Reparatur</i18nString>
@@ -418,6 +465,8 @@
         <i18nString name="denied">Anfrage abgelehnt</i18nString>
         <i18nString name="started">Angefangen</i18nString>
         <i18nString name="finished">Fertig</i18nString>
+        <i18nString name="selected_vehicle_title">Fahrzeug</i18nString>
+        <i18nString name="selected_customer_title">Kunde</i18nString>
     </i18n>
     <!-- TRANSITIONS -->
     <transition>
@@ -429,6 +478,25 @@
         </layout>
         <label>Edit</label>
         <assignPolicy>auto</assignPolicy>
+        <dataGroup>
+            <id>other_part</id>
+            <title name="t_complex_creation_other_part">Problem description</title>
+            <stretch>true</stretch>
+            <dataRef>
+                <id>priority</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <behavior>required</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>description</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <behavior>required</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
     </transition>
     <transition>
         <id>t_process_removal</id>
@@ -2100,7 +2168,7 @@
         <id>p4</id>
         <x>820</x>
         <y>180</y>
-        <label></label>
+        <label/>
         <tokens>0</tokens>
         <static>false</static>
     </place>
@@ -2116,7 +2184,7 @@
         <id>p6</id>
         <x>620</x>
         <y>60</y>
-        <label></label>
+        <label/>
         <tokens>0</tokens>
         <static>false</static>
     </place>
@@ -2124,7 +2192,7 @@
         <id>p7</id>
         <x>340</x>
         <y>100</y>
-        <label></label>
+        <label/>
         <tokens>0</tokens>
         <static>false</static>
     </place>
@@ -2140,7 +2208,7 @@
         <id>p9</id>
         <x>340</x>
         <y>20</y>
-        <label></label>
+        <label/>
         <tokens>0</tokens>
         <static>false</static>
     </place>
