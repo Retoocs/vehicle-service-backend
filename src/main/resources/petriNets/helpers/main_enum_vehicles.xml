@@ -154,7 +154,7 @@ change check_all value { false }
 					system_manufacturers: f.system_manufacturers,
 					system_models: f.system_models;
 
-					setCars(system_manufacturers, system_models);
+					// setCars(system_manufacturers, system_models);
 				</action>
 			</actions>
 		</event>
@@ -183,8 +183,18 @@ change check_all value { false }
 			<id>0</id>
 			<actions phase="pre">
 				<action>
+					file: f.import_file,
+					system_manufacturers: f.system_manufacturers,
+					system_models: f.system_models;
+
 					// todo: validate file structure (call ActionDelegate function)
-					throw new IllegalArgumentException("Import has not been implemented yet")
+
+					if (validateCarInput(file, ",") == True) {
+						setCars(system_manufacturers, system_models, file, ",");
+					} else {
+						throw new IllegalArgumentException("File is not in correct format!");
+					}
+
 				</action>
 			</actions>
 			<actions phase="post">

@@ -6,6 +6,7 @@ import com.netgrif.application.engine.startup.AbstractOrderedCommandLineRunner
 import com.netgrif.application.engine.workflow.domain.Case
 import com.netgrif.application.engine.workflow.service.interfaces.IWorkflowService
 import edu.fei.tp.CustomActionDelegate
+import edu.fei.tp.helpers.VehicleImportHelper
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
@@ -24,6 +25,9 @@ class CaseImportRunner extends AbstractOrderedCommandLineRunner{
 
     @Autowired
     private CustomActionDelegate actionDelegate
+
+    @Autowired
+    private VehicleImportHelper vehicleImportHelper
 
     @Override
     void run(String... strings) throws Exception {

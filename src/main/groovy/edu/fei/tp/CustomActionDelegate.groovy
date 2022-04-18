@@ -42,48 +42,6 @@ class CustomActionDelegate extends ActionDelegate {
         log.info("Succesfully loaded " + tmpStreets.size() + " streets into " + useCase.petriNet.title)
     }
 
-    private static Map getCars(String splitter) {
-        def csv = CSVHelper.loadCSV(pathToCarsCsv)
-        def cars = [:]
-        csv.eachWithIndex { s, idx ->
-            if(idx == 0)
-                return
-
-            def vehiclesArr = s.split(splitter)
-            def manufacturer = vehiclesArr[0].replaceAll("\\.", "-");
-            def model = vehiclesArr[1].replaceAll("\\.", "-");
-
-            if(cars.containsKey(manufacturer)){
-                if(!cars[manufacturer].contains(model)){
-                    cars[manufacturer].add(model)
-                }
-            }
-            else{
-                cars[manufacturer] = []
-                cars[manufacturer].add(model)
-            }
-        }
-        return cars
-    }
-
-
-    void setCars(EnumerationMapField manufacturers, EnumerationMapField models){
-        def cars = getCars(csvSplitter)
-        def tmpManufacturers = [:]
-        def tmpModels = [:]
-
-        for (entry in cars) {
-            tmpManufacturers = tmpManufacturers + [(entry.getKey()):entry.getKey()]
-            for(mod in entry.getValue()){
-                tmpModels = tmpModels + [(entry.getKey()+"-"+mod):mod]
-            }
-        }
-        change manufacturers options {   tmpManufacturers  }
-        change models options {  tmpModels  }
-
-        log.info("Succesfully loaded " + tmpModels.size() + " vehicles into " + useCase.petriNet.title)
-    }
-
     private List<Map<String, Field>> getDataFromReferencedTasks(List<String> taskIds){
         def resultList = []
         for(taskId in taskIds){
