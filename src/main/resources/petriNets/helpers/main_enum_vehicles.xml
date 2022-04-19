@@ -189,12 +189,9 @@ change check_all value { false }
 
 					// todo: validate file structure (call ActionDelegate function)
 
-					if (validateCarInput(file, ",") == True) {
-						setCars(system_manufacturers, system_models, file, ",");
-					} else {
+					if (!setCars(system_manufacturers, system_models, file.value, ",")) {
 						throw new IllegalArgumentException("File is not in correct format!");
 					}
-
 				</action>
 			</actions>
 			<actions phase="post">

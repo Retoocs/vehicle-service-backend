@@ -26,9 +26,6 @@ class CaseImportRunner extends AbstractOrderedCommandLineRunner{
     @Autowired
     private CustomActionDelegate actionDelegate
 
-    @Autowired
-    private VehicleImportHelper vehicleImportHelper
-
     @Override
     void run(String... strings) throws Exception {
         createEnumCases()
