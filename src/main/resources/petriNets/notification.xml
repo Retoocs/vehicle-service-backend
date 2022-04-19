@@ -38,17 +38,17 @@
 			sourceCaseName: f.sourceCaseName,
 			sourceMongoId: f.sourceMongoId,
 			sourceVisualId: f.this;
-			
+
 			def sourceCase
-			
+
 			// if sourceVisualId.value is valid (not null or empty)
 			if(sourceVisualId.value?.trim()){
 				sourceCase = findCase( {it.visualId.eq(sourceVisualId.value)} )
-				
+
 				// if the case was found
 				if(sourceCase){
-					change sourceCaseName value { return sourceCase.title; }	
-					
+					change sourceCaseName value { return sourceCase.title; }
+
 					// if MongoId is null or empty
 					if(!sourceMongoId.value?.trim()){
 						change sourceMongoId value { return sourceCase.stringId; }
@@ -60,9 +60,9 @@
 					}
 				}
 			}
-			
+
 			if(!sourceCase){
-				change sourceCaseName value { return null; }				
+				change sourceCaseName value { return null; }
 				change sourceMongoId value { return null; }
 			}
 		</action>
@@ -74,17 +74,17 @@
 			sourceCaseName: f.sourceCaseName,
 			sourceMongoId: f.this,
 			sourceVisualId: f.sourceVisualId;
-			
+
 			def sourceCase
-			
+
 			// if sourceMongoId.value is valid (not null or empty)
 			if(sourceMongoId.value?.trim()){
 				sourceCase = findCase( {it._id.eq(sourceMongoId.value)} )
-				
+
 				// if the case was found
 				if(sourceCase){
-					change sourceCaseName value { return sourceCase.title; }	
-					
+					change sourceCaseName value { return sourceCase.title; }
+
 					// if visualId is null or empty
 					if(!sourceVisualId.value?.trim()){
 						change sourceVisualId value { return sourceCase.visualId; }
@@ -96,9 +96,9 @@
 					}
 				}
 			}
-			
+
 			if(!sourceCase){
-				change sourceCaseName value { return null; }				
+				change sourceCaseName value { return null; }
 				change sourceVisualId value { return null; }
 			}
 		</action>
@@ -110,17 +110,17 @@
 			targetCaseName: f.targetCaseName,
 			targetMongoId: f.targetMongoId,
 			targetVisualId: f.this;
-			
+
 			def targetCase
-			
+
 			// if targetVisualId.value is valid (not null or empty)
 			if(targetVisualId.value?.trim()){
 				targetCase = findCase( {it.visualId.eq(targetVisualId.value)} )
-				
+
 				// if the case was found
 				if(targetCase){
-					change targetCaseName value { return targetCase.title; }	
-					
+					change targetCaseName value { return targetCase.title; }
+
 					// if MongoId is null or empty
 					if(!targetMongoId.value?.trim()){
 						change targetMongoId value { return targetCase.stringId; }
@@ -132,9 +132,9 @@
 					}
 				}
 			}
-			
+
 			if(!targetCase){
-				change targetCaseName value { return null; }				
+				change targetCaseName value { return null; }
 				change targetMongoId value { return null; }
 			}
 		</action>
@@ -146,17 +146,17 @@
 			targetCaseName: f.targetCaseName,
 			targetMongoId: f.this,
 			targetVisualId: f.targetVisualId;
-			
+
 			def targetCase
-			
+
 			// if targetMongoId.value is valid (not null or empty)
 			if(targetMongoId.value?.trim()){
 				targetCase = findCase( {it._id.eq(targetMongoId.value)} )
-				
+
 				// if the case was found
 				if(targetCase){
-					change targetCaseName value { return targetCase.title; }	
-					
+					change targetCaseName value { return targetCase.title; }
+
 					// if visualId is null or empty
 					if(!targetVisualId.value?.trim()){
 						change targetVisualId value { return targetCase.visualId; }
@@ -168,9 +168,9 @@
 					}
 				}
 			}
-			
+
 			if(!targetCase){
-				change targetCaseName value { return null; }				
+				change targetCaseName value { return null; }
 				change targetVisualId value { return null; }
 			}
 		</action>
@@ -250,6 +250,7 @@
 			<offset>0</offset>
 		</layout>
 		<label name="t_create">Create</label>
+		<assignPolicy>auto</assignPolicy>
 		<dataGroup>
 			<id>DataGroup</id>
 			<dataRef>
@@ -263,8 +264,8 @@
 			<id>t_create_finish</id>
 			<actions phase="post">
 				<action>
-					status: f.status;					
-					change status value { return "created"; }	
+					status: f.status;
+					change status value { return "created"; }
 				</action>
 			</actions>
 		</event>
@@ -440,7 +441,7 @@
 				<action>
 					async.run{
 						workflowService.deleteCase(useCase.stringId);
-					}	
+					}
 				</action>
 			</actions>
 		</event>

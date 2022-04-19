@@ -163,7 +163,7 @@
 				if (!nonVatPrice.value) {
 					change nonVatPrice value { return val; }
 				} else if (nonVatPrice.value != val) {
-					change nonVatPrice value { return val; } 
+					change nonVatPrice value { return val; }
 				}
 			}
 		</action>
@@ -245,7 +245,7 @@ if (quantity.value &lt; quantity_transfer_to_repair.value) {
 			if (tax.value) {
 				if(tax.value &lt;= 0) {
 					change tax value { return 0; }
-				} 
+				}
 				if (nonVatPrice.value &amp;&amp; !vatPrice.value) {
 					change vatPrice value { return (nonVatPrice.value + (nonVatPrice.value * (tax.value/100))).round(2); }
 				} else if (!nonVatPrice.value &amp;&amp; vatPrice.value) {
@@ -309,7 +309,7 @@ if (quantity.value &lt; quantity_transfer_to_repair.value) {
 		<i18nString name="unit_l">l (Litre)</i18nString>
 		<i18nString name="status">Stav</i18nString>
 		<i18nString name="status_created">Vytvorené</i18nString>
-		<i18nString name="tax">DPH v %</i18nString>	
+		<i18nString name="tax">DPH v %</i18nString>
 		<i18nString name="image">Fotka</i18nString>
 		<i18nString name="title">Nadpis</i18nString>
 		<i18nString name="short_description">Popis</i18nString>
@@ -343,7 +343,7 @@ if (quantity.value &lt; quantity_transfer_to_repair.value) {
 		<i18nString name="unit_l">l (Liter)</i18nString>
 		<i18nString name="status">Zustand</i18nString>
 		<i18nString name="status_created">Erstellt</i18nString>
-		<i18nString name="tax">MwSt. in %</i18nString>	
+		<i18nString name="tax">MwSt. in %</i18nString>
 		<i18nString name="image">Foto</i18nString>
 		<i18nString name="title">Titel</i18nString>
 		<i18nString name="short_description">Beschreibung</i18nString>
@@ -360,6 +360,7 @@ if (quantity.value &lt; quantity_transfer_to_repair.value) {
 			<offset>0</offset>
 		</layout>
 		<label name="t_create">Create</label>
+		<assignPolicy>auto</assignPolicy>
 		<dataGroup>
 			<id>DataGroup</id>
 			<dataRef>
@@ -419,7 +420,7 @@ if (quantity.value &lt; quantity_transfer_to_repair.value) {
 				<action>
 					async.run{
 						workflowService.deleteCase(useCase.stringId);
-					}	
+					}
 				</action>
 			</actions>
 		</event>

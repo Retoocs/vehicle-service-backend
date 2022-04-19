@@ -148,7 +148,7 @@ if (quantity.value &lt; quantity_transfer_to_warehouse.value) {
 }</action>
 			</actions>
 		</event>
-		
+
 	</data>
 	<data type="enumeration_map">
 		<id>unit</id>
@@ -283,6 +283,7 @@ if (quantity.value &lt; quantity_transfer_to_warehouse.value) {
 			<offset>0</offset>
 		</layout>
 		<label name="t_create">Create</label>
+		<assignPolicy>auto</assignPolicy>
 		<dataGroup>
 			<id>DataGroup</id>
 			<dataRef>

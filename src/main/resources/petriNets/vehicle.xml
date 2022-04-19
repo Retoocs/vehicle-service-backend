@@ -277,6 +277,7 @@
 			<offset>0</offset>
 		</layout>
 		<label name="create">Create</label>
+		<assignPolicy>auto</assignPolicy>
 		<dataGroup>
 			<id>dg0</id>
 			<stretch>true</stretch>
