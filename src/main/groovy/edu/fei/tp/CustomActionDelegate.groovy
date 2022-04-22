@@ -1,6 +1,7 @@
 package edu.fei.tp
 import com.netgrif.application.engine.petrinet.domain.dataset.EnumerationMapField
 import com.netgrif.application.engine.petrinet.domain.dataset.Field
+import com.netgrif.application.engine.petrinet.domain.dataset.FileField
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.ActionDelegate
 import edu.fei.tp.helpers.AddressImportHelper
 import edu.fei.tp.helpers.CSVHelper
@@ -100,11 +101,12 @@ class CustomActionDelegate extends ActionDelegate {
         change useCase.getField('house_number') value { data['house_number'].value }
     }
 
-    boolean setCars(EnumerationMapField manufacturers, EnumerationMapField models, String file, String splitter){
-        if (!VehicleImportHelper.validateCarInput(file, splitter)) {
+    boolean setCars(EnumerationMapField manufacturers, EnumerationMapField models, String file=pathToCarsCsv){
+        csv = VehicleImportHelper.validateCarInput(file, ",")
+        if (csv == []) {
             return false
         }
-        def cars = getCars(splitter, file)
+        def cars = VehicleImportHelper.getCars(",", csv)
         def tmpManufacturers = [:]
         def tmpModels = [:]
 
@@ -120,31 +122,6 @@ class CustomActionDelegate extends ActionDelegate {
         log.info("Succesfully loaded " + tmpModels.size() + " vehicles into " + useCase.petriNet.title)
 
         return true
-    }
-
-    private static Map getCars(String splitter, String file) {
-        // def csv = CSVHelper.loadCSV(file)
-        def csv = CSVHelper.loadCSV(file)
-        def cars = [:]
-        csv.eachWithIndex { s, idx ->
-            if(idx == 0)
-                return
-
-            def vehiclesArr = s.split(splitter)
-            def manufacturer = vehiclesArr[0].replaceAll("\\.", "-");
-            def model = vehiclesArr[1].replaceAll("\\.", "-");
-
-            if(cars.containsKey(manufacturer)){
-                if(!cars[manufacturer].contains(model)){
-                    cars[manufacturer].add(model)
-                }
-            }
-            else{
-                cars[manufacturer] = []
-                cars[manufacturer].add(model)
-            }
-        }
-        return cars
     }
 
 }

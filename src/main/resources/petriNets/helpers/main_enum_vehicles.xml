@@ -154,7 +154,7 @@ change check_all value { false }
 					system_manufacturers: f.system_manufacturers,
 					system_models: f.system_models;
 
-					// setCars(system_manufacturers, system_models);
+					setCars(system_manufacturers, system_models);
 				</action>
 			</actions>
 		</event>
@@ -189,7 +189,7 @@ change check_all value { false }
 
 					// todo: validate file structure (call ActionDelegate function)
 
-					if (!setCars(system_manufacturers, system_models, file.value, ",")) {
+					if (!setCars(system_manufacturers, system_models, file.value.path)) {
 						throw new IllegalArgumentException("File is not in correct format!");
 					}
 				</action>
