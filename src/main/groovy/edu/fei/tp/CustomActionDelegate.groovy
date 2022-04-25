@@ -21,8 +21,13 @@ class CustomActionDelegate extends ActionDelegate {
     @Autowired
     private AddressImportHelper addressImportHelper
 
-    void setAddresses(EnumerationMapField system_cities, EnumerationMapField system_streets){
-        def addresses = addressImportHelper.getAddresses(csvSplitter, pathToAddressCsv)
+    boolean  setAddresses(EnumerationMapField system_cities, EnumerationMapField system_streets,String file=pathToAddressCsv){
+        def csv = addressImportHelper.validateAddressesInput(file, ",")
+        if (csv == []) {
+            return false
+        }
+
+        def addresses = addressImportHelper.getAddresses(csvSplitter, csv)
         def i = 0;
         def tmpCities = [:]
         def tmpStreets = [:]
@@ -40,6 +45,8 @@ class CustomActionDelegate extends ActionDelegate {
         change system_streets options {  tmpStreets  }
         log.info("Succesfully loaded " + tmpCities.size() + " cities into " + useCase.petriNet.title)
         log.info("Succesfully loaded " + tmpStreets.size() + " streets into " + useCase.petriNet.title)
+
+        return true
     }
 
     private static Map getCars(String splitter) {

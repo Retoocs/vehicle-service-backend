@@ -7,8 +7,34 @@ import org.springframework.stereotype.Component
 class AddressImportHelper {
     public static final Logger log = LoggerFactory.getLogger(AddressImportHelper.class)
 
-    static Map getAddresses(String splitter, String pathToAddressCsv){
-        def csv = CSVHelper.loadCSV(pathToAddressCsv)
+    static List validateAddressesInput(String file, String splitter){
+        if (!file.endsWith(".csv")) {
+            return []
+        }
+        def csv = CSVHelper.loadCSV(file)
+
+        String headerRow = csv.get(0).toLowerCase()
+        String[] values;
+        values = headerRow.split(',');
+
+        if (!(values.length == 3)) {
+            return []
+        }
+        if (!values[0].equals('ulica') || !values[1].equals('psc') || !values[2].equals('obec')) {
+            return []
+        }
+
+        for (s in csv) {
+            if (!(s =~ '.+'+ splitter +'.+')) {
+                return []
+            }
+        }
+        return csv
+
+    }
+
+    static Map getAddresses(String splitter, List csv){
+//        def csv = CSVHelper.loadCSV(pathToAddressCsv)
         def addresses = [:]
         csv.eachWithIndex { s, idx ->
             if(idx == 0)
