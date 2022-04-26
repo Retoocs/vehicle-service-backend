@@ -6,6 +6,18 @@
 	<caseName name="case_title">Warehouse</caseName>
 	<defaultRole>true</defaultRole>
 	<transitionRole>false</transitionRole>
+	<role>
+		<id>system</id>
+		<title>System</title>
+	</role>
+	<role>
+		<id>admin</id>
+		<title>Admin</title>
+	</role>
+	<role>
+		<id>mechanic</id>
+		<title>Mechanic</title>
+	</role>
 	<caseEvents>
 		<event type="delete">
 			<id>case_delete</id>
@@ -212,6 +224,12 @@
 			<offset>0</offset>
 		</layout>
 		<label name="create">Create</label>
+		<roleRef>
+			<id>admin</id>
+			<logic>
+				<perform>true</perform>
+			</logic>
+		</roleRef>
 		<assignPolicy>auto</assignPolicy>
 		<dataGroup>
 			<id>dg1</id>
@@ -302,6 +320,12 @@
 			<offset>0</offset>
 		</layout>
 		<label name="update">Update</label>
+		<roleRef>
+			<id>admin</id>
+			<logic>
+				<perform>true</perform>
+			</logic>
+		</roleRef>
 		<assignPolicy>auto</assignPolicy>
 		<dataGroup>
 			<id>dg1</id>
@@ -452,6 +476,18 @@
 			<offset>0</offset>
 		</layout>
 		<label name="read">Read</label>
+		<roleRef>
+			<id>admin</id>
+			<logic>
+				<perform>true</perform>
+			</logic>
+		</roleRef>
+		<roleRef>
+			<id>mechanic</id>
+			<logic>
+				<view>true</view>
+			</logic>
+		</roleRef>
 		<dataGroup>
 			<id>dg1</id>
 			<title name="dg_basic_info">Basic informations</title>
@@ -511,6 +547,12 @@
 			<offset>0</offset>
 		</layout>
 		<label name="delete">Delete</label>
+		<roleRef>
+			<id>admin</id>
+			<logic>
+				<perform>true</perform>
+			</logic>
+		</roleRef>
 		<assignPolicy>auto</assignPolicy>
 		<event type="finish">
 			<id>t_delete_finish</id>
@@ -529,6 +571,18 @@
 			<offset>0</offset>
 		</layout>
 		<label name="item_addition">Item addition</label>
+		<roleRef>
+			<id>admin</id>
+			<logic>
+				<perform>true</perform>
+			</logic>
+		</roleRef>
+		<roleRef>
+			<id>mechanic</id>
+			<logic>
+				<perform>true</perform>
+			</logic>
+		</roleRef>
 		<assignPolicy>auto</assignPolicy>
 		<dataGroup>
 			<id>dg0</id>
@@ -727,6 +781,12 @@
 			<offset>0</offset>
 		</layout>
 		<label name="finish_processing">Finish file processing [await synch]</label>
+		<roleRef>
+			<id>system</id>
+			<logic>
+				<perform>true</perform>
+			</logic>
+		</roleRef>
 		<assignPolicy>auto</assignPolicy>
 	</transition>
 	<transition>
@@ -738,6 +798,18 @@
 			<offset>0</offset>
 		</layout>
 		<label name="view_items">View items</label>
+		<roleRef>
+			<id>admin</id>
+			<logic>
+				<perform>true</perform>
+			</logic>
+		</roleRef>
+		<roleRef>
+			<id>mechanic</id>
+			<logic>
+				<perform>true</perform>
+			</logic>
+		</roleRef>
 		<assignPolicy>auto</assignPolicy>
 		<dataGroup>
 			<id>dg0</id>
@@ -851,6 +923,12 @@
 			<offset>0</offset>
 		</layout>
 		<label name="warehouse">Warehouse</label>
+		<roleRef>
+			<id>system</id>
+			<logic>
+				<perform>true</perform>
+			</logic>
+		</roleRef>
 		<assignPolicy>auto</assignPolicy>
 		<dataGroup>
 			<id>DataGroup</id>
@@ -879,6 +957,12 @@
 			<offset>0</offset>
 		</layout>
 		<label>Synchronize</label>
+		<roleRef>
+			<id>system</id>
+			<logic>
+				<perform>true</perform>
+			</logic>
+		</roleRef>
 	</transition>
 	<!-- PLACES -->
 	<place>
