@@ -13,10 +13,9 @@ class AddressImportHelper {
         }
         def csv = CSVHelper.loadCSV(file)
 
-        String headerRow = csv[0].toLowerCase()
+        String headerRow = csv.get(0).toLowerCase()
         String[] values;
         values = headerRow.split(',');
-        println(values)
 
         if (!(values.length == 3)) {
             return []
