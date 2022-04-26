@@ -7,6 +7,18 @@
 	<defaultRole>true</defaultRole>
 	<anonymousRole>false</anonymousRole>
 	<transitionRole>false</transitionRole>
+	<role>
+		<id>system</id>
+		<title>System</title>
+	</role>
+	<role>
+		<id>admin</id>
+		<title>Admin</title>
+	</role>
+	<role>
+		<id>mechanic</id>
+		<title>Mechanic</title>
+	</role>
 	<caseName name="default_case_name">Repair item</caseName>
 	<caseEvents>
 		<event type="delete">
@@ -283,6 +295,18 @@ if (quantity.value &lt; quantity_transfer_to_warehouse.value) {
 			<offset>0</offset>
 		</layout>
 		<label name="t_create">Create</label>
+		<roleRef>
+			<id>admin</id>
+			<logic>
+				<perform>true</perform>
+			</logic>
+		</roleRef>
+		<roleRef>
+			<id>mechanic</id>
+			<logic>
+				<perform>true</perform>
+			</logic>
+		</roleRef>
 		<assignPolicy>auto</assignPolicy>
 		<dataGroup>
 			<id>DataGroup</id>
@@ -353,6 +377,18 @@ if (quantity.value &lt; quantity_transfer_to_warehouse.value) {
 			<offset>0</offset>
 		</layout>
 		<label name="t_update">Update</label>
+		<roleRef>
+			<id>admin</id>
+			<logic>
+				<perform>true</perform>
+			</logic>
+		</roleRef>
+		<roleRef>
+			<id>mechanic</id>
+			<logic>
+				<perform>true</perform>
+			</logic>
+		</roleRef>
 		<dataGroup>
 			<id>DataGroup</id>
 			<dataRef>
@@ -384,6 +420,18 @@ if (quantity.value &lt; quantity_transfer_to_warehouse.value) {
 			<offset>0</offset>
 		</layout>
 		<label name="t_read">Read</label>
+		<roleRef>
+			<id>admin</id>
+			<logic>
+				<perform>true</perform>
+			</logic>
+		</roleRef>
+		<roleRef>
+			<id>mechanic</id>
+			<logic>
+				<view>true</view>
+			</logic>
+		</roleRef>
 		<dataGroup>
 			<id>DataGroup1</id>
 			<dataRef>
@@ -424,6 +472,12 @@ if (quantity.value &lt; quantity_transfer_to_warehouse.value) {
 			<offset>0</offset>
 		</layout>
 		<label name="t_input_form">Input form</label>
+		<roleRef>
+			<id>system</id>
+			<logic>
+				<perform>true</perform>
+			</logic>
+		</roleRef>
 		<dataGroup>
 			<id>DataGroup</id>
 			<layout>grid</layout>
@@ -594,6 +648,12 @@ if (quantity.value &lt; quantity_transfer_to_warehouse.value) {
 			<offset>0</offset>
 		</layout>
 		<label>t_short_description</label>
+		<roleRef>
+			<id>system</id>
+			<logic>
+				<view>true</view>
+			</logic>
+		</roleRef>
 		<dataGroup>
 			<id>dg0</id>
 			<layout>grid</layout>
@@ -667,6 +727,12 @@ if (quantity.value &lt; quantity_transfer_to_warehouse.value) {
 			<offset>0</offset>
 		</layout>
 		<label>t_removal_short_description</label>
+		<roleRef>
+			<id>system</id>
+			<logic>
+				<view>true</view>
+			</logic>
+		</roleRef>
 		<dataGroup>
 			<id>dg0</id>
 			<layout>grid</layout>
