@@ -5,6 +5,14 @@
 	<title>Main vehicle enumeration</title>
 	<defaultRole>true</defaultRole>
 	<transitionRole>false</transitionRole>
+	<role>
+		<id>system</id>
+		<title>System</title>
+	</role>
+	<role>
+		<id>admin</id>
+		<title>Admin</title>
+	</role>
 	<!-- TRANSACTIONS -->
 	<!-- ROLES -->
 	<!-- PROCESS ROLE REFS -->
@@ -87,6 +95,12 @@
 			<offset>0</offset>
 		</layout>
 		<label>Process_the_selection [auto]</label>
+		<roleRef>
+			<id>system</id>
+			<logic>
+				<perform>true</perform>
+			</logic>
+		</roleRef>
 		<trigger type="auto"/>
 		<event type="assign">
 			<id>process_the_selection_assign</id>
@@ -131,6 +145,12 @@ change check_all value { false }
 			<offset>0</offset>
 		</layout>
 		<label>Initialize [auto]</label>
+		<roleRef>
+			<id>system</id>
+			<logic>
+				<perform>true</perform>
+			</logic>
+		</roleRef>
 		<trigger type="auto"/>
 		<event type="finish">
 			<id>t_init_finish</id>
@@ -167,6 +187,12 @@ change check_all value { false }
 			<offset>0</offset>
 		</layout>
 		<label name="t_import">Import file</label>
+		<roleRef>
+			<id>admin</id>
+			<logic>
+				<perform>true</perform>
+			</logic>
+		</roleRef>
 		<assignPolicy>auto</assignPolicy>
 		<dataGroup>
 			<id>dg1</id>
@@ -207,6 +233,12 @@ change check_all value { false }
 			<offset>0</offset>
 		</layout>
 		<label>Process the import [auto]</label>
+		<roleRef>
+			<id>system</id>
+			<logic>
+				<perform>true</perform>
+			</logic>
+		</roleRef>
 		<trigger type="auto"/>
 		<event type="assign">
 			<id>0</id>
@@ -244,6 +276,12 @@ change check_all value { false }
 			<offset>0</offset>
 		</layout>
 		<label>Distribute data [auto]</label>
+		<roleRef>
+			<id>system</id>
+			<logic>
+				<perform>true</perform>
+			</logic>
+		</roleRef>
 		<trigger type="auto"/>
 		<event type="assign">
 			<id>0</id>
@@ -273,6 +311,12 @@ for(caze in childEnums){
 			<offset>0</offset>
 		</layout>
 		<label name="t_status">Check status</label>
+		<roleRef>
+			<id>admin</id>
+			<logic>
+				<perform>true</perform>
+			</logic>
+		</roleRef>
 		<dataGroup>
 			<id>DataGroup</id>
 			<stretch>true</stretch>
@@ -322,6 +366,18 @@ for(caze in childEnums){
 			<offset>0</offset>
 		</layout>
 		<label>Redistribute_data</label>
+		<roleRef>
+			<id>admin</id>
+			<logic>
+				<perform>true</perform>
+			</logic>
+		</roleRef>
+		<roleRef>
+			<id>admin</id>
+			<logic>
+				<perform>true</perform>
+			</logic>
+		</roleRef>
 		<dataGroup>
 			<id>DataGroup</id>
 			<layout>grid</layout>

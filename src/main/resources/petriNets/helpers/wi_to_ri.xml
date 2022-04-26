@@ -5,6 +5,10 @@
 	<title>WI to RI</title>
 	<defaultRole>true</defaultRole>
 	<transitionRole>false</transitionRole>
+	<role>
+		<id>system</id>
+		<title>System</title>
+	</role>
 	<!-- TRANSACTIONS -->
 	<!-- ROLES -->
 	<!-- PROCESS ROLE REFS -->
@@ -45,6 +49,12 @@
 			<offset>0</offset>
 		</layout>
 		<label>Initialize [await synch]</label>
+		<roleRef>
+			<id>system</id>
+			<logic>
+				<perform>true</perform>
+			</logic>
+		</roleRef>
 	</transition>
 	<transition>
 		<id>t_do_wi_to_ri</id>
@@ -54,6 +64,12 @@
 			<offset>0</offset>
 		</layout>
 		<label>do_wi_to_ri [await synch]</label>
+		<roleRef>
+			<id>system</id>
+			<logic>
+				<perform>true</perform>
+			</logic>
+		</roleRef>
 		<event type="finish">
 			<id>0</id>
 			<actions phase="pre">

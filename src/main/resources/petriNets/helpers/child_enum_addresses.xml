@@ -5,6 +5,14 @@
 	<title>Child enum addresses</title>
 	<defaultRole>true</defaultRole>
 	<transitionRole>false</transitionRole>
+	<role>
+		<id>system</id>
+		<title>System</title>
+	</role>
+	<role>
+		<id>admin</id>
+		<title>Admin</title>
+	</role>
 	<!-- FUNCTIONS -->
 	<function scope="process" name="clear_selection">
 		{ cities, postal_code, filtered_streets, undefined_city,
@@ -199,6 +207,12 @@
 			<offset>0</offset>
 		</layout>
 		<label name="t_status">Check status</label>
+		<roleRef>
+			<id>admin</id>
+			<logic>
+				<perform>true</perform>
+			</logic>
+		</roleRef>
 		<dataGroup>
 			<id>dg1</id>
 			<stretch>true</stretch>
@@ -254,6 +268,12 @@
 			<offset>0</offset>
 		</layout>
 		<label>Select address [await synch]</label>
+		<roleRef>
+			<id>system</id>
+			<logic>
+				<perform>true</perform>
+			</logic>
+		</roleRef>
 		<dataGroup>
 			<id>dg0</id>
 			<layout>grid</layout>
@@ -631,6 +651,12 @@
 			<offset>0</offset>
 		</layout>
 		<label>Initialize [auto]</label>
+		<roleRef>
+			<id>system</id>
+			<logic>
+				<perform>true</perform>
+			</logic>
+		</roleRef>
 		<trigger type="auto"/>
 		<event type="finish">
 			<id>0</id>
