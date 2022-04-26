@@ -21,8 +21,8 @@ class CustomActionDelegate extends ActionDelegate {
     @Autowired
     private AddressImportHelper addressImportHelper
 
-    boolean  setAddresses(EnumerationMapField system_cities, EnumerationMapField system_streets,String file=pathToAddressCsv){
-        def csv = addressImportHelper.validateAddressesInput(file, ",")
+    boolean setAddresses(EnumerationMapField system_cities, EnumerationMapField system_streets,String file=pathToAddressCsv){
+        csv = addressImportHelper.validateAddressesInput(file, ",")
         if (csv == []) {
             return false
         }
