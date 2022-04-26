@@ -16,6 +16,7 @@ enum NetEnum {
     VEH("vehicle.xml", "vehicle", "Vehicle", "VEH"),
     WH("warehouse.xml", "warehouse", "Warehouse", "WH"),
     WI("warehouse_item.xml", "warehouse_item", "Warehouse Item", "WI"),
+    IA(HELPERS_FOLDER + "is_admin.xml", "is_admin", "Is Admin", "IA"),
 
     public static final String HELPERS_FOLDER = "helpers/"
     public static final String ENGINE_FOLDER = "engine/"
