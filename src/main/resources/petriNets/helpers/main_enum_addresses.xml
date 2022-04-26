@@ -250,8 +250,15 @@
 			<id>0</id>
 			<actions phase="pre">
 				<action>
+					file: f.import_file,
+					system_cities: f.system_cities,
+					system_streets: f.system_streets;
+
 					// todo: validate file structure (call ActionDelegate function)
-					throw new IllegalArgumentException("Import has not been implemented yet")
+					if (!setAddresses(system_cities, system_streets, file.value.path)){
+						throw new IllegalArgumentException("File is not in correct format!")
+					}
+
 				</action>
 			</actions>
 			<actions phase="post">
