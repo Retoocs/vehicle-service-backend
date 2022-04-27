@@ -48,13 +48,13 @@ class UserRunner extends AbstractOrderedCommandLineRunner{
             (NetEnum.MEV.netIdentifier): [],
             (NetEnum.RTW.netIdentifier): [],
             (NetEnum.WTR.netIdentifier): [],
-            (NetEnum.CUS.netIdentifier): [],
+            (NetEnum.CUS.netIdentifier): ["mechanic"],
             (NetEnum.NTF.netIdentifier): [],
-            (NetEnum.RPR.netIdentifier): [],
-            (NetEnum.RI.netIdentifier): [],
-            (NetEnum.VEH.netIdentifier): [],
-            (NetEnum.WH.netIdentifier): [],
-            (NetEnum.WI.netIdentifier): [],
+            (NetEnum.RPR.netIdentifier): ["mechanic","anonym","otherworker"],
+            (NetEnum.RI.netIdentifier): ["mechanic"],
+            (NetEnum.VEH.netIdentifier): ["mechanic"],
+            (NetEnum.WH.netIdentifier): ["mechanic"],
+            (NetEnum.WI.netIdentifier): ["mechanic"],
     ]
 
 
