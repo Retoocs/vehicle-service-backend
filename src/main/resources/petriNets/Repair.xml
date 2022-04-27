@@ -970,6 +970,12 @@
             <offset>0</offset>
         </layout>
         <label>Delete</label>
+        <roleRef>
+            <id>anonym</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
         <event type="finish">
             <actions phase="post">
                 <action>
@@ -1685,6 +1691,12 @@
         <x>260</x>
         <y>500</y>
         <label/>
+        <roleRef>
+            <id>system</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
         <dataGroup>
             <id>DataGroup</id>
             <layout>grid</layout>
@@ -1943,6 +1955,12 @@
         <x>260</x>
         <y>550</y>
         <label/>
+        <roleRef>
+            <id>system</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
         <dataGroup>
             <id>vehicle_part1</id>
             <title name="t_complex_creation_vehicle_part">Vehicle</title>

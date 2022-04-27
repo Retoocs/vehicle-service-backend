@@ -5,6 +5,18 @@
 	<title name="case_title">Vehicle</title>
 	<defaultRole>true</defaultRole>
 	<transitionRole>false</transitionRole>
+	<role>
+		<id>system</id>
+		<title>System</title>
+	</role>
+	<role>
+		<id>admin</id>
+		<title>Admin</title>
+	</role>
+	<role>
+		<id>mechanic</id>
+		<title>Mechanic</title>
+	</role>
 	<caseName name="default_case_name">Vehicle</caseName>
 	<caseEvents>
 		<event type="delete">
@@ -258,6 +270,18 @@
 			<offset>0</offset>
 		</layout>
 		<label name="delete">delete</label>
+		<roleRef>
+			<id>admin</id>
+			<logic>
+				<perform>true</perform>
+			</logic>
+		</roleRef>
+		<roleRef>
+			<id>mechanic</id>
+			<logic>
+				<perform>true</perform>
+			</logic>
+		</roleRef>
 		<event type="finish">
 			<id>t_delete_finish</id>
 			<actions phase="post">
@@ -277,6 +301,18 @@
 			<offset>0</offset>
 		</layout>
 		<label name="create">Create</label>
+		<roleRef>
+			<id>admin</id>
+			<logic>
+				<perform>true</perform>
+			</logic>
+		</roleRef>
+		<roleRef>
+			<id>mechanic</id>
+			<logic>
+				<perform>true</perform>
+			</logic>
+		</roleRef>
 		<assignPolicy>auto</assignPolicy>
 		<dataGroup>
 			<id>dg0</id>
@@ -383,6 +419,18 @@
 			<offset>0</offset>
 		</layout>
 		<label name="read">read</label>
+		<roleRef>
+			<id>admin</id>
+			<logic>
+				<perform>true</perform>
+			</logic>
+		</roleRef>
+		<roleRef>
+			<id>mechanic</id>
+			<logic>
+				<perform>true</perform>
+			</logic>
+		</roleRef>
 		<dataGroup>
 			<id>DataGroup0</id>
 			<layout>grid</layout>
@@ -678,6 +726,18 @@
 			<offset>0</offset>
 		</layout>
 		<label name="update">update</label>
+		<roleRef>
+			<id>admin</id>
+			<logic>
+				<perform>true</perform>
+			</logic>
+		</roleRef>
+		<roleRef>
+			<id>mechanic</id>
+			<logic>
+				<perform>true</perform>
+			</logic>
+		</roleRef>
 		<dataGroup>
 			<id>dg0</id>
 			<stretch>true</stretch>
@@ -856,6 +916,12 @@
 			<offset>0</offset>
 		</layout>
 		<label name="vehicle_form">Vehicle form</label>
+		<roleRef>
+			<id>system</id>
+			<logic>
+				<perform>true</perform>
+			</logic>
+		</roleRef>
 		<dataGroup>
 			<id>DataGroup</id>
 			<layout>grid</layout>
@@ -1083,6 +1149,12 @@ changeCaseProperty "title" about {
 			<offset>0</offset>
 		</layout>
 		<label>t_short_description</label>
+		<roleRef>
+			<id>system</id>
+			<logic>
+				<perform>true</perform>
+			</logic>
+		</roleRef>
 		<dataGroup>
 			<id>DataGroup</id>
 			<layout>grid</layout>
@@ -1157,6 +1229,12 @@ changeCaseProperty "title" about {
 			<offset>0</offset>
 		</layout>
 		<label>t_short_description_cus</label>
+		<roleRef>
+			<id>system</id>
+			<logic>
+				<perform>true</perform>
+			</logic>
+		</roleRef>
 		<dataGroup>
 			<id>DataGroup</id>
 			<layout>grid</layout>
@@ -1323,6 +1401,12 @@ changeCaseProperty "title" about {
             <offset>0</offset>
         </layout>
         <label>Synchronize</label>
+		<roleRef>
+			<id>system</id>
+			<logic>
+				<perform>true</perform>
+			</logic>
+		</roleRef>
     </transition>
 	<!-- PLACES -->
 	<place>
