@@ -6,6 +6,26 @@
     <defaultRole>true</defaultRole>
     <transitionRole>false</transitionRole>
     <caseName name="case_title">Repair</caseName>
+    <role>
+        <id>system</id>
+        <title>System</title>
+    </role>
+    <role>
+        <id>admin</id>
+        <title>Admin</title>
+    </role>
+    <role>
+        <id>mechanic</id>
+        <title>Mechanic</title>
+    </role>
+    <role>
+        <id>anonym</id>
+        <title>Anonym</title>
+    </role>
+    <role>
+        <id>otherworker</id>
+        <title>Other Worker</title>
+    </role>
     <caseEvents>
         <event type="delete">
             <id>case_delete</id>
@@ -477,6 +497,18 @@
             <offset>0</offset>
         </layout>
         <label>Edit</label>
+        <roleRef>
+            <id>admin</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <roleRef>
+            <id>mechanic</id>
+            <logic>
+                <view>true</view>
+            </logic>
+        </roleRef>
         <assignPolicy>auto</assignPolicy>
         <dataGroup>
             <id>other_part</id>
@@ -506,6 +538,12 @@
             <offset>0</offset>
         </layout>
         <label>Process removal [auto]</label>
+        <roleRef>
+            <id>system</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
         <trigger type="auto"/>
         <event type="finish">
             <id>0</id>
@@ -567,6 +605,18 @@
             <offset>0</offset>
         </layout>
         <label>Remove items [synch up]</label>
+        <roleRef>
+            <id>admin</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <roleRef>
+            <id>mechanic</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
         <dataGroup>
             <id>0</id>
             <stretch>true</stretch>
@@ -665,6 +715,12 @@
             <offset>0</offset>
         </layout>
         <label>Initialize [auto]</label>
+        <roleRef>
+            <id>system</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
         <trigger type="auto"/>
         <event type="finish">
             <id>t1_finish</id>
@@ -691,6 +747,12 @@
             <offset>0</offset>
         </layout>
         <label>Create - extern</label>
+        <roleRef>
+            <id>anonym</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
         <dataGroup>
             <id>t2_0</id>
             <cols>4</cols>
@@ -728,6 +790,24 @@
             <offset>0</offset>
         </layout>
         <label name="t_quick_create">Quick creation</label>
+        <roleRef>
+            <id>admin</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <roleRef>
+            <id>mechanic</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <roleRef>
+            <id>otherworker</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
         <dataGroup>
             <id>dg0</id>
             <stretch>true</stretch>
@@ -817,6 +897,18 @@
             <offset>0</offset>
         </layout>
         <label>Validate</label>
+        <roleRef>
+            <id>admin</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <roleRef>
+            <id>mechanic</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
         <dataGroup>
             <id>t4_0</id>
             <cols>4</cols>
@@ -894,6 +986,18 @@
             <offset>0</offset>
         </layout>
         <label>Finish creating</label>
+        <roleRef>
+            <id>admin</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <roleRef>
+            <id>mechanic</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
         <dataGroup>
             <id>t8_0</id>
             <cols>4</cols>
@@ -985,6 +1089,18 @@
             <offset>0</offset>
         </layout>
         <label name="t_complex_creation">Complex creation</label>
+        <roleRef>
+            <id>admin</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <roleRef>
+            <id>mechanic</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
         <dataGroup>
             <id>t2_0</id>
             <cols>4</cols>
@@ -1029,6 +1145,12 @@
             <offset>0</offset>
         </layout>
         <label>System delete [time]</label>
+        <roleRef>
+            <id>system</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
         <trigger type="time">
             <delay>P7D</delay>
         </trigger>
@@ -1049,6 +1171,12 @@
             <offset>0</offset>
         </layout>
         <label>Status - extern</label>
+        <roleRef>
+            <id>anonym</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
         <dataGroup>
             <id>DataGroup</id>
             <layout>grid</layout>
@@ -1161,6 +1289,18 @@
             <offset>0</offset>
         </layout>
         <label>Add items [await synch]</label>
+        <roleRef>
+            <id>mechanic</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <roleRef>
+            <id>admin</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
         <dataGroup>
             <id>0</id>
             <stretch>true</stretch>
@@ -1321,6 +1461,12 @@
             <offset>0</offset>
         </layout>
         <label>Item added [await synch]</label>
+        <roleRef>
+            <id>system</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
     </transition>
     <transition>
         <id>t_view_and_control</id>
@@ -1330,6 +1476,18 @@
             <offset>0</offset>
         </layout>
         <label name="t_view_and_control">View and Control</label>
+        <roleRef>
+            <id>admin</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <roleRef>
+            <id>mechanic</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
         <dataGroup>
             <id>t_view_and_control_dataGroup</id>
             <layout>grid</layout>
@@ -1424,6 +1582,18 @@
             <offset>0</offset>
         </layout>
         <label name="t_finish_repair">Finish repair [await synch]</label>
+        <roleRef>
+            <id>admin</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <roleRef>
+            <id>mechanic</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
         <event type="finish">
             <id>t_finish_repair_finish</id>
             <actions phase="pre">
@@ -1444,6 +1614,12 @@
             <offset>0</offset>
         </layout>
         <label>Create invoice</label>
+        <roleRef>
+            <id>admin</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
     </transition>
     <transition>
         <id>t18</id>
@@ -1453,6 +1629,24 @@
             <offset>0</offset>
         </layout>
         <label>Status</label>
+        <roleRef>
+            <id>admin</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <roleRef>
+            <id>mechanic</id>
+            <logic>
+                <view>true</view>
+            </logic>
+        </roleRef>
+        <roleRef>
+            <id>otherworker</id>
+            <logic>
+                <view>true</view>
+            </logic>
+        </roleRef>
     </transition>
     <transition>
         <id>t_reopen_repair</id>
@@ -1462,6 +1656,18 @@
             <offset>0</offset>
         </layout>
         <label name="t_reopen_repair">Reopen repair [await synch]</label>
+        <roleRef>
+            <id>admin</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <roleRef>
+            <id>mechanic</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
         <event type="finish">
             <id>t_reopen_repair_finish</id>
             <actions phase="pre">

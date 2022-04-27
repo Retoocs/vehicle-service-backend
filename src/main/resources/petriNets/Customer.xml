@@ -5,6 +5,18 @@
 	<title name="case_title">Customer</title>
 	<defaultRole>true</defaultRole>
 	<transitionRole>false</transitionRole>
+	<role>
+		<id>system</id>
+		<title>System</title>
+	</role>
+	<role>
+		<id>admin</id>
+		<title>Admin</title>
+	</role>
+	<role>
+		<id>mechanic</id>
+		<title>Mechanic</title>
+	</role>
 	<caseName name="default_case_name">Customer</caseName>
 	<caseEvents>
 		<event type="delete">
@@ -248,6 +260,18 @@
 			<offset>0</offset>
 		</layout>
 		<label name="t_create">Create</label>
+		<roleRef>
+			<id>admin</id>
+			<logic>
+				<perform>true</perform>
+			</logic>
+		</roleRef>
+		<roleRef>
+			<id>mechanic</id>
+			<logic>
+				<perform>true</perform>
+			</logic>
+		</roleRef>
 		<assignPolicy>auto</assignPolicy>
 		<dataGroup>
 			<id>dg0</id>
@@ -355,6 +379,12 @@
 			<offset>0</offset>
 		</layout>
 		<label name="t_input_form">Input form</label>
+		<roleRef>
+			<id>system</id>
+			<logic>
+				<perform>true</perform>
+			</logic>
+		</roleRef>
 		<dataGroup>
 			<id>DataGroup</id>
 			<layout>grid</layout>
@@ -530,6 +560,18 @@
 			<offset>0</offset>
 		</layout>
 		<label name="t_delete">Delete</label>
+		<roleRef>
+			<id>admin</id>
+			<logic>
+				<perform>true</perform>
+			</logic>
+		</roleRef>
+		<roleRef>
+			<id>mechanic</id>
+			<logic>
+				<perform>true</perform>
+			</logic>
+		</roleRef>
 		<dataGroup>
 			<id>DataGroup</id>
 			<layout>grid</layout>
@@ -567,6 +609,18 @@
 			<offset>0</offset>
 		</layout>
 		<label name="t_update">Update</label>
+		<roleRef>
+			<id>admin</id>
+			<logic>
+				<perform>true</perform>
+			</logic>
+		</roleRef>
+		<roleRef>
+			<id>mechanic</id>
+			<logic>
+				<perform>true</perform>
+			</logic>
+		</roleRef>
 		<dataGroup>
 			<id>dg0</id>
 			<stretch>true</stretch>
@@ -767,6 +821,18 @@
 			<offset>0</offset>
 		</layout>
 		<label name="t_read">Read</label>
+		<roleRef>
+			<id>admin</id>
+			<logic>
+				<perform>true</perform>
+			</logic>
+		</roleRef>
+		<roleRef>
+			<id>mechanic</id>
+			<logic>
+				<perform>true</perform>
+			</logic>
+		</roleRef>
 		<dataGroup>
 			<id>dg1</id>
 			<dataRef>
@@ -863,6 +929,18 @@
 			<cols>5</cols>
 		</layout>
 		<label name="t_view_vehicles">View Vehicles</label>
+		<roleRef>
+			<id>admin</id>
+			<logic>
+				<perform>true</perform>
+			</logic>
+		</roleRef>
+		<roleRef>
+			<id>mechanic</id>
+			<logic>
+				<perform>true</perform>
+			</logic>
+		</roleRef>
 		<dataGroup>
 			<id>DataGroup</id>
 			<layout>grid</layout>
@@ -904,6 +982,12 @@
 			<offset>0</offset>
 		</layout>
 		<label>Synchronize</label>
+		<roleRef>
+			<id>system</id>
+			<logic>
+				<perform>true</perform>
+			</logic>
+		</roleRef>
 	</transition>
 	<transition>
 		<id>t_add_vehicle</id>
@@ -913,6 +997,18 @@
 			<offset>0</offset>
 		</layout>
 		<label>Add vehicles</label>
+		<roleRef>
+			<id>admin</id>
+			<logic>
+				<perform>true</perform>
+			</logic>
+		</roleRef>
+		<roleRef>
+			<id>mechanic</id>
+			<logic>
+				<perform>true</perform>
+			</logic>
+		</roleRef>
 		<assignPolicy>auto</assignPolicy>
 		<dataGroup>
 			<id>DataGroup</id>
