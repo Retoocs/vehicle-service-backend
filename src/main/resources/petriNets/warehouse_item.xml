@@ -18,6 +18,12 @@
 		<id>mechanic</id>
 		<title>Mechanic</title>
 	</role>
+	<roleRef>
+		<id>admin</id>
+		<caseLogic>
+			<delete>true</delete>
+		</caseLogic>
+	</roleRef>
 	<caseName name="default_case_name">Warehouse item</caseName>
 	<caseEvents>
         <event type="delete">
