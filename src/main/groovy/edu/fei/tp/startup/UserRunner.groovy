@@ -42,19 +42,19 @@ class UserRunner extends AbstractOrderedCommandLineRunner{
     @Value("\${timak.user.password}")
     private String timakPassword
     private Map<String, List<String>> timakRoleMapping = [
-            (NetEnum.CEA.netIdentifier): [],
-            (NetEnum.CEV.netIdentifier): [],
-            (NetEnum.MEA.netIdentifier): [],
-            (NetEnum.MEV.netIdentifier): [],
+            (NetEnum.CEA.netIdentifier): ["admin"],
+            (NetEnum.CEV.netIdentifier): ["admin"],
+            (NetEnum.MEA.netIdentifier): ["admin"],
+            (NetEnum.MEV.netIdentifier): ["admin"],
             (NetEnum.RTW.netIdentifier): [],
             (NetEnum.WTR.netIdentifier): [],
-            (NetEnum.CUS.netIdentifier): [],
-            (NetEnum.NTF.netIdentifier): [],
-            (NetEnum.RPR.netIdentifier): [],
-            (NetEnum.RI.netIdentifier): [],
-            (NetEnum.VEH.netIdentifier): [],
-            (NetEnum.WH.netIdentifier): [],
-            (NetEnum.WI.netIdentifier): [],
+            (NetEnum.CUS.netIdentifier): ["admin", "mechanic"],
+            (NetEnum.NTF.netIdentifier): ["admin"],
+            (NetEnum.RPR.netIdentifier): ["admin", "mechanic","otherworker"],
+            (NetEnum.RI.netIdentifier): ["admin", "mechanic"],
+            (NetEnum.VEH.netIdentifier): ["admin", "mechanic"],
+            (NetEnum.WH.netIdentifier): ["admin", "mechanic"],
+            (NetEnum.WI.netIdentifier): ["admin", "mechanic"],
             (NetEnum.IA.netIdentifier): ["admin"],
     ]
 
@@ -86,6 +86,7 @@ class UserRunner extends AbstractOrderedCommandLineRunner{
         log.info("Creating Timak Projekt user...")
 
         Authority adminAuthority = authorityService.getOrCreate(Authority.admin)
+        Authority userAuthority = authorityService.getOrCreate(Authority.user)
 
         User user = new User()
         user.setEmail(this.timakEmail)
@@ -93,7 +94,7 @@ class UserRunner extends AbstractOrderedCommandLineRunner{
         user.setSurname(this.timakLastname)
         user.setPassword(this.timakPassword)
         user.setState(UserState.ACTIVE)
-        user.setAuthorities([adminAuthority] as Set<Authority>)
+        user.setAuthorities([adminAuthority, userAuthority] as Set<Authority>)
         user = userManagmentHelper.addProcessRolesToUser(this.timakRoleMapping, user)
 
         userService.saveNew(user)

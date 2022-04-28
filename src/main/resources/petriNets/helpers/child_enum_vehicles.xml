@@ -5,6 +5,14 @@
 	<title>Child vehicle enumeration</title>
 	<defaultRole>true</defaultRole>
 	<transitionRole>false</transitionRole>
+	<role>
+		<id>system</id>
+		<title>System</title>
+	</role>
+	<role>
+		<id>admin</id>
+		<title>Admin</title>
+	</role>
 	<!-- FUNCTIONS -->
 	<function scope="process" name="clear_selection">
 		{ manufacturers, filtered_models, undefined_manufacturer, undefined_model,
@@ -161,6 +169,12 @@
 			<offset>0</offset>
 		</layout>
 		<label>Initialize [auto]</label>
+		<roleRef>
+			<id>system</id>
+			<logic>
+				<perform>true</perform>
+			</logic>
+		</roleRef>
 		<trigger type="auto"/>
 		<event type="finish">
 			<id>0</id>
@@ -206,6 +220,12 @@
 			<offset>0</offset>
 		</layout>
 		<label>Check status</label>
+		<roleRef>
+			<id>admin</id>
+			<logic>
+				<perform>true</perform>
+			</logic>
+		</roleRef>
 		<dataGroup>
 			<id>dg1</id>
 			<stretch>true</stretch>
@@ -255,6 +275,12 @@
 			<offset>0</offset>
 		</layout>
 		<label>Select vehicle [await synch]</label>
+		<roleRef>
+			<id>system</id>
+			<logic>
+				<perform>true</perform>
+			</logic>
+		</roleRef>
 		<dataGroup>
 			<id>dg1</id>
 			<layout>grid</layout>

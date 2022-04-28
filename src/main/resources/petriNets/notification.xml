@@ -5,6 +5,14 @@
 	<title name="case_title">Notification</title>
 	<defaultRole>true</defaultRole>
 	<transitionRole>false</transitionRole>
+	<role>
+		<id>system</id>
+		<title>System</title>
+	</role>
+	<role>
+		<id>admin</id>
+		<title>Admin</title>
+	</role>
 	<caseName name="default_case_name">Notification</caseName>
 	<!-- TRANSACTIONS -->
 	<!-- ROLES -->
@@ -250,6 +258,12 @@
 			<offset>0</offset>
 		</layout>
 		<label name="t_create">Create</label>
+		<roleRef>
+			<id>system</id>
+			<logic>
+				<perform>true</perform>
+			</logic>
+		</roleRef>
 		<assignPolicy>auto</assignPolicy>
 		<dataGroup>
 			<id>DataGroup</id>
@@ -288,6 +302,12 @@
 			<offset>0</offset>
 		</layout>
 		<label name="t_update">Update</label>
+		<roleRef>
+			<id>admin</id>
+			<logic>
+				<perform>true</perform>
+			</logic>
+		</roleRef>
 		<dataGroup>
 			<id>DataGroup</id>
 			<dataRef>
@@ -306,6 +326,12 @@
 			<offset>0</offset>
 		</layout>
 		<label name="t_read">Read</label>
+		<roleRef>
+			<id>admin</id>
+			<logic>
+				<perform>true</perform>
+			</logic>
+		</roleRef>
 		<dataGroup>
 			<id>DataGroup</id>
 			<layout>grid</layout>
@@ -435,6 +461,12 @@
 			<offset>0</offset>
 		</layout>
 		<label name="t_delete">Delete</label>
+		<roleRef>
+			<id>system</id>
+			<logic>
+				<perform>true</perform>
+			</logic>
+		</roleRef>
 		<event type="finish">
 			<id>t_delete_finish</id>
 			<actions phase="post">
@@ -454,6 +486,12 @@
 			<offset>0</offset>
 		</layout>
 		<label name="t_input_form">Input form</label>
+		<roleRef>
+			<id>system</id>
+			<logic>
+				<perform>true</perform>
+			</logic>
+		</roleRef>
 		<dataGroup>
 			<id>DataGroup</id>
 			<layout>grid</layout>
