@@ -1,10 +1,8 @@
 package edu.fei.tp
 import com.netgrif.application.engine.petrinet.domain.dataset.EnumerationMapField
 import com.netgrif.application.engine.petrinet.domain.dataset.Field
-import com.netgrif.application.engine.petrinet.domain.dataset.FileField
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.ActionDelegate
 import edu.fei.tp.helpers.AddressImportHelper
-import edu.fei.tp.helpers.CSVHelper
 import edu.fei.tp.helpers.VehicleImportHelper
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory

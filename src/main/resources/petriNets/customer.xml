@@ -12,10 +12,32 @@
 	<role>
 		<id>admin</id>
 		<title>Admin</title>
+		<event type="assign">
+			<id>1</id>
+			<actions phase="post">
+				<action>
+					def processIdentifier = "child_enum_addresses"
+					if(!checkIfUserHasInstance(processIdentifier)){
+						createInstance(processIdentifier, "CEA", "white")
+					}
+				</action>
+			</actions>
+		</event>
 	</role>
 	<role>
 		<id>mechanic</id>
 		<title>Mechanic</title>
+		<event type="assign">
+			<id>1</id>
+			<actions phase="post">
+				<action>
+					def processIdentifier = "child_enum_addresses"
+					if(!checkIfUserHasInstance(processIdentifier)){
+						createInstance(processIdentifier, "CEA", "white")
+					}
+				</action>
+			</actions>
+		</event>
 	</role>
 	<caseName name="default_case_name">Customer</caseName>
 	<caseEvents>
