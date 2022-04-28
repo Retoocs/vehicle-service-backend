@@ -2,6 +2,7 @@ package edu.fei.tp;
 
 import com.netgrif.application.engine.ApplicationEngine;
 import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.ActionDelegate;
+import com.netgrif.application.engine.petrinet.domain.dataset.logic.action.delegate.RoleActionDelegate;
 import com.netgrif.application.engine.startup.RunnerController;
 import edu.fei.tp.startup.CustomRunnerController;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
@@ -37,6 +38,13 @@ public class VehicleServiceApp {
     @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
     public ActionDelegate actionDelegate() {
         return new CustomActionDelegate();
+    }
+
+    @Primary
+    @Bean("roleActionDelegate")
+    @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
+    public RoleActionDelegate roleActionDelegate() {
+        return new CustomRoleActionDelegate();
     }
 }
 
