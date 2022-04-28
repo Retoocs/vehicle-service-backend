@@ -42,19 +42,19 @@ class UserRunner extends AbstractOrderedCommandLineRunner{
     @Value("\${timak.user.password}")
     private String timakPassword
     private Map<String, List<String>> timakRoleMapping = [
-            (NetEnum.CEA.netIdentifier): [],
-            (NetEnum.CEV.netIdentifier): [],
-            (NetEnum.MEA.netIdentifier): [],
-            (NetEnum.MEV.netIdentifier): [],
+            (NetEnum.CEA.netIdentifier): ["admin"],
+            (NetEnum.CEV.netIdentifier): ["admin"],
+            (NetEnum.MEA.netIdentifier): ["admin"],
+            (NetEnum.MEV.netIdentifier): ["admin"],
             (NetEnum.RTW.netIdentifier): [],
             (NetEnum.WTR.netIdentifier): [],
-            (NetEnum.CUS.netIdentifier): ["mechanic"],
-            (NetEnum.NTF.netIdentifier): [],
-            (NetEnum.RPR.netIdentifier): ["mechanic","anonym","otherworker"],
-            (NetEnum.RI.netIdentifier): ["mechanic"],
-            (NetEnum.VEH.netIdentifier): ["mechanic"],
-            (NetEnum.WH.netIdentifier): ["mechanic"],
-            (NetEnum.WI.netIdentifier): ["mechanic"],
+            (NetEnum.CUS.netIdentifier): ["admin", "mechanic"],
+            (NetEnum.NTF.netIdentifier): ["admin"],
+            (NetEnum.RPR.netIdentifier): ["admin", "mechanic","otherworker"],
+            (NetEnum.RI.netIdentifier): ["admin", "mechanic"],
+            (NetEnum.VEH.netIdentifier): ["admin", "mechanic"],
+            (NetEnum.WH.netIdentifier): ["admin", "mechanic"],
+            (NetEnum.WI.netIdentifier): ["admin", "mechanic"],
             (NetEnum.IA.netIdentifier): ["admin"],
     ]
 
