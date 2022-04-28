@@ -383,8 +383,9 @@
 			<offset>0</offset>
 		</layout>
 		<label name="read">read</label>
+		<assignPolicy>auto</assignPolicy>
 		<dataGroup>
-			<id>DataGroup0</id>
+			<id>0</id>
 			<layout>grid</layout>
 			<dataRef>
 				<id>manufacturer</id>
@@ -442,7 +443,7 @@
 			</dataRef>
 		</dataGroup>
 		<dataGroup>
-			<id>DataGroup</id>
+			<id>1</id>
 			<layout>grid</layout>
 			<dataRef>
 				<id>vin</id>
@@ -630,7 +631,7 @@
 			</dataRef>
 		</dataGroup>
 		<dataGroup>
-			<id>DataGroup2</id>
+			<id>2</id>
 			<layout>grid</layout>
 			<dataRef>
 				<id>status</id>
@@ -657,17 +658,11 @@
 				</action>
 			</actions>
 		</event>
-		<event type="cancel">
-			<title></title>
-		</event>
-		<event type="assign">
-			<title></title>
-		</event>
 		<event type="finish">
-			<title></title>
+			<title/>
 		</event>
 		<event type="delegate">
-			<title></title>
+			<title/>
 		</event>
 	</transition>
 	<transition>
