@@ -557,7 +557,7 @@
 			<dataRef>
 				<id>dateEC</id>
 				<logic>
-					<behavior>visible</behavior>
+					<behavior>hidden</behavior>
 				</logic>
 				<layout>
 					<x>0</x>
@@ -572,7 +572,7 @@
 			<dataRef>
 				<id>dateTC</id>
 				<logic>
-					<behavior>visible</behavior>
+					<behavior>hidden</behavior>
 				</logic>
 				<layout>
 					<x>2</x>
@@ -587,7 +587,7 @@
 			<dataRef>
 				<id>oilChangeKM</id>
 				<logic>
-					<behavior>visible</behavior>
+					<behavior>hidden</behavior>
 				</logic>
 				<layout>
 					<x>2</x>
@@ -602,7 +602,7 @@
 			<dataRef>
 				<id>carDescription</id>
 				<logic>
-					<behavior>visible</behavior>
+					<behavior>hidden</behavior>
 				</logic>
 				<layout>
 					<x>0</x>
@@ -617,7 +617,7 @@
 			<dataRef>
 				<id>oilChangeDate</id>
 				<logic>
-					<behavior>visible</behavior>
+					<behavior>hidden</behavior>
 				</logic>
 				<layout>
 					<x>0</x>
