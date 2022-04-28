@@ -247,11 +247,15 @@ if (quantity.value &lt; quantity_transfer_to_warehouse.value) {
 		<id>short_description</id>
 		<title name="short_description">Description</title>
 		<view> <htmlEditor/> </view>
-<!--		<valid>minLength 2</valid>-->
+		<valid>minLength 2</valid>
 	</data>
 	<data type="text">
 		<id>repair_id</id>
 		<title>repair_id</title>
+	</data>
+	<data type="boolean" immediate="true">
+		<id>is_created</id>
+		<title>is_created</title>
 	</data>
 	<!-- I18NS -->
 	<i18n locale="sk">
@@ -350,6 +354,10 @@ if (quantity.value &lt; quantity_transfer_to_warehouse.value) {
 					changeCaseProperty "title" about {
 						return OENumber.value + " - " + title.value;
 					}
+				</action>
+				<action>
+					is_created: f.is_created;
+					change is_created value { true }
 				</action>
 			</actions>
 		</event>

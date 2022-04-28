@@ -126,7 +126,7 @@
             <name>area</name>
         </component>
     </data>
-    <data type="enumeration_map">
+    <data type="enumeration_map" immediate="true">
         <id>priority</id>
         <title name="priority">Priority</title>
         <options>
@@ -224,7 +224,7 @@
         <title name="info_text_new_customer">Fill the fields below to create a new customer and use it in this repair.</title>
         <valid>minLength 2</valid>
     </data>
-    <data type="enumeration_map">
+    <data type="enumeration_map" immediate="true">
         <id>status</id>
         <title name="status">Status</title>
         <options>
@@ -274,17 +274,17 @@
         <title name="natural_legal_person">Natural P. - Legal P.</title>
         <init>false</init>
     </data>
-    <data type="text">
+    <data type="text" immediate="true">
         <id>public_name</id>
         <title name="name">Name</title>
         <valid>minLength 2</valid>
     </data>
-    <data type="text">
+    <data type="text" immediate="true">
         <id>public_surname</id>
         <title name="surname">Surname</title>
         <valid>minLength 2</valid>
     </data>
-    <data type="text">
+    <data type="text" immediate="true">
         <id>public_company_name</id>
         <title name="company_name">Company name</title>
         <valid>minLength 2</valid>
@@ -292,7 +292,7 @@
     <data type="text">
         <id>public_phone</id>
         <title name="phone_number">Phone number</title>
-        <!--		<valid>regex("^\+?[0-9]{7,14}$")</valid>-->
+        <valid>regex("^\+?[0-9]{7,14}$")</valid>
     </data>
     <data type="text">
         <id>public_mail</id>
@@ -314,7 +314,7 @@
     <data type="text">
         <id>public_licenseNumber</id>
         <title name="licenceNumber">License number</title>
-        <!--		<valid>regex("^[0-9a-zA-Z]{4,9}$")</valid>-->
+        <valid>regex("^[0-9a-zA-Z]{4,9}$")</valid>
     </data>
     <data type="text">
         <id>public_model</id>
@@ -329,7 +329,7 @@
                 <message name="manufactureYear_valid">Must be greater or even than 1900</message>
             </validation>
         </validations>
-        <!--		<valid>regex("^(19|[2-9][0-9])\d{2}$")</valid>-->
+        <valid>regex("^(19|[2-9][0-9])\d{2}$")</valid>
     </data>
     <data type="text">
         <id>public_description</id>

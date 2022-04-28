@@ -213,6 +213,10 @@
 		<title></title>
 		<init>t_input_form</init>
 	</data>
+	<data type="boolean" immediate="true">
+		<id>is_created</id>
+		<title>is_created</title>
+	</data>
 	<!-- I18NS -->
 	<i18n locale="sk">
         <i18nString name="t_create">Vytvoriť</i18nString>
@@ -287,6 +291,10 @@
 				<action>
 					status: f.status;
 					change status value { return "created"; }
+				</action>
+				<action>
+					is_created: f.is_created;
+					change is_created value { true }
 				</action>
 			</actions>
 		</event>

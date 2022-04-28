@@ -113,18 +113,18 @@
 	<data type="text">
 		<id>vin</id>
 		<title name="vin">VIN</title>
-<!--		<valid>regex("^[A-HJ-NPR-Za-hj-npr-z\d]{8}[\dX][A-HJ-NPR-Za-hj-npr-z\d]{2}\d{6}$")</valid>-->
+		<valid>regex("^[A-HJ-NPR-Za-hj-npr-z\d]{8}[\dX][A-HJ-NPR-Za-hj-npr-z\d]{2}\d{6}$")</valid>
 	</data>
-	<data type="text">
+	<data type="text" immediate="true">
 		<id>manufacturer</id>
 		<title name="Manufacturer">Manufacturer</title>
 	</data>
-	<data type="text">
+	<data type="text" immediate="true">
 		<id>licenceNumber</id>
 		<title name="licenceNumber">Licence munber</title>
-<!--		<valid>regex("^[0-9a-zA-Z]{4,9}$")</valid>-->
+		<valid>regex("^[0-9a-zA-Z]{4,9}$")</valid>
 	</data>
-	<data type="text">
+	<data type="text" immediate="true">
 		<id>model</id>
 		<title name="model">Model</title>
 	</data>
@@ -152,7 +152,7 @@
 			</validation>
 		</validations>
 	</data>
-	<data type="enumeration_map">
+	<data type="enumeration_map" immediate="true">
 		<id>status</id>
 		<title name="status">Status</title>
 		<options>
@@ -167,6 +167,10 @@
 	<data type="boolean">
 		<id>change_model</id>
 		<title name="change_model">Do you want to change the model?</title>
+	</data>
+	<data type="boolean" immediate="true">
+		<id>is_created</id>
+		<title>is_created</title>
 	</data>
 	<data type="text">
 		<id>actual_customer_id</id>
@@ -443,6 +447,10 @@
 				<action>
 					useCase.dataSet.get("enum_form").value = []
 					workflowService.save(useCase)
+				</action>
+				<action>
+					is_created: f.is_created;
+					change is_created value { true }
 				</action>
 			</actions>
 		</event>
