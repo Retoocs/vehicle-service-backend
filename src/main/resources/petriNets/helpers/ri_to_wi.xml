@@ -9,6 +9,13 @@
 		<id>system</id>
 		<title>System</title>
 	</role>
+	<roleRef>
+		<id>system</id>
+		<caseLogic>
+			<create>true</create>
+			<delete>true</delete>
+		</caseLogic>
+	</roleRef>
 	<!-- TRANSACTIONS -->
 	<!-- ROLES -->
 	<!-- PROCESS ROLE REFS -->
