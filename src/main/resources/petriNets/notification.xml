@@ -13,6 +13,13 @@
 		<id>admin</id>
 		<title>Admin</title>
 	</role>
+	<roleRef>
+		<id>system</id>
+		<caseLogic>
+			<create>true</create>
+			<delete>true</delete>
+		</caseLogic>
+	</roleRef>
 	<caseName name="default_case_name">Notification</caseName>
 	<!-- TRANSACTIONS -->
 	<!-- ROLES -->

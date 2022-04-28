@@ -26,6 +26,36 @@
         <id>otherworker</id>
         <title>Other Worker</title>
     </role>
+    <roleRef>
+        <id>system</id>
+        <caseLogic>
+            <create>true</create>
+            <delete>true</delete>
+            <view>true</view>
+        </caseLogic>
+    </roleRef>
+    <roleRef>
+        <id>admin</id>
+        <caseLogic>
+            <create>true</create>
+            <delete>true</delete>
+            <view>true</view>
+        </caseLogic>
+    </roleRef>
+    <roleRef>
+        <id>mechanic</id>
+        <caseLogic>
+            <create>true</create>
+            <view>true</view>
+        </caseLogic>
+    </roleRef>
+    <roleRef>
+        <id>otherworker</id>
+        <caseLogic>
+            <create>true</create>
+            <view>true</view>
+        </caseLogic>
+    </roleRef>
     <caseEvents>
         <event type="delete">
             <id>case_delete</id>
