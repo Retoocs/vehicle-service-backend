@@ -85,6 +85,7 @@ class UserRunner extends AbstractOrderedCommandLineRunner{
         log.info("Creating Timak Projekt user...")
 
         Authority adminAuthority = authorityService.getOrCreate(Authority.admin)
+        Authority userAuthority = authorityService.getOrCreate(Authority.user)
 
         User user = new User()
         user.setEmail(this.timakEmail)
@@ -92,7 +93,7 @@ class UserRunner extends AbstractOrderedCommandLineRunner{
         user.setSurname(this.timakLastname)
         user.setPassword(this.timakPassword)
         user.setState(UserState.ACTIVE)
-        user.setAuthorities([adminAuthority] as Set<Authority>)
+        user.setAuthorities([adminAuthority, userAuthority] as Set<Authority>)
         user = userManagmentHelper.addProcessRolesToUser(this.timakRoleMapping, user)
 
         userService.saveNew(user)
