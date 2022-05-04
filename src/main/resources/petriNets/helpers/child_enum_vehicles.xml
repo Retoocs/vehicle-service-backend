@@ -1,0 +1,659 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://netgrif.github.io/petriflow/petriflow.schema.xsd">
+	<id>child_enum_vehicles</id>
+	<initials>CEV</initials>
+	<title>Child vehicle enumeration</title>
+	<defaultRole>true</defaultRole>
+	<transitionRole>false</transitionRole>
+	<role>
+		<id>system</id>
+		<title>System</title>
+	</role>
+	<role>
+		<id>admin</id>
+		<title>Admin</title>
+	</role>
+	<roleRef>
+		<id>system</id>
+		<caseLogic>
+			<create>true</create>
+			<delete>true</delete>
+		</caseLogic>
+	</roleRef>
+	<!-- FUNCTIONS -->
+	<function scope="process" name="clear_selection">
+		{ manufacturers, filtered_models, undefined_manufacturer, undefined_model,
+			is_undefined_manufacturer, is_undefined_model, flag_manufacturer_no_action_trigger, flag_model_no_action_trigger,
+			vehicle_id, trans ->
+
+			change manufacturers value { null }
+			change filtered_models value { null }
+			change filtered_models options { [:] }
+			change undefined_manufacturer value { null }
+			change undefined_model value { null }
+			change flag_manufacturer_no_action_trigger value { true }
+			change is_undefined_manufacturer value { false }
+			change flag_model_no_action_trigger value { true }
+			change is_undefined_model value { false }
+			change vehicle_id value { null }
+
+			make filtered_models, hidden on trans when { true }
+			make filtered_models, optional on trans when { true }
+			make undefined_manufacturer,hidden on trans when { true }
+			make undefined_manufacturer,optional on trans when { true }
+			make undefined_model,hidden on trans when { true }
+			make undefined_model,optional on trans when { true }
+			make is_undefined_model,hidden on trans when { true }
+
+			make manufacturers,editable on trans when { true }
+			make manufacturers,required on trans when { true }
+		}
+	</function>
+	<!-- TRANSACTIONS -->
+	<!-- ROLES -->
+	<!-- PROCESS ROLE REFS -->
+	<!-- PROCESS USER REFS -->
+	<!-- DATA -->
+	<data type="enumeration_map">
+		<id>manufacturers</id>
+		<title name="manufacturers">Manufacturer</title>
+		<desc name="manufacturers_desc">Select the manufacturer</desc>
+		<view>
+			<autocomplete/>
+		</view>
+	</data>
+	<data type="enumeration_map">
+		<id>system_models</id>
+		<title>system_models</title>
+	</data>
+	<data type="text">
+		<id>undefined_manufacturer</id>
+		<title name="undefined_manufacturer">Manufacturer</title>
+		<desc name="undefined_manufacturer_desc">Type here the manufacturer</desc>
+	</data>
+	<data type="text">
+		<id>vehicle_id</id>
+		<title>vehicle_id</title>
+	</data>
+	<data type="enumeration_map">
+		<id>filtered_models</id>
+		<title name="filtered_models">Model</title>
+		<desc name="filtered_models_desc">Select the model</desc>
+		<view>
+			<autocomplete/>
+		</view>
+	</data>
+	<data type="text">
+		<id>undefined_model</id>
+		<title name="undefined_model">Model</title>
+		<desc name="undefined_model_desc">Type here the model</desc>
+	</data>
+	<data type="boolean">
+		<id>is_undefined_manufacturer</id>
+		<title name="is_undefined_manufacturer">Manufacturer is not in the list</title>
+		<init>false</init>
+	</data>
+	<data type="boolean">
+		<id>is_undefined_model</id>
+		<title name="is_undefined_model">Model is not in the list</title>
+		<init>false</init>
+	</data>
+	<data type="boolean">
+		<id>flag_manufacturer_no_action_trigger</id>
+		<title>flag_manufacturer_no_action_trigger</title>
+		<init>false</init>
+	</data>
+	<data type="boolean">
+		<id>flag_model_no_action_trigger</id>
+		<title>flag_model_no_action_trigger</title>
+		<init>false</init>
+	</data>
+	<data type="text">
+		<id>status</id>
+		<title name="status">Status</title>
+	</data>
+	<data type="number">
+		<id>requests_processed</id>
+		<title name="requests_processed">Requests processed</title>
+		<desc name="requests_processed_desc">Number of requests processed</desc>
+		<init>0</init>
+	</data>
+	<data type="dateTime">
+		<id>lists_actualization_date</id>
+		<title name="list_actualization_date">Date of last change</title>
+		<desc name="list_actualization_date_desc">Date when last change in lists has been made</desc>
+		<action trigger="get">
+			lists_actualization_date: f.lists_actualization_date;
+			def mainCase = findCase( {it.processIdentifier.eq("main_enum_vehicles")} );
+			change lists_actualization_date value { mainCase?.dataSet.get("last_imported_file")?.value; }
+		</action>
+	</data>
+	<data type="dateTime">
+		<id>initialization_date</id>
+		<title name="initialization_date">Initialization date</title>
+	</data>
+	<!-- I18NS -->
+	<i18n locale="sk">
+		<i18nString name="is_undefined">Vozidlo nie je v zozname</i18nString>
+		<i18nString name="manufacturers">Výrobca</i18nString>
+		<i18nString name="manufacturers_desc">Vyber výrobcu zo zoznamu</i18nString>
+		<i18nString name="undefined_manufacturer">Výrobca</i18nString>
+		<i18nString name="undefined_manufacturer_desc">Sem napíš výrobcu</i18nString>
+		<i18nString name="filtered_models">Model</i18nString>
+		<i18nString name="filtered_models_desc">Vyber model zo zoznamu</i18nString>
+		<i18nString name="undefined_model">Model</i18nString>
+		<i18nString name="undefined_model_desc">Sem napíš model</i18nString>
+		<i18nString name="status">Stav</i18nString>
+		<i18nString name="requests_processed">Počet vykonaných operácií</i18nString>
+		<i18nString name="requests_processed_desc">Počet vykonaných operácií</i18nString>
+		<i18nString name="list_actualization_date">Dátum aktualizovania zoznamu</i18nString>
+		<i18nString name="list_actualization_date_desc">Dátum aktualizovania zoznamu</i18nString>
+		<i18nString name="initialization_date">Dátum inicializácie inštancie</i18nString>
+	</i18n>
+	<i18n locale="de">
+		<i18nString name="is_undefined">Fahrzeug ist nicht in der Liste</i18nString>
+		<i18nString name="manufacturers">Produzent</i18nString>
+		<i18nString name="manufacturers_desc">Wähle den Hersteller</i18nString>
+		<i18nString name="undefined_manufacturer">Produzent</i18nString>
+		<i18nString name="undefined_manufacturer_desc">Schreib den Hersteller hier</i18nString>
+		<i18nString name="filtered_models">Modell</i18nString>
+		<i18nString name="filtered_models_desc">Wähle das Modell</i18nString>
+		<i18nString name="undefined_model">Modell</i18nString>
+		<i18nString name="undefined_model_desc">Schreib das Modell hier</i18nString>
+		<i18nString name="status">Status</i18nString>
+		<i18nString name="requests_processed">Anzahl der durchgeführten Operationen</i18nString>
+		<i18nString name="requests_processed_desc">Anzahl der durchgeführten Operationen</i18nString>
+		<i18nString name="list_actualization_date">Datum der Listenaktualisierung</i18nString>
+		<i18nString name="list_actualization_date_desc">Datum der Listenaktualisierung</i18nString>
+		<i18nString name="initialization_date">Datum der Instanzinitialisierung</i18nString>
+	</i18n>
+	<!-- TRANSITIONS -->
+	<transition>
+		<id>t_init</id>
+		<x>420</x>
+		<y>300</y>
+		<layout>
+			<offset>0</offset>
+		</layout>
+		<label>Initialize [auto]</label>
+		<roleRef>
+			<id>system</id>
+			<logic>
+				<perform>true</perform>
+			</logic>
+		</roleRef>
+		<trigger type="auto"/>
+		<event type="finish">
+			<id>0</id>
+			<actions phase="pre">
+				<action>
+                    manufacturers: f.manufacturers,
+                    system_models: f.system_models;
+
+                    def mainCase = findCase( {it.processIdentifier.eq("main_enum_vehicles")} )
+
+                    if(mainCase == null)
+                        return
+
+                    change manufacturers options { mainCase.dataSet['system_manufacturers'].options }
+                    change system_models options { mainCase.dataSet['system_models'].options }
+				</action>
+			</actions>
+			<actions phase="post">
+				<action>
+					initialization_date: f.initialization_date,
+					t_init: t.t_init,
+					status: f.status;
+
+					change initialization_date value {  java.time.LocalDateTime.now();}
+					change status value { "Created"; }
+				</action>
+			</actions>
+		</event>
+		<event type="assign">
+			<id>t_init_assign</id>
+			<actions phase="post">
+				<action>
+					changeCaseProperty "title" about { return useCase.author.getFullName() + " - Vehicle enumeration"; }
+				</action>
+			</actions>
+		</event>
+	</transition>
+	<transition>
+		<id>t_status</id>
+		<x>220</x>
+		<y>460</y>
+		<layout>
+			<offset>0</offset>
+		</layout>
+		<label>Check status</label>
+		<roleRef>
+			<id>admin</id>
+			<logic>
+				<perform>true</perform>
+			</logic>
+		</roleRef>
+		<dataGroup>
+			<id>dg1</id>
+			<stretch>true</stretch>
+			<dataRef>
+				<id>requests_processed</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+			</dataRef>
+			<dataRef>
+				<id>status</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+			</dataRef>
+			<dataRef>
+				<id>initialization_date</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+			</dataRef>
+			<dataRef>
+				<id>lists_actualization_date</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+			</dataRef>
+		</dataGroup>
+		<event type="cancel">
+			<title></title>
+		</event>
+		<event type="assign">
+			<title></title>
+		</event>
+		<event type="finish">
+			<title></title>
+		</event>
+		<event type="delegate">
+			<title></title>
+		</event>
+	</transition>
+	<transition>
+		<id>t_select_vehicle</id>
+		<x>900</x>
+		<y>300</y>
+		<layout>
+			<offset>0</offset>
+		</layout>
+		<label>Select vehicle [await synch]</label>
+		<roleRef>
+			<id>system</id>
+			<logic>
+				<perform>true</perform>
+			</logic>
+		</roleRef>
+		<dataGroup>
+			<id>dg1</id>
+			<layout>grid</layout>
+			<dataRef>
+				<id>manufacturers</id>
+				<logic>
+					<behavior>editable</behavior>
+					<behavior>required</behavior>
+					<action trigger="set">
+						thisTrans: t.t_select_vehicle,
+                        manufacturers: f.this,
+                        system_models: f.system_models,
+						is_undefined_model: f.is_undefined_model,
+						undefined_model: f.undefined_model,
+                        filtered_models: f.filtered_models;
+
+                        if(manufacturers.value == null)
+                            return
+
+						change filtered_models value { "" }
+						change filtered_models options { [:] }
+
+						// value must be exactly the key
+						if(manufacturers.options?.containsKey(manufacturers.value)){
+							make filtered_models,editable on thisTrans when { true }
+							make filtered_models,required on thisTrans when { true }
+							make is_undefined_model,editable on thisTrans when { true }
+
+							def selectedManufacturer = manufacturers.value
+							def keysToFilter = system_models.options.findAll{ it.key.contains(selectedManufacturer) }.collect{ it.key }
+							if(keysToFilter == null || keysToFilter == []){
+								change is_undefined_model value { true }
+								make is_undefined_model,visible on thisTrans when { true }
+							} else {
+								change filtered_models options { system_models.options?.subMap(keysToFilter) }
+							}
+						}
+						// value is not exactly the key
+						else{
+							make filtered_models,hidden on thisTrans when { true }
+							make filtered_models,optional on thisTrans when { true }
+							make is_undefined_model,hidden on thisTrans when { true }
+						}
+					</action>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>3</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>undefined_manufacturer</id>
+				<logic>
+					<behavior>hidden</behavior>
+					<action trigger="set">
+						thisTrans: t.t_select_vehicle,
+						undefined_manufacturer: f.this,
+						is_undefined_model: f.is_undefined_model,
+						undefined_model: f.undefined_model;
+
+						if(undefined_manufacturer.value == null || undefined_manufacturer.value?.isEmpty()){
+							make undefined_model,hidden on thisTrans when { true }
+							make undefined_model,optional on thisTrans when { true }
+							make is_undefined_model,hidden on thisTrans when { true }
+						}
+						else{
+							make undefined_model,editable on thisTrans when { true }
+							make undefined_model,required on thisTrans when { true }
+							make is_undefined_model,visible on thisTrans when { true }
+						}
+					</action>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>3</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>is_undefined_manufacturer</id>
+				<logic>
+					<behavior>editable</behavior>
+					<action trigger="set">
+						trans: t.t_select_vehicle,
+						manufacturers: f.manufacturers,
+						filtered_models: f.filtered_models,
+						undefined_manufacturer: f.undefined_manufacturer,
+						undefined_model: f.undefined_model,
+						is_undefined_model: f.is_undefined_model,
+						flag_model_no_action_trigger: f.flag_model_no_action_trigger,
+						flag_manufacturer_no_action_trigger: f.flag_manufacturer_no_action_trigger,
+						is_undefined_manufacturer: f.is_undefined_manufacturer;
+
+						if(flag_manufacturer_no_action_trigger.value){
+							change flag_manufacturer_no_action_trigger value { false }
+							return
+						}
+
+						if(is_undefined_manufacturer.value){
+							change manufacturers value { null }
+							change undefined_model value { null }
+							change filtered_models value { null }
+
+							make manufacturers,hidden on trans when { true }
+							make manufacturers,optional on trans when { true }
+							make filtered_models,hidden on trans when { true }
+							make filtered_models,optional on trans when { true }
+							make undefined_model,hidden on trans when { true }
+							make undefined_model,optional on trans when { true }
+
+							make undefined_manufacturer,editable on trans when { true }
+							make undefined_manufacturer,required on trans when { true }
+
+							change flag_model_no_action_trigger value { true }
+							change is_undefined_model value { true }
+							make is_undefined_model,hidden on trans when { true }
+						}
+						else{
+							change undefined_manufacturer value { null }
+							change undefined_model value { null }
+							change filtered_models value { null }
+
+							make undefined_manufacturer,hidden on trans when { true }
+							make undefined_manufacturer,optional on trans when { true }
+							make undefined_model,hidden on trans when { true }
+							make undefined_model,optional on trans when { true }
+							make filtered_models,hidden on trans when { true }
+							make filtered_models,optional on trans when { true }
+
+							make manufacturers,editable on trans when { true }
+							make manufacturers,required on trans when { true }
+
+							change flag_model_no_action_trigger value { true }
+							change is_undefined_model value { false }
+							make is_undefined_model,hidden on trans when { true }
+						}
+					</action>
+				</logic>
+				<layout>
+					<x>3</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>filtered_models</id>
+				<logic>
+					<behavior>hidden</behavior>
+					<behavior>required</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>3</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>undefined_model</id>
+				<logic>
+					<behavior>hidden</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>3</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>is_undefined_model</id>
+				<logic>
+					<behavior>hidden</behavior>
+					<action trigger="set">
+						trans: t.t_select_vehicle,
+						filtered_models: f.filtered_models,
+						undefined_model: f.undefined_model,
+						is_undefined_manufacturer: f.is_undefined_manufacturer,
+						flag_model_no_action_trigger: f.flag_model_no_action_trigger,
+						is_undefined_model: f.is_undefined_model;
+
+						if(flag_model_no_action_trigger.value){
+							change flag_model_no_action_trigger value { false }
+							return
+						}
+
+						if(is_undefined_model.value){
+							change filtered_models value { null }
+
+							make filtered_models,hidden on trans when { true }
+							make filtered_models,optional on trans when { true }
+
+							make undefined_model,editable on trans when { true }
+							make undefined_model,required on trans when { true }
+						}
+						else{
+							change undefined_model value { null }
+
+							make undefined_model,hidden on trans when { true }
+							make undefined_model,optional on trans when { true }
+
+							make filtered_models,editable on trans when { true }
+							make filtered_models,required on trans when { true }
+						}
+					</action>
+				</logic>
+				<layout>
+					<x>3</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
+		<event type="cancel">
+			<id>0</id>
+			<actions phase="pre">
+				<action>
+					trans: t.t_select_vehicle,
+					manufacturers: f.manufacturers,
+					filtered_models: f.filtered_models,
+					undefined_manufacturer: f.undefined_manufacturer,
+					undefined_model: f.undefined_model,
+					is_undefined_manufacturer: f.is_undefined_manufacturer,
+					is_undefined_model: f.is_undefined_model,
+					flag_manufacturer_no_action_trigger: f.flag_manufacturer_no_action_trigger,
+					flag_model_no_action_trigger: f.flag_model_no_action_trigger,
+					vehicle_id: f.vehicle_id;
+
+					clear_selection(
+						manufacturers, filtered_models, undefined_manufacturer, undefined_model,
+						is_undefined_manufacturer, is_undefined_model, flag_manufacturer_no_action_trigger, flag_model_no_action_trigger,
+						vehicle_id, trans
+					)
+				</action>
+			</actions>
+		</event>
+		<event type="assign">
+			<id>t_select_vehicle_assign</id>
+			<actions phase="pre">
+				<action>
+					status: f.status;
+					change status value {"Selection in progress"; }
+				</action>
+			</actions>
+		</event>
+		<event type="finish">
+			<id>t_select_vehicle_finish</id>
+			<actions phase="post">
+				<action>
+					trans: t.t_select_vehicle,
+					manufacturers: f.manufacturers,
+					filtered_models: f.filtered_models,
+					undefined_manufacturer: f.undefined_manufacturer,
+					undefined_model: f.undefined_model,
+					is_undefined_manufacturer: f.is_undefined_manufacturer,
+					is_undefined_model: f.is_undefined_model,
+					flag_manufacturer_no_action_trigger: f.flag_manufacturer_no_action_trigger,
+					flag_model_no_action_trigger: f.flag_model_no_action_trigger,
+					vehicle_id: f.vehicle_id;
+
+					clear_selection(
+						manufacturers, filtered_models, undefined_manufacturer, undefined_model,
+						is_undefined_manufacturer, is_undefined_model, flag_manufacturer_no_action_trigger, flag_model_no_action_trigger,
+						vehicle_id, trans
+					)
+				</action>
+				<action>
+					requests_processed: f.requests_processed;
+					change requests_processed value { requests_processed.value+1; }
+				</action>
+				<action>
+					status: f.status;
+					change status value { "Waiting to start selection"; }
+				</action>
+			</actions>
+		</event>
+	</transition>
+	<!-- PLACES -->
+	<place>
+		<id>p1</id>
+		<x>220</x>
+		<y>300</y>
+		<label>uninitialized</label>
+		<tokens>1</tokens>
+		<static>false</static>
+	</place>
+	<place>
+		<id>p2</id>
+		<x>660</x>
+		<y>300</y>
+		<label>initialized</label>
+		<tokens>0</tokens>
+		<static>false</static>
+	</place>
+	<place>
+		<id>p8</id>
+		<x>420</x>
+		<y>460</y>
+		<label>created</label>
+		<tokens>0</tokens>
+		<static>false</static>
+	</place>
+	<!-- ARCS -->
+	<arc>
+		<id>a1</id>
+		<type>regular</type>
+		<sourceId>p1</sourceId>
+		<destinationId>t_init</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a2</id>
+		<type>regular</type>
+		<sourceId>t_init</sourceId>
+		<destinationId>p2</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a10</id>
+		<type>regular</type>
+		<sourceId>p2</sourceId>
+		<destinationId>t_select_vehicle</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a11</id>
+		<type>regular</type>
+		<sourceId>t_select_vehicle</sourceId>
+		<destinationId>p2</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a14</id>
+		<type>regular</type>
+		<sourceId>t_init</sourceId>
+		<destinationId>p8</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a15</id>
+		<type>read</type>
+		<sourceId>p8</sourceId>
+		<destinationId>t_status</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+</document>

@@ -1,0 +1,1143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://netgrif.github.io/petriflow/petriflow.schema.xsd">
+	<id>warehouse</id>
+	<initials>WH</initials>
+	<title name="case_title">Warehouse</title>
+	<caseName name="case_title">Warehouse</caseName>
+	<defaultRole>true</defaultRole>
+	<transitionRole>false</transitionRole>
+	<role>
+		<id>system</id>
+		<title>System</title>
+	</role>
+	<role>
+		<id>admin</id>
+		<title>Admin</title>
+		<event type="assign">
+			<id>1</id>
+			<actions phase="post">
+				<action>
+					def processIdentifier = "child_enum_addresses"
+					if(!checkIfUserHasInstance(processIdentifier)){
+						createInstance(processIdentifier, "CEA", "white")
+					}
+				</action>
+			</actions>
+		</event>
+	</role>
+	<role>
+		<id>mechanic</id>
+		<title>Mechanic</title>
+		<event type="assign">
+			<id>1</id>
+			<actions phase="post">
+				<action>
+					def processIdentifier = "child_enum_addresses"
+					if(!checkIfUserHasInstance(processIdentifier)){
+						createInstance(processIdentifier, "CEA", "white")
+					}
+				</action>
+			</actions>
+		</event>
+	</role>
+	<roleRef>
+		<id>admin</id>
+		<caseLogic>
+			<create>true</create>
+			<delete>true</delete>
+		</caseLogic>
+	</roleRef>
+	<caseEvents>
+		<event type="delete">
+			<id>case_delete</id>
+			<actions phase="pre">
+				<action>
+					items: f.items;
+					for(itemId in items.choices.collect{it.defaultValue}){
+						if( findCase( {it._id.eq(itemId)} ) == null)
+							continue
+						workflowService.deleteCase(itemId)
+					}
+				</action>
+				<action>
+					def cea = findCase( {it.processIdentifier.eq("child_enum_addresses").and(it.dataSet.get("target_id").value?.eq(useCase.stringId))} )
+					if(cea == null)
+						return
+
+					def exists = false
+					for(taskpair in cea.tasks){
+						if(taskpair.transition == "t_select_address"){
+							exists = true
+							break
+						}
+					}
+
+					if(exists)
+						cancelTask("t_select_address", cea)
+				</action>
+			</actions>
+		</event>
+	</caseEvents>
+	<!-- TRANSACTIONS -->
+	<!-- ROLES -->
+	<!-- PROCESS ROLE REFS -->
+	<!-- PROCESS USER REFS -->
+	<!-- DATA -->
+	<data type="number">
+		<id>is_one_item_addition</id>
+		<title name="able">To [able to add items]</title>
+		<init>0</init>
+	</data>
+	<data type="number">
+		<id>is_more_item_addition</id>
+		<title name="proccessing">To [processing file]</title>
+		<init>0</init>
+	</data>
+	<data type="text">
+		<id>warehouse_name</id>
+		<title name="warehouse_name">Warehouse name</title>
+		<valid>minLength 2</valid>
+	</data>
+	<data type="text">
+		<id>description</id>
+		<title name="description">Description</title>
+		<valid>minLength 2</valid>
+		<component>
+			<name>area</name>
+		</component>
+	</data>
+	<data type="enumeration">
+		<id>items</id>
+		<title name="items">Items</title>
+	</data>
+	<data type="enumeration">
+		<id>OENumbers</id>
+		<title>OENumbers</title>
+	</data>
+	<data type="taskRef">
+		<id>t_init_form</id>
+		<title/>
+		<init>t_init_form_warehouse</init>
+	</data>
+	<data type="taskRef">
+		<id>item_addition_taskref</id>
+		<title/>
+	</data>
+	<data type="enumeration_map">
+		<id>select_addition_type</id>
+		<title name="select_addition_type">Select addition type</title>
+		<options>
+			<option key="one_item" name="one_item">Add one item</option>
+			<option key="more_items" name="multiple_items">Add multiple items</option>
+		</options>
+		<view> <list/> </view>
+	</data>
+	<data type="taskRef">
+		<id>view_taskref</id>
+		<title/>
+	</data>
+	<data type="enumeration_map">
+		<id>system_item_map</id>
+		<title name="system_item_map">System item map</title>
+	</data>
+	<data type="text">
+		<id>filter_item_map</id>
+		<title name="filter_item_map">Filter items</title>
+		<desc name="filter_item_map_desc">Filter by manufacturer, title or OENumber</desc>
+	</data>
+	<data type="text">
+		<id>postal_code</id>
+		<title name="postal_code">Postal code</title>
+		<valid>regex("^\d{3} ?\d{2}$")</valid>
+	</data>
+	<data type="text" immediate="true">
+		<id>city</id>
+		<title name="city">City</title>
+		<valid>minLength 2</valid>
+	</data>
+	<data type="text" immediate="true">
+		<id>street</id>
+		<title name="street">Street</title>
+		<valid>minLength 2</valid>
+	</data>
+	<data type="text">
+		<id>house_number</id>
+		<title name="house_number">House number</title>
+	</data>
+	<data type="taskRef">
+		<id>t_adress_form</id>
+		<title/>
+	</data>
+	<data type="boolean">
+		<id>change_address</id>
+		<title name="change_address">Do you want to change the address?</title>
+	</data>
+	<data type="boolean" immediate="true">
+		<id>is_created</id>
+		<title>is_created</title>
+	</data>
+	<!-- I18NS -->
+	<i18n locale="sk">
+		<i18nString name="case_title">Sklad</i18nString>
+		<i18nString name="able">Na [môcť pridávať položky]</i18nString>
+		<i18nString name="create">Vytvoriť</i18nString>
+		<i18nString name="read">Prečítať</i18nString>
+		<i18nString name="update">Aktualizovať</i18nString>
+		<i18nString name="delete">Vymazať</i18nString>
+		<i18nString name="proccessing">Na [súbor na spracovanie]</i18nString>
+		<i18nString name="warehouse_name">Názov skladu</i18nString>
+		<i18nString name="location">Lokácia</i18nString>
+		<i18nString name="description">Popis</i18nString>
+		<i18nString name="items">Položky</i18nString>
+		<i18nString name="select_addition_type">Vyberte typ pridania</i18nString>
+		<i18nString name="one_item">Pridať jednu položku</i18nString>
+		<i18nString name="multiple_items">Pridanie viacerých položiek</i18nString>
+		<i18nString name="system_item_map">Mapa položiek systému</i18nString>
+		<i18nString name="filter_tems">Filtrovanie položiek</i18nString>
+		<i18nString name="item_addition">Doplnenie položky</i18nString>
+		<i18nString name="finish_processing">Dokončiť spracovanie súboru [čakať na synchronizáciu]</i18nString>
+		<i18nString name="view_items">Zobraziť položky</i18nString>
+		<i18nString name="warehouse">Sklad</i18nString>
+		<i18nString name="procesing_file">Súbor na spracovanie</i18nString>
+		<i18nString name="able_to_add">Možnosť pridávať položky</i18nString>
+		<i18nString name="change_address">Chcete zmeniť adresu?</i18nString>
+		<i18nString name="dg_basic_info">Základné informácie</i18nString>
+		<i18nString name="dg_address">Adresa</i18nString>
+		<i18nString name="filter_item_map">Filtruj položky</i18nString>
+		<i18nString name="filter_item_map_desc">Filtruj pomocou výrobcu, nadpisu alebo podľa čísla Original Equipment</i18nString>
+		<i18nString name="postal_code">PSČ</i18nString>
+		<i18nString name="city">Obec</i18nString>
+		<i18nString name="street">Ulica</i18nString>
+		<i18nString name="house_number">Číslo domu</i18nString>
+	</i18n>
+	<i18n locale="de">
+		<i18nString name="case_title">Lagerhaus</i18nString>
+		<i18nString name="able">Zum [Hinzufügen von Artikeln]</i18nString>
+		<i18nString name="create">Schaffen</i18nString>
+		<i18nString name="read">Lesen</i18nString>
+		<i18nString name="update">Aktualisieren</i18nString>
+		<i18nString name="delete">Löschen</i18nString>
+		<i18nString name="proccessing">Zu [Verarbeitungsdatei]</i18nString>
+		<i18nString name="warehouse_name">Name des Lagers</i18nString>
+		<i18nString name="location">Standort</i18nString>
+		<i18nString name="description">Beschreibung</i18nString>
+		<i18nString name="items">Produkte</i18nString>
+		<i18nString name="select_addition_type">Additionsart auswählen</i18nString>
+		<i18nString name="one_item">Einen Artikel hinzufügen</i18nString>
+		<i18nString name="multiple_items">Mehrere Produkte hinzufügen</i18nString>
+		<i18nString name="system_item_map">Karte der Systemelemente</i18nString>
+		<i18nString name="filter_tems">Produkte filtern</i18nString>
+		<i18nString name="item_addition">Produkt hinzufügen</i18nString>
+		<i18nString name="finish_processing">Dateiverarbeitung beenden [await synch]</i18nString>
+		<i18nString name="view_items">Artikel ansehen</i18nString>
+		<i18nString name="warehouse">Lagerhaus</i18nString>
+		<i18nString name="procesing_file">Verarbeitungsdatei</i18nString>
+		<i18nString name="able_to_add">Produkte hinzufügen können</i18nString>
+		<i18nString name="change_address">Möchten Sie die Adresse ändern?</i18nString>
+		<i18nString name="dg_basic_info">Grundlegende Informationen</i18nString>
+		<i18nString name="dg_address">Adresse</i18nString>
+		<i18nString name="filter_item_map">Artikel filtern</i18nString>
+		<i18nString name="filter_item_map_desc">Filtern nach Hersteller, Titel oder OE nummer</i18nString>
+		<i18nString name="postal_code">Postleitzahl</i18nString>
+		<i18nString name="city">Stadt</i18nString>
+		<i18nString name="street">Straße</i18nString>
+		<i18nString name="house_number">Hausnummer</i18nString>
+	</i18n>
+	<!-- TRANSITIONS -->
+	<transition>
+		<id>t_create</id>
+		<x>260</x>
+		<y>340</y>
+		<layout>
+			<offset>0</offset>
+		</layout>
+		<label name="create">Create</label>
+		<roleRef>
+			<id>admin</id>
+			<logic>
+				<perform>true</perform>
+			</logic>
+		</roleRef>
+		<assignPolicy>auto</assignPolicy>
+		<dataGroup>
+			<id>dg1</id>
+			<dataRef>
+				<id>t_init_form</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+			</dataRef>
+		</dataGroup>
+		<dataGroup>
+			<id>dg2</id>
+			<dataRef>
+				<id>t_adress_form</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+			</dataRef>
+		</dataGroup>
+		<event type="finish">
+			<id>1</id>
+			<actions phase="pre">
+				<action>
+					OENumbers: f.OENumbers,
+					items: f.items;
+					change items choices { [] }
+					change OENumbers choices { [] }
+				</action>
+				<action>
+					getAndSetAddressFromEnum("t_adress_form")
+				</action>
+			</actions>
+			<actions phase="post">
+				<action>                    
+					def Case = findCase( {it.processIdentifier.eq("child_enum_addresses").and(it.author.email.eq(loggedUser().email))} ) ?: log.error("")
+					if(Case == null)
+						throw new IllegalArgumentException("Cannot find your instance of process Child addresses enumeration")
+
+					finishTask("t_select_address", Case)
+				</action>
+				<action>
+					useCase.dataSet.get("t_adress_form").value = []
+					workflowService.save(useCase)
+				</action>
+				<action>
+					is_created: f.is_created;
+					change is_created value { true }
+				</action>
+			</actions>
+		</event>
+		<event type="cancel">
+			<id>t_create_cancel</id>
+			<actions phase="post">
+				<action>
+					async.run{
+						workflowService.deleteCase(useCase.stringId)
+					}
+				</action>
+			</actions>
+		</event>
+		<event type="assign">
+			<id>t_create_assign</id>
+			<actions phase="pre">
+				<action>
+					t_adress_form: f.t_adress_form;
+
+					def Case = findCase( {it.processIdentifier.eq("child_enum_addresses").and(it.author.email.eq(loggedUser().email))} )
+					if(Case == null)
+						throw new IllegalArgumentException("Cannot find your instance of process Child addresses enumeration")
+
+                    def addressTask = findTask( {it.caseId.eq(Case.stringId).and(it.transitionId.eq("t_select_address"))} )
+					if(addressTask == null)
+						throw new IllegalArgumentException("Cannot find task with id t_select_address in ${Case.title}")
+
+					assignTask(addressTask)
+                    setData(addressTask, [
+						"target_id": [
+							"value": useCase.stringId,
+							"type" : "text"
+						],
+					])
+					change t_adress_form value{ [addressTask.stringId] }
+			</action>
+			</actions>
+		</event>
+	</transition>
+	<transition>
+		<id>t_update</id>
+		<x>620</x>
+		<y>500</y>
+		<layout>
+			<offset>0</offset>
+		</layout>
+		<label name="update">Update</label>
+		<roleRef>
+			<id>admin</id>
+			<logic>
+				<perform>true</perform>
+			</logic>
+		</roleRef>
+		<assignPolicy>auto</assignPolicy>
+		<dataGroup>
+			<id>dg1</id>
+			<stretch>true</stretch>
+			<dataRef>
+				<id>t_init_form</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+			</dataRef>
+		</dataGroup>
+		<dataGroup>
+			<id>dg2</id>
+			<stretch>true</stretch>
+			<dataRef>
+				<id>change_address</id>
+				<logic>
+					<behavior>editable</behavior>
+					<action trigger="set">
+						change_address: f.this,
+						t_adress_form: f.t_adress_form;
+
+						if(!change_address.value){
+							if(t_adress_form.value == null || t_adress_form.value == [])
+								return
+							def tazk = findTask( {it._id.eq(t_adress_form.value[0])} )
+							async.run{ cancelTask(tazk) }
+							change t_adress_form value { [] }
+
+							return
+						}
+
+						def myEnumCase = findCase( {it.processIdentifier.eq("child_enum_addresses").and(it.author.email.eq(loggedUser().email))} )
+						if(myEnumCase == null)
+							throw new IllegalArgumentException("Cannot find your instance of process Child address enumeration")
+
+						def enumTask = findTask( {it.caseId.eq(myEnumCase.stringId).and(it.transitionId.eq("t_select_address"))} )
+						if(enumTask == null)
+							throw new IllegalArgumentException("Cannot find task with id t_select_address in ${myEnumCase.title}")
+
+						async.run{ assignTask(enumTask) }
+						setData(enumTask, [
+							"target_id": [
+								"value": useCase.stringId,
+								"type" : "text"
+							],
+						])
+						change t_adress_form value { [enumTask.stringId] }
+					</action>
+				</logic>
+			</dataRef>
+		</dataGroup>
+		<dataGroup>
+			<id>dg3</id>
+			<stretch>true</stretch>
+			<dataRef>
+				<id>t_adress_form</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+			</dataRef>
+		</dataGroup>
+		<dataGroup>
+			<id>dg4</id>
+			<title name="dg_address">Address</title>
+			<dataRef>
+				<id>city</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+			</dataRef>
+			<dataRef>
+				<id>postal_code</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+			</dataRef>
+			<dataRef>
+				<id>street</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+			</dataRef>
+			<dataRef>
+				<id>house_number</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+			</dataRef>
+		</dataGroup>
+		<event type="assign">
+			<id>0</id>
+			<actions phase="pre">
+				<action>
+					change_address: f.change_address;
+					change change_address value { false }
+				</action>
+			</actions>
+		</event>
+		<event type="cancel">
+			<id>1</id>
+			<actions phase="pre">
+				<action>
+					def cea = findCase( {it.processIdentifier.eq("child_enum_addresses").and(it.dataSet.get("target_id").value?.eq(useCase.stringId))} )
+					if(cea == null)
+						return
+
+					def exists = false
+					for(taskpair in cea.tasks){
+						if(taskpair.transition == "t_select_address"){
+							exists = true
+							break
+						}
+					}
+
+					if(exists)
+						cancelTask("t_select_address", cea)
+				</action>
+			</actions>
+		</event>
+		<event type="finish">
+			<id>1</id>
+			<actions phase="pre">
+				<action>
+					getAndSetAddressFromEnum("t_adress_form")
+				</action>
+			</actions>
+			<actions phase="post">
+				<action>
+					def myEnumCase = findCase( {it.processIdentifier.eq("child_enum_addresses").and(it.author.email.eq(loggedUser().email))} )
+					if(myEnumCase == null)
+						throw new IllegalArgumentException("Cannot find your instance of process Child address enumeration")
+
+					async.run{ finishTask("t_select_address", myEnumCase) }
+				</action>
+				<action>
+					t_adress_form: f.t_adress_form;
+					change t_adress_form value { [] }
+				</action>
+			</actions>
+		</event>
+	</transition>
+	<transition>
+		<id>t_read</id>
+		<x>260</x>
+		<y>500</y>
+		<layout>
+			<offset>0</offset>
+		</layout>
+		<label name="read">Read</label>
+		<roleRef>
+			<id>admin</id>
+			<logic>
+				<perform>true</perform>
+			</logic>
+		</roleRef>
+		<roleRef>
+			<id>mechanic</id>
+			<logic>
+				<view>true</view>
+			</logic>
+		</roleRef>
+		<dataGroup>
+			<id>dg1</id>
+			<title name="dg_basic_info">Basic informations</title>
+			<dataRef>
+				<id>t_init_form</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+			</dataRef>
+		</dataGroup>
+		<dataGroup>
+			<id>dg2</id>
+			<title name="dg_address">Address</title>
+			<dataRef>
+				<id>city</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+			</dataRef>
+			<dataRef>
+				<id>postal_code</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+			</dataRef>
+			<dataRef>
+				<id>street</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+			</dataRef>
+			<dataRef>
+				<id>house_number</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+			</dataRef>
+		</dataGroup>
+		<event type="cancel">
+			<title></title>
+		</event>
+		<event type="assign">
+			<title></title>
+		</event>
+		<event type="finish">
+			<title></title>
+		</event>
+		<event type="delegate">
+			<title></title>
+		</event>
+	</transition>
+	<transition>
+		<id>t_delete</id>
+		<x>620</x>
+		<y>340</y>
+		<layout>
+			<offset>0</offset>
+		</layout>
+		<label name="delete">Delete</label>
+		<roleRef>
+			<id>admin</id>
+			<logic>
+				<perform>true</perform>
+			</logic>
+		</roleRef>
+		<assignPolicy>auto</assignPolicy>
+		<event type="finish">
+			<id>t_delete_finish</id>
+			<actions phase="post">
+				<action>
+					async.run{ workflowService.deleteCase(useCase.stringId); }
+				</action>
+			</actions>
+		</event>
+	</transition>
+	<transition>
+		<id>t_add_item</id>
+		<x>420</x>
+		<y>60</y>
+		<layout>
+			<offset>0</offset>
+		</layout>
+		<label name="item_addition">Item addition</label>
+		<roleRef>
+			<id>admin</id>
+			<logic>
+				<perform>true</perform>
+			</logic>
+		</roleRef>
+		<roleRef>
+			<id>mechanic</id>
+			<logic>
+				<perform>true</perform>
+			</logic>
+		</roleRef>
+		<assignPolicy>auto</assignPolicy>
+		<dataGroup>
+			<id>dg0</id>
+			<dataRef>
+				<id>select_addition_type</id>
+				<logic>
+					<behavior>editable</behavior>
+					<action trigger="set">
+						item_addition_taskref: f.item_addition_taskref,
+						select_addition_type: f.select_addition_type;
+
+						if(select_addition_type.value == null)
+							return
+
+						if( (item_addition_taskref.value != null).and(item_addition_taskref.value != []) ){
+							def atask = findTask( {it._id.eq(item_addition_taskref.value.first())} )
+							if(atask != null){
+								cancelTask(atask)
+							}
+						}
+
+						// selected one item
+						if(select_addition_type.value == "one_item"){
+							def new_warehouse_item = createCase("warehouse_item");
+							if(new_warehouse_item == null)
+								return
+
+							def item_task = findTask({it.caseId.eq(new_warehouse_item.stringId).and(it.transitionId.eq("t_create"))})
+							if(item_task == null)
+								return
+
+							assignTask(item_task)
+							setDataWithPropagation(item_task, [
+								"is_from_warehouse": [
+									"value": true,
+									"type" : "boolean"
+								],
+							])
+							setDataWithPropagation(item_task, [
+								"warehouseId": [
+									"value": useCase.stringId,
+									"type" : "text"
+								],
+							])
+							change item_addition_taskref value { [item_task.stringId]; }
+						}
+						// selected more items
+						if(select_addition_type.value == "more_items"){
+							//todo: TBD
+							throw new IllegalArgumentException("Not implemented yet")
+							// create new import_items instance
+							// assign a task
+							// set taskref view
+						}
+					</action>
+				</logic>
+			</dataRef>
+		</dataGroup>
+		<dataGroup>
+			<id>dg1</id>
+			<dataRef>
+				<id>item_addition_taskref</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+			</dataRef>
+		</dataGroup>
+		<event type="assign">
+			<id>0</id>
+			<actions phase="pre">
+				<action>
+					is_one_item_addition: f.is_one_item_addition,
+					is_more_item_addition: f.is_more_item_addition,
+					select_addition_type: f.select_addition_type;
+
+					change select_addition_type value { null }
+					change is_one_item_addition value { 0 }
+					change is_more_item_addition value { 0 }
+				</action>
+			</actions>
+		</event>
+		<event type="cancel">
+			<id>1</id>
+			<actions phase="post">
+				<action>
+					select_addition_type: f.select_addition_type,
+					item_addition_taskref: f.item_addition_taskref;
+
+					if(item_addition_taskref.value == null || item_addition_taskref.value == [] || select_addition_type.value == null)
+						return
+
+					def atask = findTask({it._id.eq(item_addition_taskref.value.first())})
+					if(atask == null)
+						return
+
+					cancelTask(atask)
+					change item_addition_taskref value { [] }
+				</action>
+			</actions>
+		</event>
+		<event type="finish">
+			<id>2</id>
+			<actions phase="pre">
+				<action>
+					items: f.items,
+					item_addition_taskref: f.item_addition_taskref,
+					select_addition_type: f.select_addition_type;
+
+					if(select_addition_type.value != "one_item")
+						return
+
+					if(item_addition_taskref.value == null || item_addition_taskref.value == [])
+						return
+
+					def currentItemTask = findTask({it._id.eq(item_addition_taskref.value.first())})
+					if(currentItemTask == null)
+						return
+					def currentItem = findCase({it._id.eq(currentItemTask.caseId)})
+					if(currentItem == null)
+						return
+					def currentItemCaseData = getData("t_input_form", currentItem)
+
+					for(choice in items.choices){
+						def itemCase = findCase( { it._id.eq(choice.defaultValue) } )
+						if(itemCase == null)
+							return
+						def OEnumItemCase = itemCase.dataSet.get("OENumber").value
+
+						if(OEnumItemCase == currentItemCaseData["OENumber"].value){
+							def oldQuantity = itemCase.dataSet.get("quantity").value
+							setData("t_read", itemCase, [
+								"quantity": [
+									"value": oldQuantity + currentItemCaseData["quantity"].value,
+									"type" : "number"
+								],
+							])
+							async.run{
+								workflowService.deleteCase(currentItemTask.caseId)
+							}
+							change item_addition_taskref value { [] }
+							return
+						}
+
+					}
+				</action>
+				<action>
+					OENumbers: f.OENumbers,
+					items: f.items,
+					is_one_item_addition: f.is_one_item_addition,
+					is_more_item_addition: f.is_more_item_addition,
+					select_addition_type: f.select_addition_type,
+					item_addition_taskref: f.item_addition_taskref;
+
+					if(item_addition_taskref.value == null || item_addition_taskref.value == [] || select_addition_type.value == null){
+						change is_one_item_addition value { 1 }
+						change is_more_item_addition value { 0 }
+						return
+					}
+
+					def atask = findTask({it._id.eq(item_addition_taskref.value.first())})
+					if(atask == null)
+						return
+
+					if(select_addition_type.value == "one_item"){
+						change is_one_item_addition value { 1 }
+						change is_more_item_addition value { 0 }
+						change items choices { items.choices + [atask.caseId] }
+						def itemCase = findCase( {it._id.eq(atask.caseId)} )
+						if(itemCase != null){
+							change OENumbers choices { OENumbers.choices + [itemCase.getFieldValue("OENumber") as String]}
+						}
+					}
+					if(select_addition_type.value == "more_items"){
+						change is_one_item_addition value { 0 }
+						change is_more_item_addition value { 1 }
+						//todo: TBD adding caseIds to items.choices
+						//todo: TBD adding OENumbers to OENumbers.choices
+					}
+
+					finishTask(atask)
+				</action>
+			</actions>
+			<actions phase="post">
+				<action>
+					item_addition_taskref: f.item_addition_taskref;
+					change item_addition_taskref value { [] }
+				</action>
+			</actions>
+		</event>
+	</transition>
+	<transition>
+		<id>t_finish_processing</id>
+		<x>820</x>
+		<y>220</y>
+		<layout>
+			<offset>0</offset>
+		</layout>
+		<label name="finish_processing">Finish file processing [await synch]</label>
+		<roleRef>
+			<id>system</id>
+			<logic>
+				<perform>true</perform>
+			</logic>
+		</roleRef>
+		<assignPolicy>auto</assignPolicy>
+	</transition>
+	<transition>
+		<id>t_view_items</id>
+		<x>420</x>
+		<y>500</y>
+		<layout>
+			<cols>5</cols>
+			<offset>0</offset>
+		</layout>
+		<label name="view_items">View items</label>
+		<roleRef>
+			<id>admin</id>
+			<logic>
+				<perform>true</perform>
+			</logic>
+		</roleRef>
+		<roleRef>
+			<id>mechanic</id>
+			<logic>
+				<perform>true</perform>
+			</logic>
+		</roleRef>
+		<assignPolicy>auto</assignPolicy>
+		<dataGroup>
+			<id>dg0</id>
+			<layout>grid</layout>
+			<dataRef>
+				<id>filter_item_map</id>
+				<logic>
+					<behavior>editable</behavior>
+					<action trigger="set">
+						filter_item_map: f.this,
+						system_item_map: f.system_item_map,
+						view_taskref: f.view_taskref;
+
+						def oldOptions = system_item_map.options
+						def newOptions = [:]
+
+						def tmpFilter = filter_item_map.value.toLowerCase()
+						tmpFilter = java.text.Normalizer.normalize(tmpFilter, java.text.Normalizer.Form.NFD)
+						tmpFilter = tmpFilter.replaceAll("[\\p{InCombiningDiacriticalMarks}]", "")
+
+						for(option in oldOptions){
+							if(option.value.defaultValue.contains(tmpFilter)){
+								newOptions = newOptions + [option]
+							}
+						}
+						change view_taskref value { newOptions.collect{it.key} }
+					</action>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>5</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
+		<dataGroup>
+			<id>dg1</id>
+			<layout>grid</layout>
+			<dataRef>
+				<id>view_taskref</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
+		<event type="assign">
+			<id>0</id>
+			<actions phase="pre">
+				<action>
+					system_item_map: f.system_item_map,
+					items: f.items,
+					view_taskref: f.view_taskref;
+
+					for(i18_item_id in items.choices){
+						def warehouse_item_task = findTask( { it.caseId.eq(i18_item_id.defaultValue).and(it.transitionId.eq("t_short_description")) } )
+
+						if(warehouse_item_task != null){
+							def data = getData(warehouse_item_task)
+							def tmpValue = data["OENumber"]?.value + "-" + data["manufacturer"]?.value + "-" + data["title"]?.value
+
+							tmpValue = tmpValue.toLowerCase()
+							tmpValue = java.text.Normalizer.normalize(tmpValue, java.text.Normalizer.Form.NFD)
+							tmpValue = tmpValue.replaceAll("[\\p{InCombiningDiacriticalMarks}]", "")
+
+							change system_item_map options { system_item_map.options + [(warehouse_item_task.stringId): tmpValue]; }
+							change view_taskref value { view_taskref.value + [warehouse_item_task.stringId] }
+						}
+					}
+					change item_map options { system_item_map.options }
+				</action>
+			</actions>
+		</event>
+		<event type="cancel">
+			<id>1</id>
+			<actions phase="post">
+				<action>
+					view_taskref: f.view_taskref;
+
+					change view_taskref value { [] }
+				</action>
+			</actions>
+		</event>
+		<event type="finish">
+			<id>t_view_items_finish</id>
+			<actions phase="post">
+				<action>view_taskref: f.view_taskref;
+
+					change view_taskref value { [] }
+				</action>
+			</actions>
+		</event>
+	</transition>
+	<transition>
+		<id>t_init_form_warehouse</id>
+		<x>260</x>
+		<y>60</y>
+		<layout>
+			<offset>0</offset>
+		</layout>
+		<label name="warehouse">Warehouse</label>
+		<roleRef>
+			<id>system</id>
+			<logic>
+				<perform>true</perform>
+			</logic>
+		</roleRef>
+		<assignPolicy>auto</assignPolicy>
+		<dataGroup>
+			<id>DataGroup</id>
+			<title name="dg_basic_info">Basic informations</title>
+			<stretch>true</stretch>
+			<dataRef>
+				<id>warehouse_name</id>
+				<logic>
+					<behavior>editable</behavior>
+					<behavior>required</behavior>
+				</logic>
+			</dataRef>
+			<dataRef>
+				<id>description</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+			</dataRef>
+		</dataGroup>
+	</transition>
+	<transition>
+		<id>t_synchronize</id>
+		<x>350</x>
+		<y>60</y>
+		<layout>
+			<offset>0</offset>
+		</layout>
+		<label>Synchronize</label>
+		<roleRef>
+			<id>system</id>
+			<logic>
+				<perform>true</perform>
+			</logic>
+		</roleRef>
+	</transition>
+	<!-- PLACES -->
+	<place>
+		<id>p1</id>
+		<x>140</x>
+		<y>340</y>
+		<label></label>
+		<tokens>1</tokens>
+		<static>false</static>
+	</place>
+	<place>
+		<id>p2</id>
+		<x>420</x>
+		<y>340</y>
+		<label>created</label>
+		<tokens>0</tokens>
+		<static>false</static>
+	</place>
+	<place>
+		<id>p3</id>
+		<x>820</x>
+		<y>340</y>
+		<label>deleted</label>
+		<tokens>0</tokens>
+		<static>false</static>
+	</place>
+	<place>
+		<id>p4</id>
+		<x>820</x>
+		<y>60</y>
+		<label>processing file</label>
+		<tokens>0</tokens>
+		<static>false</static>
+	</place>
+	<place>
+		<id>p5</id>
+		<x>420</x>
+		<y>220</y>
+		<label>able to add items</label>
+		<tokens>0</tokens>
+		<static>false</static>
+	</place>
+	<!-- ARCS -->
+	<arc>
+		<id>a1</id>
+		<type>regular</type>
+		<sourceId>p1</sourceId>
+		<destinationId>t_create</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a2</id>
+		<type>regular</type>
+		<sourceId>t_create</sourceId>
+		<destinationId>p2</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a3</id>
+		<type>regular</type>
+		<sourceId>p2</sourceId>
+		<destinationId>t_delete</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a4</id>
+		<type>regular</type>
+		<sourceId>t_delete</sourceId>
+		<destinationId>p3</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a5</id>
+		<type>regular</type>
+		<sourceId>p2</sourceId>
+		<destinationId>t_update</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a6</id>
+		<type>regular</type>
+		<sourceId>t_update</sourceId>
+		<destinationId>p2</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a7</id>
+		<type>read</type>
+		<sourceId>p2</sourceId>
+		<destinationId>t_read</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a9</id>
+		<type>regular</type>
+		<sourceId>t_add_item</sourceId>
+		<destinationId>p4</destinationId>
+		<multiplicity>0</multiplicity>
+		<reference>is_more_item_addition</reference>
+	</arc>
+	<arc>
+		<id>a10</id>
+		<type>regular</type>
+		<sourceId>p4</sourceId>
+		<destinationId>t_finish_processing</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a14</id>
+		<type>read</type>
+		<sourceId>p2</sourceId>
+		<destinationId>t_view_items</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a20</id>
+		<type>regular</type>
+		<sourceId>t_create</sourceId>
+		<destinationId>p5</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a21</id>
+		<type>regular</type>
+		<sourceId>p5</sourceId>
+		<destinationId>t_add_item</destinationId>
+		<multiplicity>1</multiplicity>
+		<breakPoint><x>380</x><y>140</y></breakPoint>
+	</arc>
+	<arc>
+		<id>a22</id>
+		<type>regular</type>
+		<sourceId>t_add_item</sourceId>
+		<destinationId>p5</destinationId>
+		<multiplicity>0</multiplicity>
+		<reference>is_one_item_addition</reference>
+		<breakPoint><x>460</x><y>140</y></breakPoint>
+	</arc>
+	<arc>
+		<id>a23</id>
+		<type>regular</type>
+		<sourceId>t_finish_processing</sourceId>
+		<destinationId>p5</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+</document>

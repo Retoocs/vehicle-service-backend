@@ -1,0 +1,627 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://netgrif.github.io/petriflow/petriflow.schema.xsd">
+	<id>main_enum_addresses</id>
+	<initials>MEA</initials>
+	<title>Main enumeration addresses</title>
+	<defaultRole>true</defaultRole>
+	<transitionRole>false</transitionRole>
+	<role>
+		<id>system</id>
+		<title>System</title>
+	</role>
+	<role>
+		<id>admin</id>
+		<title>Admin</title>
+	</role>
+	<roleRef>
+		<id>system</id>
+		<caseLogic>
+			<create>true</create>
+			<delete>true</delete>
+		</caseLogic>
+	</roleRef>
+	<!-- TRANSACTIONS -->
+	<!-- ROLES -->
+	<!-- PROCESS ROLE REFS -->
+	<!-- PROCESS USER REFS -->
+	<!-- DATA -->
+	<data type="file">
+		<id>import_file</id>
+		<title name="import_file">Import a CSV file</title>
+	</data>
+	<data type="enumeration_map">
+		<id>system_cities</id>
+		<title>system_cities</title>
+	</data>
+	<data type="enumeration_map">
+		<id>system_streets</id>
+		<title>system_streets</title>
+	</data>
+	<data type="number">
+		<id>child_enumeration</id>
+		<title name="child_enumeration">Child enumerations</title>
+		<desc name="child_enumeration_desc">Number of requests processed</desc>
+		<init>0</init>
+		<action trigger="get">
+			child_enumeration: f.child_enumeration;
+			def cases = findCases( {it.processIdentifier.eq("child_enum_addresses")} )
+			change child_enumeration value { return cases?.size(); }
+		</action>
+	</data>
+	<data type="text">
+		<id>status</id>
+		<title name="status">Status</title>
+	</data>
+	<data type="dateTime">
+		<id>initialization_date</id>
+		<title name="initialization_date">Initialization date</title>
+	</data>
+	<data type="dateTime">
+		<id>last_imported_file</id>
+		<title name="last_imported_file">Date of last change</title>
+		<desc name="last_imported_file_desc">Date when last import has been made</desc>
+	</data>
+	<data type="multichoice_map">
+		<id>system_child_enums</id>
+		<title>System Child Enums</title>
+	</data>
+	<data type="boolean">
+		<id>check_all</id>
+		<title>Check all</title>
+		<init>false</init>
+	</data>
+	<!-- I18NS -->
+	<i18n locale="sk">
+		<i18nString name="import_file">Vlož CSV súbor</i18nString>
+		<i18nString name="status">Stav</i18nString>
+		<i18nString name="initialization_date">Dátum inicializácie inštancie</i18nString>
+		<i18nString name="last_imported_file">Dátum poslednej zmeny</i18nString>
+		<i18nString name="last_imported_file_desc">Dátum kedy bolo posledné vloženie vykonané</i18nString>
+		<i18nString name="child_enumeration">Detské enumerácie</i18nString>
+		<i18nString name="child_enumeration_desc">Počet detských enumerácií</i18nString>
+		<i18nString name="t_import">Vlož súbor</i18nString>
+		<i18nString name="t_status">Pozri stav</i18nString>
+	</i18n>
+	<i18n locale="de">
+		<i18nString name="import_file">Eine CSV Datei einfügen</i18nString>
+		<i18nString name="status">Status</i18nString>
+		<i18nString name="initialization_date">Datum der Instanzinitialisierung</i18nString>
+		<i18nString name="last_imported_file">Datum der letzten Änderung</i18nString>
+		<i18nString name="last_imported_file_desc">Datum des letzten Imports</i18nString>
+		<i18nString name="child_enumeration">Untergeordnete Aufzählungen</i18nString>
+		<i18nString name="child_enumeration_desc">Anzahl untergeordneter Aufzählungen</i18nString>
+		<i18nString name="t_import">Datei einfügen</i18nString>
+		<i18nString name="t_status">Status ansehen</i18nString>
+	</i18n>
+	<!-- TRANSITIONS -->
+	<transition>
+		<id>t_status</id>
+		<x>300</x>
+		<y>620</y>
+		<layout>
+			<offset>0</offset>
+		</layout>
+		<label name="t_status"> Check status</label>
+		<roleRef>
+			<id>admin</id>
+			<logic>
+				<perform>true</perform>
+			</logic>
+		</roleRef>
+		<dataGroup>
+			<id>DataGroup</id>
+			<stretch>true</stretch>
+			<dataRef>
+				<id>child_enumeration</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+			</dataRef>
+			<dataRef>
+				<id>status</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+			</dataRef>
+			<dataRef>
+				<id>initialization_date</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+			</dataRef>
+			<dataRef>
+				<id>last_imported_file</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+			</dataRef>
+		</dataGroup>
+		<event type="cancel">
+			<title></title>
+		</event>
+		<event type="assign">
+			<title></title>
+		</event>
+		<event type="finish">
+			<title></title>
+		</event>
+		<event type="delegate">
+			<title></title>
+		</event>
+	</transition>
+	<transition>
+		<id>t_distribute_data</id>
+		<x>660</x>
+		<y>620</y>
+		<layout>
+			<offset>0</offset>
+		</layout>
+		<label>Distribute data [auto]</label>
+		<roleRef>
+			<id>system</id>
+			<logic>
+				<perform>true</perform>
+			</logic>
+		</roleRef>
+		<trigger type="auto"/>
+		<event type="assign">
+			<id>0</id>
+			<actions phase="post">
+				<action>
+					system_cities: f.system_cities,
+					system_streets: f.system_streets;
+
+					def childEnums = findCases( {it.processIdentifier.eq("child_enum_addresses")} )
+					if(childEnums == null)
+						return
+
+					for(caze in childEnums){
+						caze.dataSet.get("cities")?.options = system_cities.options
+						caze.dataSet.get("system_streets")?.options = system_streets.options
+						workflowService.save(caze)
+					}
+				</action>
+			</actions>
+		</event>
+	</transition>
+	<transition>
+		<id>t_process_import</id>
+		<x>1100</x>
+		<y>620</y>
+		<layout>
+			<offset>0</offset>
+		</layout>
+		<label>Process the import [auto]</label>
+		<roleRef>
+			<id>system</id>
+			<logic>
+				<perform>true</perform>
+			</logic>
+		</roleRef>
+		<trigger type="auto"/>
+		<event type="assign">
+			<id>0</id>
+			<actions phase="pre">
+				<action>
+					status: f.status;
+					change status value {"Processing in progress"; }
+				</action>
+			</actions>
+			<actions phase="post">
+				<action>
+					// todo: file processing here (call ActionDelegate function)
+				</action>
+			</actions>
+		</event>
+		<event type="finish">
+			<id>t_process_import_finish</id>
+			<actions phase="post">
+				<action>
+					status: f.status;
+					change status value { "Import processed"; }
+				</action>
+				<action>
+					last_imported_file: f.last_imported_file;
+					change last_imported_file value { java.time.LocalDateTime.now(); }
+				</action>
+			</actions>
+		</event>
+	</transition>
+	<transition>
+		<id>t_init</id>
+		<x>460</x>
+		<y>420</y>
+		<layout>
+			<offset>0</offset>
+		</layout>
+		<label>Initialize [auto]</label>
+		<roleRef>
+			<id>system</id>
+			<logic>
+				<perform>true</perform>
+			</logic>
+		</roleRef>
+		<trigger type="auto"/>
+		<event type="assign">
+			<id>t_init_assign</id>
+			<actions phase="post">
+				<action>
+					system_cities: f.system_cities,
+					system_streets: f.system_streets;
+
+					changeCaseProperty "title" about { "Addresses enumeration – importing data" }
+					setAddresses(system_cities, system_streets);
+				</action>
+			</actions>
+		</event>
+		<event type="finish">
+			<id>t_init_finish</id>
+			<actions phase="post">
+				<action>initialization_date: f.initialization_date,
+					status: f.status;
+
+					change initialization_date value {  java.time.LocalDateTime.now();}
+					change status value { "Created"; }
+				</action>
+			</actions>
+		</event>
+	</transition>
+	<transition>
+		<id>t_import</id>
+		<x>860</x>
+		<y>420</y>
+		<layout>
+			<offset>0</offset>
+		</layout>
+		<label>Import data</label>
+		<roleRef>
+			<id>admin</id>
+			<logic>
+				<perform>true</perform>
+			</logic>
+		</roleRef>
+		<assignPolicy>auto</assignPolicy>
+		<dataGroup>
+			<id>dg1</id>
+			<stretch>true</stretch>
+			<dataRef>
+				<id>import_file</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+			</dataRef>
+		</dataGroup>
+		<event type="finish">
+			<id>0</id>
+			<actions phase="pre">
+				<action>
+					file: f.import_file,
+					system_cities: f.system_cities,
+					system_streets: f.system_streets;
+
+					if (!setAddresses(system_cities, system_streets, file.value.path)){
+						throw new IllegalArgumentException("File is not in correct format!")
+					}
+
+				</action>
+			</actions>
+			<actions phase="post">
+				<action>
+					last_import_date: f.last_imported_file;
+					change last_import_date value { java.time.LocalDateTime.now(); }
+				</action>
+				<action>
+					status: f.status;
+					change status value { "File is imported"; }
+				</action>
+			</actions>
+		</event>
+	</transition>
+	<transition>
+		<id>t_redistribute_data</id>
+		<x>580</x>
+		<y>300</y>
+		<layout>
+			<offset>0</offset>
+		</layout>
+		<label>Redistribute_data</label>
+		<roleRef>
+			<id>admin</id>
+			<logic>
+				<perform>true</perform>
+			</logic>
+		</roleRef>
+		<assignPolicy>auto</assignPolicy>
+		<dataGroup>
+			<id>DataGroup</id>
+			<layout>grid</layout>
+			<dataRef>
+				<id>system_child_enums</id>
+				<logic>
+					<behavior>editable</behavior>
+					<action trigger="set">
+						system_child_enums: f.system_child_enums,check_all: f.check_all;
+
+						if(system_child_enums.value.size() != system_child_enums.options.size() &amp;&amp; check_all.value)
+							change check_all value { false }
+						else if(system_child_enums.value.size() == system_child_enums.options.size() &amp;&amp; !check_all.value)
+							change check_all value { true }
+					</action>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>3</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>check_all</id>
+				<logic>
+					<behavior>editable</behavior>
+					<action trigger="get">thisTrans: t.t_redistribute_data,
+						system_child_enums: f.system_child_enums;
+						make system_child_enums,visible on thisTrans when { system_child_enums.options == null || system_child_enums.options == [:] }
+					</action>
+					<action trigger="set">
+						system_child_enums: f.system_child_enums,
+						check_all: f.check_all;
+
+						if(check_all.value)
+							change system_child_enums value { system_child_enums.options.collect{ it.key } }
+						else if(system_child_enums.value.size() == system_child_enums.options.size())
+							change system_child_enums value { [] }
+					</action>
+				</logic>
+				<layout>
+					<x>3</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance></appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
+		<event type="assign">
+			<id>redistribute_data_assign</id>
+			<actions phase="pre">
+				<action>
+					system_child_enums: f.system_child_enums,
+					system_cities: f.system_cities,
+					system_streets: f.system_streets;
+
+					def childCases = findCases( {it.processIdentifier.eq("child_enum_addresses")} )
+					if(childCases == null)
+						return
+					def tmpMap = [:]
+
+					change system_child_enums value { null }
+					change system_child_enums options { [] }
+
+					for(childCase in childCases){
+						tmpMap = tmpMap + [ (childCase.stringId) : childCase.title ]
+					}
+					change system_child_enums options { tmpMap }
+
+				</action>
+			</actions>
+		</event>
+		<event type="cancel">
+			<id>redistribute_data_cancel</id>
+			<actions phase="post">
+				<action>
+					check_all: f.check_all,
+					system_child_enums: f.system_child_enums;
+
+					change system_child_enums value { null }
+					change system_child_enums options { [] }
+					change check_all value { false }
+				</action>
+			</actions>
+		</event>
+	</transition>
+	<transition>
+		<id>t_process_selection</id>
+		<x>740</x>
+		<y>300</y>
+		<layout>
+			<offset>0</offset>
+		</layout>
+		<label>Process_the_selection [auto]</label>
+		<roleRef>
+			<id>system</id>
+			<logic>
+				<perform>true</perform>
+			</logic>
+		</roleRef>
+		<trigger type="auto"/>
+		<event type="assign">
+			<id>t_process_selection_assign</id>
+			<actions phase="post">
+				<action>
+					system_cities: f.system_cities,
+					system_streets: f.system_streets,
+					system_child_enums: f.system_child_enums;
+
+					for ( child in system_child_enums.value ) {
+						def childCase = findCase( {it._id.eq(child)} );
+
+						if(childCase == null)
+							continue
+
+						childCase.dataSet.get("system_streets").options = system_streets.options
+						childCase.dataSet.get("cities").options = system_cities.options
+
+						workflowService.save(childCase)
+					}
+				</action>
+			</actions>
+		</event>
+		<event type="finish">
+			<id>t_process_selection_finish</id>
+			<actions phase="post">
+				<action>
+					check_all: f.check_all,
+					system_child_enums: f.system_child_enums;
+
+					change system_child_enums value { null }
+					change system_child_enums options { [] }
+					change check_all value { false }
+				</action>
+			</actions>
+		</event>
+	</transition>
+	<!-- PLACES -->
+	<place>
+		<id>p6</id>
+		<x>460</x>
+		<y>620</y>
+		<label>created</label>
+		<tokens>0</tokens>
+		<static>false</static>
+	</place>
+	<place>
+		<id>p4</id>
+		<x>860</x>
+		<y>620</y>
+		<label>Import processed</label>
+		<tokens>0</tokens>
+		<static>false</static>
+	</place>
+	<place>
+		<id>p3</id>
+		<x>1100</x>
+		<y>420</y>
+		<label></label>
+		<tokens>0</tokens>
+		<static>false</static>
+	</place>
+	<place>
+		<id>p2</id>
+		<x>660</x>
+		<y>420</y>
+		<label>initialized</label>
+		<tokens>0</tokens>
+		<static>false</static>
+	</place>
+	<place>
+		<id>p1</id>
+		<x>300</x>
+		<y>420</y>
+		<label>uninitialized</label>
+		<tokens>1</tokens>
+		<static>false</static>
+	</place>
+	<place>
+		<id>p7</id>
+		<x>660</x>
+		<y>220</y>
+		<label></label>
+		<tokens>0</tokens>
+		<static>false</static>
+	</place>
+	<!-- ARCS -->
+	<arc>
+		<id>a1</id>
+		<type>regular</type>
+		<sourceId>p1</sourceId>
+		<destinationId>t_init</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a2</id>
+		<type>regular</type>
+		<sourceId>t_init</sourceId>
+		<destinationId>p2</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a5</id>
+		<type>regular</type>
+		<sourceId>p3</sourceId>
+		<destinationId>t_process_import</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a6</id>
+		<type>regular</type>
+		<sourceId>t_process_import</sourceId>
+		<destinationId>p4</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a7</id>
+		<type>regular</type>
+		<sourceId>p4</sourceId>
+		<destinationId>t_distribute_data</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a8</id>
+		<type>regular</type>
+		<sourceId>t_distribute_data</sourceId>
+		<destinationId>p2</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a10</id>
+		<type>regular</type>
+		<sourceId>t_init</sourceId>
+		<destinationId>p6</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a13</id>
+		<type>read</type>
+		<sourceId>p6</sourceId>
+		<destinationId>t_status</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a18</id>
+		<type>regular</type>
+		<sourceId>p2</sourceId>
+		<destinationId>t_import</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a19</id>
+		<type>regular</type>
+		<sourceId>t_import</sourceId>
+		<destinationId>p3</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a24</id>
+		<type>regular</type>
+		<sourceId>p2</sourceId>
+		<destinationId>t_redistribute_data</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a25</id>
+		<type>regular</type>
+		<sourceId>t_redistribute_data</sourceId>
+		<destinationId>p7</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a26</id>
+		<type>regular</type>
+		<sourceId>p7</sourceId>
+		<destinationId>t_process_selection</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a27</id>
+		<type>regular</type>
+		<sourceId>t_process_selection</sourceId>
+		<destinationId>p2</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+</document>

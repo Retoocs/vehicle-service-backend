@@ -1,0 +1,290 @@
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  namespace: autoservis
+  name: upload-files-pv-claim
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  namespace: autoservis
+  name: log-pv-claim
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 0.5Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  namespace: autoservis
+  name: mongo-pv-claim
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  namespace: autoservis
+  name: elastic-pv-claim
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: autoservis
+  name: elastic-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      cdk8s.deployment: elastic-deployment-template
+  template:
+    metadata:
+      namespace: autoservis
+      labels:
+        cdk8s.deployment: elastic-deployment-template
+    spec:
+      securityContext:
+        fsGroup: 1000
+      containers:
+        - env:
+            - name: node.name
+              value: elasticsearch
+            - name: cluster.name
+              value: elasticsearch
+            - name: discovery.type
+              value: single-node
+            - name: thread_pool.search.size
+              value: "30"
+            - name: thread_pool.search.queue_size
+              value: "2000"
+            - name: thread_pool.search.min_queue_size
+              value: "10"
+            - name: thread_pool.search.max_queue_size
+              value: "5000"
+          ports:
+            - containerPort: 9300
+            - containerPort: 9200
+          image: elasticsearch:7.10.1
+          imagePullPolicy: Always
+          name: elastic-pod
+          volumeMounts:
+            - name: elastic-storage
+              mountPath: /usr/share/elasticsearch/data
+      volumes:
+        - name: elastic-storage
+          persistentVolumeClaim:
+            claimName: elastic-pv-claim
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: autoservis
+  name: elastic-service
+spec:
+  ports:
+    - port: 9300
+      name: cluster
+    - port: 9200
+      name: bash
+  selector:
+    cdk8s.deployment: elastic-deployment-template
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: autoservis
+  name: mongo-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      cdk8s.deployment: mongo-deployment-template
+  template:
+    metadata:
+      namespace: autoservis
+      labels:
+        cdk8s.deployment: mongo-deployment-template
+    spec:
+      containers:
+        - image: mongo:4.4
+          imagePullPolicy: Always
+          name: mongo-pod
+          ports:
+            - containerPort: 27017
+          volumeMounts:
+            - name: mongo-storage
+              mountPath: /data/db
+      volumes:
+        - name: mongo-storage
+          persistentVolumeClaim:
+            claimName: mongo-pv-claim
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: autoservis
+  name: mongo-service
+spec:
+  ports:
+    - port: 27017
+      targetPort: 27017
+  selector:
+    cdk8s.deployment: mongo-deployment-template
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: autoservis
+  name: redis-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      cdk8s.deployment: redis-deployment-template
+  template:
+    metadata:
+      namespace: autoservis
+      labels:
+        cdk8s.deployment: redis-deployment-template
+    spec:
+      containers:
+        - image: redis:6
+          imagePullPolicy: Always
+          name: redis-pod
+          ports:
+            - containerPort: 6379
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: autoservis
+  name: redis-service
+spec:
+  ports:
+    - port: 6379
+      targetPort: 6379
+  selector:
+    cdk8s.deployment: redis-deployment-template
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: autoservis
+  name: vehicle-service-backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      cdk8s.deployment: vehicle-service-backend-template
+  template:
+    metadata:
+      namespace: autoservis
+      labels:
+        cdk8s.deployment: vehicle-service-backend-template
+    spec:
+      containers:
+        - command: [ ]
+          env:
+            - name: spring.data.mongodb.uri
+              value: mongodb://mongo-service:27017
+            - name: spring.data.elasticsearch.url
+              value: elastic-service
+            - name: spring.session.redis.host
+              value: redis-service
+            - name: spring.jpa.hibernate.naming.physical-strategy
+              value: com.netgrif.workflow.configuration.HibernateNamingStrategy
+            - name: nae.security.jwt.private-key
+              value: file:src/main/resources/certificates/private.der
+            - name: nae.mail.redirect-to.port
+              value: 
+            - name: nae.mail.redirect-to.host
+              value: autoservis.bawix.xyz
+          image: timakprojekt/vehicle-service-backend:1.0.0
+          imagePullPolicy: Always
+          name: vehicle-service-backend-pod
+          ports:
+            - containerPort: 8080
+          volumeMounts:
+            - name: upload-files-storage
+              mountPath: /storage
+            - name: log-storage
+              mountPath: /log
+      volumes:
+        - name: upload-files-storage
+          persistentVolumeClaim:
+            claimName: upload-files-pv-claim
+        - name: log-storage
+          persistentVolumeClaim:
+            claimName: log-pv-claim
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: autoservis
+  name: vehicle-service-backend-service
+spec:
+  externalIPs: [ ]
+  ports:
+    - port: 80
+      targetPort: 8080
+  selector:
+    cdk8s.deployment: vehicle-service-backend-template	
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: autoservis
+  name: vehicle-service-frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      cdk8s.deployment: vehicle-service-frontend-template
+  template:
+    metadata:
+      namespace: autoservis
+      labels:
+        cdk8s.deployment: vehicle-service-frontend-template
+    spec:
+      containers:
+        - command: [ ]
+          image: timakprojekt/vehicle-service-frontend:1.0.0
+          imagePullPolicy: Always
+          name: vehicle-service-frontend-pod
+          ports:
+            - containerPort: 80
+          volumeMounts: [ ]
+      volumes: [ ]
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: autoservis
+  name: vehicle-service-frontend-service
+spec:
+  externalIPs: [ ]
+  ports:
+    - port: 80
+      targetPort: 80
+  selector:
+    cdk8s.deployment: vehicle-service-frontend-template

@@ -1,0 +1,2793 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://netgrif.github.io/petriflow/petriflow.schema.xsd">
+    <id>repair</id>
+    <initials>RPR</initials>
+    <title name="case_title">Repair</title>
+    <defaultRole>true</defaultRole>
+    <transitionRole>false</transitionRole>
+    <caseName name="case_title">Repair</caseName>
+    <role>
+        <id>system</id>
+        <title>System</title>
+    </role>
+    <role>
+        <id>admin</id>
+        <title>Admin</title>
+    </role>
+    <role>
+        <id>mechanic</id>
+        <title>Mechanic</title>
+    </role>
+    <role>
+        <id>anonym</id>
+        <title>Anonym</title>
+    </role>
+    <role>
+        <id>otherworker</id>
+        <title>Other Worker</title>
+    </role>
+    <roleRef>
+        <id>system</id>
+        <caseLogic>
+            <create>true</create>
+            <delete>true</delete>
+            <view>true</view>
+        </caseLogic>
+    </roleRef>
+    <roleRef>
+        <id>admin</id>
+        <caseLogic>
+            <create>true</create>
+            <delete>true</delete>
+            <view>true</view>
+        </caseLogic>
+    </roleRef>
+    <roleRef>
+        <id>mechanic</id>
+        <caseLogic>
+            <create>true</create>
+            <view>true</view>
+        </caseLogic>
+    </roleRef>
+    <roleRef>
+        <id>otherworker</id>
+        <caseLogic>
+            <create>true</create>
+            <view>true</view>
+        </caseLogic>
+    </roleRef>
+    <caseEvents>
+        <event type="delete">
+            <id>case_delete</id>
+            <actions phase="pre">
+                <action>
+                    creation_new_vehicle_taskref: f.creation_new_vehicle_taskref,
+                    creation_new_customer_taskref: f.creation_new_customer_taskref;
+
+                    //Creation of new vehicle is open
+                    if ((creation_new_vehicle_taskref.value != null).and(creation_new_vehicle_taskref.value != [])) {
+                        clear_and_cancel_taskref(creation_new_vehicle_taskref)
+                    }
+
+                    //Creation of new customer is open
+                    if ((creation_new_customer_taskref.value != null).and(creation_new_customer_taskref.value != [])) {
+                        clear_and_cancel_taskref(creation_new_customer_taskref)
+                    }
+                </action>
+            </actions>
+        </event>
+    </caseEvents>
+    <!-- FUNCTIONS -->
+    <function scope="process" name="clear_and_cancel_taskref">
+        { aTaskref ->
+            def toCancel  = findTask( {it._id.eq(aTaskref.value.first())} )
+            if(toCancel == null)
+                return
+            cancelTask(toCancel)
+            change aTaskref value { [] }
+        }
+    </function>
+    <!-- TRANSACTIONS -->
+    <!-- ROLES -->
+    <!-- PROCESS ROLE REFS -->
+    <!-- PROCESS USER REFS -->
+    <!-- DATA -->
+    <data type="number">
+        <id>is_extern</id>
+        <title>To [extern]</title>
+        <init>0</init>
+    </data>
+    <data type="number">
+        <id>is_intern</id>
+        <title>To [intern]</title>
+        <init>0</init>
+    </data>
+    <data type="enumeration_map">
+        <id>vehicles</id>
+        <title name="vehicles">Vehicles</title>
+        <desc name="vehicles_desc">Find the vehicle via plate number</desc>
+        <view>
+            <autocomplete/>
+        </view>
+    </data>
+    <data type="enumeration_map">
+        <id>customers</id>
+        <title name="customers">Customers</title>
+        <desc name="customers_desc">Find the customer by name or company</desc>
+        <view>
+            <autocomplete/>
+        </view>
+    </data>
+    <data type="text">
+        <id>description</id>
+        <title name="description">Description</title>
+        <valid>minLength 2</valid>
+        <component>
+            <name>area</name>
+        </component>
+    </data>
+    <data type="enumeration_map" immediate="true">
+        <id>priority</id>
+        <title name="priority">Priority</title>
+        <options>
+            <option key="low" name="priority_small">Small</option>
+            <option key="medium" name="priority_medium">Medium</option>
+            <option key="high" name="priority_high">High</option>
+        </options>
+        <init>medium</init>
+    </data>
+    <data type="text">
+        <id>selected_vehicle_id</id>
+        <title>selected_vehicle_id</title>
+        <action trigger="set">
+            selected_vehicle_id: f.selected_vehicle_id,
+            selected_vehicle_title: f.selected_vehicle_title;
+
+            if(selected_vehicle_id.value == null)
+                return
+
+            def aCase = workflowService.findOne(selected_vehicle_id.value)
+            if(aCase == null)
+                return
+
+            def title = aCase.dataSet['manufacturer'].value + " " + aCase.dataSet['model'].value
+
+            change selected_vehicle_title value { title }
+        </action>
+    </data>
+    <data type="text" immediate="true">
+        <id>selected_vehicle_title</id>
+        <title name="selected_vehicle_title">Vehicle</title>
+    </data>
+    <data type="text">
+        <id>selected_customer_id</id>
+        <title>selected_customer_id</title>
+        <action trigger="set">
+            selected_customer_id: f.selected_customer_id,
+            selected_customer_title: f.selected_customer_title;
+
+            if(selected_vehicle_id.value == null)
+                return
+
+            def aCase = workflowService.findOne(selected_customer_id.value)
+            if(aCase == null)
+                return
+
+            def title
+            if(aCase.dataSet['natural_legal_person'].value){
+                title = aCase.dataSet['name'].value + " " + aCase.dataSet['surname'].value
+            }
+            else {
+                title = aCase.dataSet['company_name'].value
+            }
+
+            change selected_customer_title value { title }
+        </action>
+    </data>
+    <data type="text" immediate="true">
+        <id>selected_customer_title</id>
+        <title name="selected_customer_title">Customer</title>
+    </data>
+    <data type="number">
+        <id>val_deny</id>
+        <title>To [denied]</title>
+        <init>0</init>
+    </data>
+    <data type="number">
+        <id>val_accept</id>
+        <title>To [validated]</title>
+        <init>0</init>
+    </data>
+    <data type="boolean">
+        <id>creation_new_vehicle</id>
+        <title name="creation_new_vehicle">Create a new vehicle record?</title>
+    </data>
+    <data type="boolean">
+        <id>creation_new_customer</id>
+        <title name="creation_new_customer">Create a new customer record?</title>
+    </data>
+    <data type="taskRef">
+        <id>creation_new_vehicle_taskref</id>
+        <title>creation_new_vehicle_taskref</title>
+    </data>
+    <data type="taskRef">
+        <id>creation_new_customer_taskref</id>
+        <title>creation_new_customer_taskref</title>
+    </data>
+    <data type="text">
+        <id>info_text_new_vehicle</id>
+        <title name="info_text_new_vehicle">Fill the fields below to create a new vehicle and use it in this repair.</title>
+        <valid>minLength 2</valid>
+    </data>
+    <data type="text">
+        <id>info_text_new_customer</id>
+        <title name="info_text_new_customer">Fill the fields below to create a new customer and use it in this repair.</title>
+        <valid>minLength 2</valid>
+    </data>
+    <data type="enumeration_map" immediate="true">
+        <id>status</id>
+        <title name="status">Status</title>
+        <options>
+            <option key="not_started" name="status_not_started">Not started</option>
+            <option key="started" name="status_started">Started</option>
+            <option key="finished" name="status_finished">Finished</option>
+        </options>
+        <view>
+            <autocomplete/>
+        </view>
+        <init>not_started</init>
+    </data>
+    <data type="boolean">
+        <id>is_finished</id>
+        <title name="is_finished">Is Finished</title>
+        <init>false</init>
+    </data>
+    <data type="enumeration_map">
+        <id>public_status_extern_text</id>
+        <title name="status">Status</title>
+        <options>
+            <option key="sent" name="sent">Request sent</option>
+            <option key="accepted" name="accepted">Request accepted</option>
+            <option key="denied" name="denied">Request denied</option>
+            <option key="started" name="started">Started</option>
+            <option key="finished" name="finished">Finished</option>
+        </options>
+        <view>
+            <autocomplete/>
+        </view>
+        <init>not_started</init>
+    </data>
+    <data type="button">
+        <id>public_remove_1</id>
+        <title name="remove_from_warehouse_1">Remove</title>
+    </data>
+    <data type="button">
+        <id>public_remove_2</id>
+        <title name="remove_from_warehouse_2">Approve removal</title>
+    </data>
+    <data type="button">
+        <id>public_remove_3</id>
+        <title name="remove_from_warehouse_3">Click on finish to accept removal</title>
+    </data>
+    <data type="boolean">
+        <id>public_natural_legal_person</id>
+        <title name="natural_legal_person">Natural P. - Legal P.</title>
+        <init>false</init>
+    </data>
+    <data type="text" immediate="true">
+        <id>public_name</id>
+        <title name="name">Name</title>
+        <valid>minLength 2</valid>
+    </data>
+    <data type="text" immediate="true">
+        <id>public_surname</id>
+        <title name="surname">Surname</title>
+        <valid>minLength 2</valid>
+    </data>
+    <data type="text" immediate="true">
+        <id>public_company_name</id>
+        <title name="company_name">Company name</title>
+        <valid>minLength 2</valid>
+    </data>
+    <data type="text">
+        <id>public_phone</id>
+        <title name="phone_number">Phone number</title>
+        <valid>regex("^\+?[0-9]{7,14}$")</valid>
+    </data>
+    <data type="text">
+        <id>public_mail</id>
+        <title name="email">E-mail</title>
+        <valid>email</valid>
+    </data>
+    <data type="text">
+        <id>public_businessID</id>
+        <title name="businessID">Business ID</title>
+    </data>
+    <data type="text">
+        <id>public_taxID</id>
+        <title name="taxID">Tax ID</title>
+    </data>
+    <data type="text">
+        <id>public_manufacturer</id>
+        <title name="manufacturer">Manufacturer</title>
+    </data>
+    <data type="text">
+        <id>public_licenseNumber</id>
+        <title name="licenceNumber">License number</title>
+        <valid>regex("^[0-9a-zA-Z]{4,9}$")</valid>
+    </data>
+    <data type="text">
+        <id>public_model</id>
+        <title name="model">Model</title>
+    </data>
+    <data type="number">
+        <id>public_manufactureYear</id>
+        <title name="manufactureYear">Manufacture Year</title>
+        <validations>
+            <validation>
+                <expression>inrange 1900,2100</expression>
+                <message name="manufactureYear_valid">Must be greater or even than 1900</message>
+            </validation>
+        </validations>
+        <valid>regex("^(19|[2-9][0-9])\d{2}$")</valid>
+    </data>
+    <data type="text">
+        <id>public_description</id>
+        <title name="problem_description">Problem description</title>
+        <valid>minLength 2</valid>
+        <component>
+            <name>area</name>
+        </component>
+    </data>
+    <data type="boolean">
+        <id>public_remove_check</id>
+        <title/>
+        <init>false</init>
+    </data>
+    <data type="enumeration_map">
+        <id>warehouses</id>
+        <title name="warehouses">Warehouses</title>
+    </data>
+    <data type="enumeration_map">
+        <id>warehouses_for_removal</id>
+        <title name="warehouses_for_removal">Select destination warehouse</title>
+    </data>
+    <data type="multichoice_map">
+        <id>warehouse_items</id>
+        <title name="warehouse_items">Warehouse items</title>
+    </data>
+    <data type="enumeration">
+        <id>repair_items</id>
+        <title name="repair_items">Repair items</title>
+    </data>
+    <data type="multichoice_map">
+        <id>repair_items_for_removal</id>
+        <title name="repair_items_for_removal">Repaired items for removal</title>
+    </data>
+    <data type="taskRef">
+        <id>selected_wi_taskref</id>
+        <title>selected_wi_taskref</title>
+    </data>
+    <data type="taskRef">
+        <id>selected_ri_taskref</id>
+        <title>selected_ri_taskref</title>
+    </data>
+    <data type="enumeration">
+        <id>OENumbers</id>
+        <title>OENumbers</title>
+    </data>
+    <data type="taskRef">
+        <id>create_extern_taskref</id>
+        <title/>
+        <init>t25</init>
+    </data>
+    <data type="enumeration">
+        <id>approve_extern_repair</id>
+        <title/>
+        <options>
+            <option name="apply" key="apply">Apply</option>
+            <option name="deny" key="deny">Deny</option>
+        </options>
+        <init>apply</init>
+    </data>
+    <data type="taskRef">
+        <id>complex_creation_taskref</id>
+        <title/>
+        <init>t26</init>
+    </data>
+    <!-- I18NS -->
+    <i18n locale="sk">
+        <i18nString name="case_title">Oprava</i18nString>
+        <i18nString name="vehicles">Vozidlá</i18nString>
+        <i18nString name="vehicles_desc">Nájdi vozidlo pomocou EČV</i18nString>
+        <i18nString name="description">Popis</i18nString>
+        <i18nString name="priority">Priorita</i18nString>
+        <i18nString name="priority_small">Malá</i18nString>
+        <i18nString name="priority_medium">Stredná</i18nString>
+        <i18nString name="priority_high">Veľká</i18nString>
+        <i18nString name="t_quick_create">Rýchle vytvorenie opravy</i18nString>
+        <i18nString name="info_text_new_vehicle">Vypľňte polia nižšie. Tým si vytvorí nový záznam vozidla a zároveň sa vloží do tejto opravy.</i18nString>
+        <i18nString name="info_text_new_customer">Vypľňte polia nižšie. Tým si vytvorí nový záznam zákazníka a zároveň sa vloží do tejto opravy.</i18nString>
+        <i18nString name="customers">Zákazníci</i18nString>
+        <i18nString name="customers_desc">Nájdite zákaznika pomocou mena alebo názvu spoločnosti</i18nString>
+        <i18nString name="creation_new_vehicle">Želáte si vytvoriť nový záznam vozidla?</i18nString>
+        <i18nString name="creation_new_customer">Želáte si vytvoriť nový záznam zákazníka?</i18nString>
+        <i18nString name="t_complex_creation">Podrobnejšie vytvorenie opravy</i18nString>
+        <i18nString name="t_complex_creation_vehicle_part">Vozidlo</i18nString>
+        <i18nString name="t_complex_creation_customer_part">Zákazník</i18nString>
+        <i18nString name="t_complex_creation_other_part">Popis problému</i18nString>
+        <i18nString name="status">Stav</i18nString>
+        <i18nString name="status_not_started">Nezačatá</i18nString>
+        <i18nString name="status_started">Začatá</i18nString>
+        <i18nString name="status_finished">Hotová</i18nString>
+        <i18nString name="is_finished">Je hotová</i18nString>
+        <i18nString name="t_view_and_control">Zobraziť a spravovať</i18nString>
+        <i18nString name="t_reopen_repair">Znovu otvoriť</i18nString>
+        <i18nString name="name">Meno</i18nString>
+        <i18nString name="surname">Priezvisko</i18nString>
+        <i18nString name="company_mane">Názov firmy</i18nString>
+        <i18nString name="email">E-mail</i18nString>
+        <i18nString name="businessID">IČO</i18nString>
+        <i18nString name="taxID">DIČO</i18nString>
+        <i18nString name="phone_number">Telefónne číslo</i18nString>
+        <i18nString name="status">Stav</i18nString>
+        <i18nString name="natural_legal_person">Fyzic. O - Právn. O</i18nString>
+        <i18nString name="manufacturer">Výrobca</i18nString>
+        <i18nString name="licenceNumber">EČV</i18nString>
+        <i18nString name="model">Model</i18nString>
+        <i18nString name="manufactureYear">Rok výroby</i18nString>
+        <i18nString name="problem_description">Popis chyby</i18nString>
+        <i18nString name="remove_from_warehouse_1">Vymazať</i18nString>
+        <i18nString name="remove_from_warehouse_2">Potvrdiť vymazanie</i18nString>
+        <i18nString name="remove_from_warehouse_3">Kliknite na dokončiť pre vymazanie žiadosti</i18nString>
+        <i18nString name="repair_items_for_removal">Opravené položky na odstránenie</i18nString>
+        <i18nString name="repair_items">Položky na opravu</i18nString>
+        <i18nString name="warehouse_items">Položky skladu</i18nString>
+        <i18nString name="warehouses_for_removal">Vyberte cieľový sklad</i18nString>
+        <i18nString name="warehouses">Sklady</i18nString>
+        <i18nString name="company_name">Názov firmy</i18nString>
+        <i18nString name="manufactureYear_valid">Musi byť väčšie alebo rovné ako 1900</i18nString>
+        <i18nString name="apply">Schváliť</i18nString>
+        <i18nString name="deny">Zamietnuť</i18nString>
+        <i18nString name="sent">Požiadavka odoslaná</i18nString>
+        <i18nString name="accepted">Požiadavka schválená</i18nString>
+        <i18nString name="denied">Požiadavka zamietnutá</i18nString>
+        <i18nString name="started">Oprava začatá</i18nString>
+        <i18nString name="finished">Oprava dokončená</i18nString>
+        <i18nString name="selected_vehicle_title">Vozidlo</i18nString>
+        <i18nString name="selected_customer_title">Zákazník</i18nString>
+    </i18n>
+    <i18n locale="de">
+        <i18nString name="case_title">Reparatur</i18nString>
+        <i18nString name="vehicles">Fahrzeuge</i18nString>
+        <i18nString name="vehicles_desc">Finde ein Fahrzeug mit KZ</i18nString>
+        <i18nString name="description">Beschreibung</i18nString>
+        <i18nString name="priority">Priorität</i18nString>
+        <i18nString name="priority_small">Klein</i18nString>
+        <i18nString name="priority_medium">Mittel</i18nString>
+        <i18nString name="priority_high">Hoch</i18nString>
+        <i18nString name="t_quick_create">Schnelle Erstellung</i18nString>
+        <i18nString name="info_text_new_vehicle">Füllen Sie die Felder unten aus, um ein neues Fahrzeug zu erstellen und es bei dieser Reparatur zu verwenden.</i18nString>
+        <i18nString name="info_text_new_customer">Füllen Sie die Felder unten aus, um einen neuen Kunden zu erstellen und ihn bei dieser Reparatur zu verwenden.</i18nString>
+        <i18nString name="customers">Kunden</i18nString>
+        <i18nString name="customers_desc">Finden Sie den Kunden nach Name oder Firma</i18nString>
+        <i18nString name="creation_new_vehicle">Neuen Fahrzeugdatensatz erstellen?</i18nString>
+        <i18nString name="creation_new_customer">Neuen Kundendatensatz anlegen?</i18nString>
+        <i18nString name="t_complex_creation">Detailliertere Erstellung der Reparierung</i18nString>
+        <i18nString name="t_complex_creation_vehicle_part">Fahrzeug</i18nString>
+        <i18nString name="t_complex_creation_customer_part">Kunde</i18nString>
+        <i18nString name="t_complex_creation_other_part">Problem Beschreibung</i18nString>
+        <i18nString name="status">Zustand</i18nString>
+        <i18nString name="status_not_started">Nicht Angefangen</i18nString>
+        <i18nString name="status_started">Angefangen</i18nString>
+        <i18nString name="status_finished">Fertig</i18nString>
+        <i18nString name="is_finished">Ist fertig</i18nString>
+        <i18nString name="t_view_and_control">Ansehen und Steuern</i18nString>
+        <i18nString name="t_reopen_repair">Wieder öffnen</i18nString>
+        <i18nString name="name">Name</i18nString>
+        <i18nString name="surname">Familienname</i18nString>
+        <i18nString name="company_mane">Firmennahme</i18nString>
+        <i18nString name="email">E-mail</i18nString>
+        <i18nString name="businessID">Id. Nr. - Identifikationsnummer</i18nString>
+        <i18nString name="taxID">USt.-Ident.-Nr.</i18nString>
+        <i18nString name="phone_number">Rufnummer</i18nString>
+        <i18nString name="status">Zustand</i18nString>
+        <i18nString name="natural_legal_person">Natürliche P. - Juristische P.</i18nString>
+        <i18nString name="manufacturer">Produzent</i18nString>
+        <i18nString name="licenceNumber">amtliches Kennzeichen </i18nString>
+        <i18nString name="model">Modell </i18nString>
+        <i18nString name="manufactureYear">Jahr der Herstellung</i18nString>
+        <i18nString name="problem_description">Beschreibung des Problems</i18nString>
+        <i18nString name="remove_from_warehouse_1">Löschen</i18nString>
+        <i18nString name="remove_from_warehouse_2">Löschung bestätigen</i18nString>
+        <i18nString name="remove_from_warehouse_3">Klicken Sie auf Fertig stellen, um das Entfernen zu akzeptieren</i18nString>
+        <i18nString name="repair_items_for_removal">Berichtigte Einträge zu entfernen</i18nString>
+        <i18nString name="repair_items">Gegenstände zur Reparatur</i18nString>
+        <i18nString name="warehouse_items">Lagerartikel</i18nString>
+        <i18nString name="warehouses_for_removal">Wählen Sie das Ziellager</i18nString>
+        <i18nString name="warehouses">Lagerhäuser</i18nString>
+        <i18nString name="company_name">Name des Unternehmens</i18nString>
+        <i18nString name="manufactureYear_valid">Must sein 1900+</i18nString>
+        <i18nString name="apply">Annehmen</i18nString>
+        <i18nString name="deny">Leugnen</i18nString>
+        <i18nString name="sent">Anfrage eingereicht</i18nString>
+        <i18nString name="accepted">Anfrage genehmigt</i18nString>
+        <i18nString name="denied">Anfrage abgelehnt</i18nString>
+        <i18nString name="started">Angefangen</i18nString>
+        <i18nString name="finished">Fertig</i18nString>
+        <i18nString name="selected_vehicle_title">Fahrzeug</i18nString>
+        <i18nString name="selected_customer_title">Kunde</i18nString>
+    </i18n>
+    <!-- TRANSITIONS -->
+    <transition>
+        <id>t24</id>
+        <x>1300</x>
+        <y>740</y>
+        <layout>
+            <offset>0</offset>
+        </layout>
+        <label>Edit</label>
+        <roleRef>
+            <id>admin</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <roleRef>
+            <id>mechanic</id>
+            <logic>
+                <view>true</view>
+            </logic>
+        </roleRef>
+        <assignPolicy>auto</assignPolicy>
+        <dataGroup>
+            <id>other_part</id>
+            <title name="t_complex_creation_other_part">Problem description</title>
+            <stretch>true</stretch>
+            <dataRef>
+                <id>priority</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <behavior>required</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>description</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <behavior>required</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+    </transition>
+    <transition>
+        <id>t_process_removal</id>
+        <x>1420</x>
+        <y>420</y>
+        <layout>
+            <offset>0</offset>
+        </layout>
+        <label>Process removal [auto]</label>
+        <roleRef>
+            <id>system</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <trigger type="auto"/>
+        <event type="finish">
+            <id>0</id>
+            <actions phase="pre">
+                <action>
+                    selected_ri_taskref: f.selected_ri_taskref;
+                    change selected_ri_taskref value { [] } <!-- todo nefunguje fix -->
+                </action>
+                <action>
+                    repairItems: f.repair_items_for_removal,
+                    warehouses: f.warehouses_for_removal;
+
+                    for(repairItemId in repairItems.value){
+                        def rtwCase = createCase("ri_to_wi")
+
+                        def initTask = assignTask("t_initialize", rtwCase)
+                        setData(initTask, [
+                            "origin_ri_id": [
+                                "type": "text",
+                                "value": repairItemId
+                            ],
+                            "origin_repair_id": [
+                                "type": "text",
+                                "value": useCase.stringId
+                            ],
+                            "target_wh_id": [
+                                "type": "text",
+                                "value": warehouses.value
+                            ]
+                        ])
+                        finishTask(initTask)
+
+                        async.run{
+                            def doTask = assignTask("t_do_ri_to_wi", rtwCase)
+                            finishTask(doTask)
+                        }
+                    }
+                </action>
+            </actions>
+            <actions phase="post">
+                <action>
+                    repair_items_for_removal: f.repair_items_for_removal,
+                    warehouses_for_removal: f.warehouses_for_removal;
+
+                    change warehouses_for_removal value { null }
+                    change warehouses_for_removal options { [:] }
+
+                    change repair_items_for_removal value { null }
+                    change repair_items_for_removal options { [:] }
+                </action>
+            </actions>
+        </event>
+    </transition>
+    <transition>
+        <id>t_remove_items</id>
+        <x>1420</x>
+        <y>300</y>
+        <layout>
+            <offset>0</offset>
+        </layout>
+        <label>Remove items [synch up]</label>
+        <roleRef>
+            <id>admin</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <roleRef>
+            <id>mechanic</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <dataGroup>
+            <id>0</id>
+            <stretch>true</stretch>
+            <dataRef>
+                <id>repair_items_for_removal</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <behavior>required</behavior>
+                    <action trigger="set">
+                        repair_items_for_removal: f.repair_items_for_removal,
+                        selected_ri_taskref: f.selected_ri_taskref;
+
+                        change selected_ri_taskref value { [] }
+
+                        for(riId in repair_items_for_removal.value){
+                            def riTask = findTask( {it.caseId.eq(riId).and(it.transitionId.eq("t_removal_short_description"))} )
+                            if(riTask == null)
+                                return
+
+                            change selected_ri_taskref value { selected_ri_taskref.value + [riTask.stringId] }
+                        }
+                    </action>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>warehouses_for_removal</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <behavior>required</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>1</id>
+            <stretch>true</stretch>
+            <dataRef>
+                <id>selected_ri_taskref</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+        <event type="assign">
+            <id>0</id>
+            <actions phase="pre">
+                <action>
+                    warehouses_for_removal: f.warehouses_for_removal;
+
+                    def foundWarehouses = findCases({ it.processIdentifier.eq("warehouse") })
+                    if (foundWarehouses == null)
+                        return
+
+                    change warehouses_for_removal options { foundWarehouses.collectEntries{ [(it.stringId): it.dataSet.get("warehouse_name").value] } }
+                </action>
+                <action>
+                    repair_items: f.repair_items,
+                    repair_items_for_removal: f.repair_items_for_removal;
+
+                    def tmpMap = [:]
+                    for(itemId in repair_items.choices){
+                        def riCase = findCase( {it._id.eq(itemId.defaultValue)} )
+                        if(riCase != null){
+                            def itemTitle = riCase.dataSet.get("title").value
+                            tmpMap = tmpMap + [(itemId.defaultValue): itemTitle]
+                        }
+                    }
+
+                    change repair_items_for_removal options { tmpMap }
+                </action>
+            </actions>
+        </event>
+        <event type="cancel">
+            <id>1</id>
+            <actions phase="pre">
+                <action>
+                    repair_items_for_removal: f.repair_items_for_removal,
+                    selected_ri_taskref: f.selected_ri_taskref,
+                    warehouses_for_removal: f.warehouses_for_removal;
+
+                    change warehouses_for_removal value { null }
+                    change warehouses_for_removal options { [:] }
+
+                    change repair_items_for_removal value { null }
+                    change repair_items_for_removal options { [:] }
+
+                    change selected_ri_taskref value { [] }
+                </action>
+            </actions>
+        </event>
+    </transition>
+    <transition>
+        <id>t_init</id>
+        <x>340</x>
+        <y>300</y>
+        <layout>
+            <offset>0</offset>
+        </layout>
+        <label>Initialize [auto]</label>
+        <roleRef>
+            <id>system</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <trigger type="auto"/>
+        <event type="finish">
+            <id>t1_finish</id>
+            <actions phase="pre">
+                <action>
+                    is_intern: f.is_intern,
+                    is_extern: f.is_extern;
+
+                    if(userService.getLoggedOrSystem().email == "anonym@netgrif.com"){
+                        change is_extern value { 1 }
+                    }
+                    else {
+                        change is_intern value { 1 }
+                    }
+                </action>
+            </actions>
+        </event>
+    </transition>
+    <transition>
+        <id>t2</id>
+        <x>620</x>
+        <y>180</y>
+        <layout>
+            <offset>0</offset>
+        </layout>
+        <label>Create - extern</label>
+        <roleRef>
+            <id>anonym</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <dataGroup>
+            <id>t2_0</id>
+            <cols>4</cols>
+            <layout>grid</layout>
+            <dataRef>
+                <id>create_extern_taskref</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>4</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+        </dataGroup>
+        <event type="finish">
+            <id>0</id>
+            <actions phase="post">
+                <action>
+                    public_status_extern_text: f.public_status_extern_text;
+                    change public_status_extern_text value { "sent" }
+                </action>
+            </actions>
+        </event>
+    </transition>
+    <transition>
+        <id>t_quick_create</id>
+        <x>820</x>
+        <y>580</y>
+        <layout>
+            <offset>0</offset>
+        </layout>
+        <label name="t_quick_create">Quick creation</label>
+        <roleRef>
+            <id>admin</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <roleRef>
+            <id>mechanic</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <roleRef>
+            <id>otherworker</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <dataGroup>
+            <id>dg0</id>
+            <stretch>true</stretch>
+            <dataRef>
+                <id>vehicles</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <behavior>required</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>priority</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <behavior>required</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>description</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <behavior>required</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+        <event type="assign">
+            <id>0</id>
+            <actions phase="pre">
+                <action>
+                    vehicles: f.vehicles;
+
+                    def vehicle_cases = findCases( { it.processIdentifier.eq("vehicle").and(it.dataSet.get("status").value.eq("assigned")) } )
+
+                    if(vehicle_cases == null || vehicle_cases == [])
+                        return
+
+                    change vehicles options { [] }
+                    change vehicles value { "" }
+
+                    for(vehicle in vehicle_cases){
+                    def val = vehicle.dataSet.get("licenceNumber").value + " - " + vehicle.dataSet.get("manufacturer").value + " " + vehicle.dataSet.get("model").value
+                        change vehicles options { vehicles.options + [(vehicle.stringId): val]; }
+                    }
+                </action>
+            </actions>
+        </event>
+        <event type="finish">
+            <id>1</id>
+            <actions phase="pre">
+                <action>
+                    selected_vehicle_id: f.selected_vehicle_id,
+                    selected_customer_id: f.selected_customer_id,
+                    vehicles: f.vehicles;
+
+                    def selectedVehicleId = vehicles.value
+                    def vehicle = findCase( {it._id.eq(selectedVehicleId)} )
+
+                    if(vehicle == null)
+                        throw new IllegalArgumentException("Vehicle with id: " + selectedVehicleId + " does not exist anymore")
+
+                    def selectedCustomerId = vehicle.dataSet.get("actual_customer_id").value
+
+                    change selected_vehicle_id value { selectedVehicleId }
+                    change selected_customer_id value { selectedCustomerId }
+                </action>
+                <action>
+                    status: f.status;
+
+                    change status value { return "started"; }
+                </action>
+            </actions>
+            <actions phase="post">
+                <action>
+                    vehicles: f.vehicles;
+
+                    change vehicles value { null }
+                    change vehicles options { [:] }
+                </action>
+            </actions>
+        </event>
+    </transition>
+    <transition>
+        <id>t4</id>
+        <x>1060</x>
+        <y>180</y>
+        <layout>
+            <offset>0</offset>
+        </layout>
+        <label>Validate</label>
+        <roleRef>
+            <id>admin</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <roleRef>
+            <id>mechanic</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <dataGroup>
+            <id>t4_0</id>
+            <cols>4</cols>
+            <layout>grid</layout>
+            <dataRef>
+                <id>create_extern_taskref</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>4</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>approve_extern_repair</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>1</y>
+                    <rows>1</rows>
+                    <cols>4</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+        </dataGroup>
+        <event type="finish">
+            <id>t4_finish</id>
+            <actions phase="pre">
+                <action>
+                    approve_extern_repair: f.approve_extern_repair,
+                    val_accept: f.val_accept,
+                    public_status_extern_text: f.public_status_extern_text,
+                    val_deny: f.val_deny;
+
+                    if(approve_extern_repair.value == "apply"){
+                        change val_accept value { 1 }
+                        change public_status_extern_text value { "accepted" }
+                    } else {
+                        change val_deny value { 1 }
+                        change public_status_extern_text value { "denied" }
+                    }
+                </action>
+            </actions>
+        </event>
+    </transition>
+    <transition>
+        <id>t5</id>
+        <x>460</x>
+        <y>100</y>
+        <layout>
+            <offset>0</offset>
+        </layout>
+        <label>Delete</label>
+        <roleRef>
+            <id>anonym</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <event type="finish">
+            <actions phase="post">
+                <action>
+                    async.run{ workflowService.deleteCase(useCase.stringId) }
+                </action>
+            </actions>
+        </event>
+    </transition>
+    <transition>
+        <id>t8</id>
+        <x>820</x>
+        <y>380</y>
+        <layout>
+            <offset>0</offset>
+        </layout>
+        <label>Finish creating</label>
+        <roleRef>
+            <id>admin</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <roleRef>
+            <id>mechanic</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <dataGroup>
+            <id>t8_0</id>
+            <cols>4</cols>
+            <layout>grid</layout>
+            <dataRef>
+                <id>create_extern_taskref</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>4</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>t8_1</id>
+            <cols>4</cols>
+            <layout>grid</layout>
+            <dataRef>
+                <id>complex_creation_taskref</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>4</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+        </dataGroup>
+        <event type="assign">
+            <id>t8_assign</id>
+            <actions phase="pre">
+                <action id="t8_assign_pre_1">
+                    vehicles: f.vehicles,
+                    public_licenseNumber: f.public_licenseNumber;
+
+                    def vehicle_case = findCase( { it.processIdentifier.eq("vehicle").and(it.dataSet.get("licenceNumber").value.eq(public_licenseNumber.value)) } )
+
+                    if(vehicle_case == null || vehicle_case == [])
+                        return
+
+                    change vehicles value { vehicle_case.stringId }
+                </action>
+                <action id="t8_assign_pre_2">
+                    customers: f.customers,
+                    public_mail: f.public_mail;
+
+                    def customers_case = findCase( { it.processIdentifier.eq("customer").and(it.dataSet.get("email").value.eq(public_mail.value)) } )
+
+                    if(customers_case == null || customers_case == [])
+                        return
+
+                    change customers value { customers_case.stringId }
+                </action>
+                <action id="t8_assign_pre_3">
+                    description: f.description,
+                    public_description: f.public_description;
+
+                    change description value { public_description.value }
+                </action>
+                <action>
+                    assignTask("t26")
+                </action>
+            </actions>
+        </event>
+        <event type="finish">
+            <id>0</id>
+            <actions phase="pre">
+                <action>
+                    finishTask("t26")
+                </action>
+            </actions>
+        </event>
+    </transition>
+    <transition>
+        <id>t_complex_creation</id>
+        <x>820</x>
+        <y>740</y>
+        <layout>
+            <offset>0</offset>
+        </layout>
+        <label name="t_complex_creation">Complex creation</label>
+        <roleRef>
+            <id>admin</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <roleRef>
+            <id>mechanic</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <dataGroup>
+            <id>t2_0</id>
+            <cols>4</cols>
+            <layout>grid</layout>
+            <dataRef>
+                <id>complex_creation_taskref</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>4</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+        </dataGroup>
+        <event type="assign">
+            <id>0</id>
+            <actions phase="pre">
+                <action>
+                    assignTask("t26")
+                </action>
+            </actions>
+        </event>
+        <event type="finish">
+            <id>0</id>
+            <actions phase="pre">
+                <action>
+                    finishTask("t26")
+                </action>
+            </actions>
+        </event>
+    </transition>
+    <transition>
+        <id>t10</id>
+        <x>460</x>
+        <y>20</y>
+        <layout>
+            <offset>0</offset>
+        </layout>
+        <label>System delete [time]</label>
+        <roleRef>
+            <id>system</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <trigger type="time">
+            <delay>P7D</delay>
+        </trigger>
+
+        <event type="finish">
+            <actions phase="post">
+                <action>
+                    async.run{ workflowService.deleteCase(useCase.stringId) }
+                </action>
+            </actions>
+        </event>
+    </transition>
+    <transition>
+        <id>t11</id>
+        <x>820</x>
+        <y>60</y>
+        <layout>
+            <offset>0</offset>
+        </layout>
+        <label>Status - extern</label>
+        <roleRef>
+            <id>anonym</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <dataGroup>
+            <id>DataGroup</id>
+            <layout>grid</layout>
+            <dataRef>
+                <id>public_status_extern_text</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <action trigger="get">
+                        thisTask: t.t11,
+                        remove2: f.public_remove_2,
+                        remove1: f.public_remove_1;
+
+                        make remove1,editable on thisTask when { true }
+                        make remove2,hidden on thisTask when { true }
+                    </action>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>3</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>public_remove_1</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <action trigger="set">
+                        thisTask: t.t11,
+                        remove2: f.public_remove_2,
+                        remove1: f.public_remove_1;
+
+                        make remove1,hidden on thisTask when { true }
+                        make remove2,editable on thisTask when { true }
+                    </action>
+
+                </logic>
+                <layout>
+                    <x>3</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>public_remove_2</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                    <action trigger="set">
+                        thisTask: t.t11,
+                        remove2: f.public_remove_2,
+                        remove3: f.public_remove_3,
+                        check: f.public_remove_check;
+
+                        make remove2,hidden on thisTask when { true }
+                        make remove3,visible on thisTask when { true }
+                        change check value { return true }
+                    </action>
+
+                </logic>
+                <layout>
+                    <x>3</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>public_remove_3</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                </logic>
+                <layout>
+                    <x>3</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                </layout>
+            </dataRef>
+        </dataGroup>
+        <event type="finish">
+            <id>t11_finish</id>
+            <actions phase="post">
+                <action>
+                    check: f.public_remove_check;
+                    if(check.value){
+                        async.run{
+                            assignTask("t5")
+                            finishTask("t5")
+                        }
+                    }
+                </action>
+            </actions>
+        </event>
+    </transition>
+    <transition>
+        <id>t_add_items</id>
+        <x>1220</x>
+        <y>60</y>
+        <layout>
+            <offset>0</offset>
+        </layout>
+        <label>Add items [await synch]</label>
+        <roleRef>
+            <id>mechanic</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <roleRef>
+            <id>admin</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <dataGroup>
+            <id>0</id>
+            <stretch>true</stretch>
+            <dataRef>
+                <id>warehouses</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <behavior>required</behavior>
+                    <action trigger="set">
+                        warehouses: f.warehouses,
+                        warehouse_items: f.warehouse_items;
+
+                        if(warehouses.value == null)
+                            return
+
+                        def selectedWarehouse = findCase( {it._id.eq(warehouses.value)} )
+                        if(selectedWarehouse == null)
+                            return
+
+                        def itemIds = selectedWarehouse.dataSet.get("items").choices
+                        if(itemIds == null || itemIds == [])
+                            return
+
+                        def tmpMap = [:]
+                        for(itemId in itemIds){
+                            def itemCase = findCase( {it._id.eq(itemId.defaultValue)} )
+                            if(itemCase != null){
+                                def itemTitle = itemCase.dataSet.get("title").value
+                                tmpMap = tmpMap + [(itemId.defaultValue): itemTitle]
+                            }
+                        }
+
+                        change warehouse_items options { tmpMap }
+                    </action>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>warehouse_items</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <behavior>required</behavior>
+                    <action trigger="set">
+                        warehouse_items: f.warehouse_items,
+                        selected_wi_taskref: f.selected_wi_taskref;
+
+                        change selected_wi_taskref value { [] }
+
+                        for(wiId in warehouse_items.value){
+                            def wiTask = findTask( {it.caseId.eq(wiId).and(it.transitionId.eq("t_repair_short_description"))} )
+                            if(wiTask == null)
+                                return
+
+                            change selected_wi_taskref value { selected_wi_taskref.value + [wiTask.stringId] }
+                        }
+                    </action>
+                </logic>
+            </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>1</id>
+            <stretch>true</stretch>
+            <dataRef>
+                <id>selected_wi_taskref</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+        <event type="assign">
+            <id>0</id>
+            <actions phase="pre">
+                <action>
+                    warehouses: f.warehouses;
+
+                    def foundWarehouses = findCases({ it.processIdentifier.eq("warehouse") })
+                    if (foundWarehouses == null)
+                        return
+
+                    change warehouses options { foundWarehouses.collectEntries{ [(it.stringId): it.dataSet.get("warehouse_name").value] } }
+                </action>
+            </actions>
+        </event>
+        <event type="cancel">
+            <id>1</id>
+            <actions phase="pre">
+                <action>
+                    warehouse_items: f.warehouse_items,
+                    selected_wi_taskref: f.selected_wi_taskref,
+                    warehouses: f.warehouses;
+
+                    change warehouses value { null }
+                    change warehouses options { [:] }
+
+                    change warehouse_items value { null }
+                    change warehouse_items options { [:] }
+
+                    change selected_wi_taskref value { [] }
+                </action>
+            </actions>
+        </event>
+        <event type="finish">
+            <id>2</id>
+            <actions phase="pre">
+                <action>
+                    selected_wi_taskref: f.selected_wi_taskref;
+                    change selected_wi_taskref value { [] }
+                </action>
+                <action>
+                    warehouses: f.warehouses,
+                    warehouse_items: f.warehouse_items;
+
+                    for(wiId in warehouse_items.value){
+                        def wtrCase = createCase("wi_to_ri")
+
+                        def initTask = assignTask("t_initialize", wtrCase)
+                        setData(initTask, [
+                            "origin_wi_id": [
+                                "type": "text",
+                                "value": wiId
+                            ],
+                            "origin_wh_id": [
+                                "type": "text",
+                                "value": warehouses.value
+                            ],
+                            "target_repair_id": [
+                                "type": "text",
+                                "value": useCase.stringId
+                            ]
+                        ])
+                        finishTask(initTask)
+
+                        async.run{
+                            def doTask = assignTask("t_do_wi_to_ri", wtrCase)
+                            finishTask(doTask)
+                        }
+                    }
+                </action>
+            </actions>
+            <actions phase="post">
+                <action>
+                    warehouse_items: f.warehouse_items,
+                    warehouses: f.warehouses;
+
+                    change warehouses value { null }
+                    change warehouses options { [:] }
+
+                    change warehouse_items value { null }
+                    change warehouse_items options { [:] }
+                </action>
+            </actions>
+        </event>
+    </transition>
+    <transition>
+        <id>t_item_added</id>
+        <x>1420</x>
+        <y>180</y>
+        <layout>
+            <offset>0</offset>
+        </layout>
+        <label>Item added [await synch]</label>
+        <roleRef>
+            <id>system</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+    </transition>
+    <transition>
+        <id>t_view_and_control</id>
+        <x>1180</x>
+        <y>740</y>
+        <layout>
+            <offset>0</offset>
+        </layout>
+        <label name="t_view_and_control">View and Control</label>
+        <roleRef>
+            <id>admin</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <roleRef>
+            <id>mechanic</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <dataGroup>
+            <id>t_view_and_control_dataGroup</id>
+            <layout>grid</layout>
+            <dataRef>
+                <id>description</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>status</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+                <layout>
+                    <x>1</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>vehicles</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+                <layout>
+                    <x>2</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>is_finished</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <action trigger="set">
+                        is_finished: f.is_finished;
+
+                        if(is_finished.value) {
+                            def t_finish_repairTask = findTask( { it.caseId.eq(useCase.stringId).and(it.transitionId.eq("t_finish_repair")) } )
+                            if (t_finish_repairTask != null) {
+                                async.run{
+                                    assignTask(t_finish_repairTask)
+                                    finishTask(t_finish_repairTask)
+                                }
+                            }
+                        }
+                        else if (!is_finished.value) {
+                            def t_reopen_repairTask = findTask( { it.caseId.eq(useCase.stringId).and(it.transitionId.eq("t_reopen_repair")) } )
+                            if (t_reopen_repairTask != null) {
+                                async.run{
+                                    assignTask(t_reopen_repairTask)
+                                    finishTask(t_reopen_repairTask)
+                                }
+                            }
+                        }
+                    </action>
+                </logic>
+                <layout>
+                    <x>3</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                </layout>
+            </dataRef>
+        </dataGroup>
+    </transition>
+    <transition>
+        <id>t_finish_repair</id>
+        <x>1300</x>
+        <y>500</y>
+        <layout>
+            <offset>0</offset>
+        </layout>
+        <label name="t_finish_repair">Finish repair [await synch]</label>
+        <roleRef>
+            <id>admin</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <roleRef>
+            <id>mechanic</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <event type="finish">
+            <id>t_finish_repair_finish</id>
+            <actions phase="pre">
+                <!-- set status to finished on finish repair -->
+                <action>
+                    status: f.status;
+
+                    change status value { return "finished"; }
+                </action>
+            </actions>
+        </event>
+    </transition>
+    <transition>
+        <id>t17</id>
+        <x>1540</x>
+        <y>740</y>
+        <layout>
+            <offset>0</offset>
+        </layout>
+        <label>Create invoice</label>
+        <roleRef>
+            <id>admin</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+    </transition>
+    <transition>
+        <id>t18</id>
+        <x>940</x>
+        <y>740</y>
+        <layout>
+            <offset>0</offset>
+        </layout>
+        <label>Status</label>
+        <roleRef>
+            <id>admin</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <roleRef>
+            <id>mechanic</id>
+            <logic>
+                <view>true</view>
+            </logic>
+        </roleRef>
+        <roleRef>
+            <id>otherworker</id>
+            <logic>
+                <view>true</view>
+            </logic>
+        </roleRef>
+    </transition>
+    <transition>
+        <id>t_reopen_repair</id>
+        <x>1300</x>
+        <y>580</y>
+        <layout>
+            <offset>0</offset>
+        </layout>
+        <label name="t_reopen_repair">Reopen repair [await synch]</label>
+        <roleRef>
+            <id>admin</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <roleRef>
+            <id>mechanic</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <event type="finish">
+            <id>t_reopen_repair_finish</id>
+            <actions phase="pre">
+                <!-- set status to finished on finish repair -->
+                <action>
+                    status: f.status;
+
+                    change status value { return "started"; }
+                </action>
+            </actions>
+        </event>
+    </transition>
+    <transition>
+        <id>t25</id>
+        <x>260</x>
+        <y>500</y>
+        <label/>
+        <roleRef>
+            <id>system</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <dataGroup>
+            <id>DataGroup</id>
+            <layout>grid</layout>
+            <dataRef>
+                <id>public_natural_legal_person</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <action trigger="set"> name: f.public_name,
+                        name: f.public_name,
+                        taxID: f.public_taxID,
+                        businessID: f.public_businessID,
+                        natural_legal_person: f.public_natural_legal_person,
+                        t_input_form: t.t25,
+                        company_name: f.public_company_name,
+                        surname: f.public_surname;
+
+                        make name, editable on t_input_form when { natural_legal_person.value == false; }
+                        make surname, editable on t_input_form when { natural_legal_person.value == false; }
+                        make name, required on t_input_form when { natural_legal_person.value == false; }
+                        make surname, required on t_input_form when { natural_legal_person.value == false; }
+
+                        make company_name, hidden on t_input_form when { natural_legal_person.value == false; }
+                        make taxID, hidden on t_input_form when { natural_legal_person.value == false; }
+                        make businessID, hidden on t_input_form when { natural_legal_person.value == false; }
+                        make company_name, optional on t_input_form when { natural_legal_person.value == false; }
+                        make taxID, optional on t_input_form when { natural_legal_person.value == false; }
+                        make businessID, optional on t_input_form when { natural_legal_person.value == false; }
+
+                        make name, hidden on t_input_form when { natural_legal_person.value == true; }
+                        make surname, hidden on t_input_form when { natural_legal_person.value == true; }
+                        make name, optional on t_input_form when { natural_legal_person.value == true; }
+                        make surname, optional on t_input_form when { natural_legal_person.value == true; }
+
+                        make company_name, editable on t_input_form when { natural_legal_person.value == true; }
+                        make businessID, editable on t_input_form when { natural_legal_person.value == true; }
+                        make taxID, editable on t_input_form when { natural_legal_person.value == true; }
+                        make company_name, required on t_input_form when { natural_legal_person.value == true; }
+                        make businessID, required on t_input_form when { natural_legal_person.value == true; }
+                        make taxID, required on t_input_form when { natural_legal_person.value == true; }
+
+                        if (natural_legal_person.value == true) {
+                            change name value { null; }
+                            change surname value {  null; }
+                        }else {
+                            change company_name value { null; }
+                            change businessID value { null; }
+                            change taxID value { null; }
+                        }
+                    </action>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>4</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>public_name</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <behavior>required</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>1</y>
+                    <rows>1</rows>
+                    <cols>2</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>public_surname</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <behavior>required</behavior>
+                </logic>
+                <layout>
+                    <x>2</x>
+                    <y>1</y>
+                    <rows>1</rows>
+                    <cols>2</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>public_company_name</id>
+                <logic>
+                    <behavior>required</behavior>
+                    <behavior>hidden</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>2</y>
+                    <rows>1</rows>
+                    <cols>4</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>public_phone</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <behavior>required</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>3</y>
+                    <rows>1</rows>
+                    <cols>4</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>public_mail</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <behavior>required</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>4</y>
+                    <rows>1</rows>
+                    <cols>4</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>public_businessID</id>
+                <logic>
+                    <behavior>required</behavior>
+                    <behavior>hidden</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>5</y>
+                    <rows>1</rows>
+                    <cols>4</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>public_taxID</id>
+                <logic>
+                    <behavior>required</behavior>
+                    <behavior>hidden</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>6</y>
+                    <rows>1</rows>
+                    <cols>4</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>public_manufacturer</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <behavior>required</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>7</y>
+                    <rows>1</rows>
+                    <cols>2</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>public_licenseNumber</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <behavior>required</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>8</y>
+                    <rows>1</rows>
+                    <cols>2</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>public_model</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <behavior>required</behavior>
+                </logic>
+                <layout>
+                    <x>2</x>
+                    <y>7</y>
+                    <rows>1</rows>
+                    <cols>2</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>public_manufactureYear</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <behavior>required</behavior>
+                </logic>
+                <layout>
+                    <x>2</x>
+                    <y>8</y>
+                    <rows>1</rows>
+                    <cols>2</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>public_description</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <behavior>required</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>9</y>
+                    <rows>1</rows>
+                    <cols>4</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+        </dataGroup>
+    </transition>
+    <transition>
+        <id>t26</id>
+        <x>260</x>
+        <y>550</y>
+        <label/>
+        <roleRef>
+            <id>system</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <dataGroup>
+            <id>vehicle_part1</id>
+            <title name="t_complex_creation_vehicle_part">Vehicle</title>
+            <layout>grid</layout>
+            <dataRef>
+                <id>vehicles</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <behavior>required</behavior>
+                    <action trigger="set">
+                        customers: f.customers,
+                        vehicles: f.vehicles;
+
+                        def vehicleCase = findCase( {it._id.eq(vehicles.value)} )
+                        if(vehicleCase == null)
+                            return
+
+                        def cusId = vehicleCase.getFieldValue("actual_customer_id") as String
+                        if(cusId == null)
+                            return
+
+                        if(customers.options?.containsKey(cusId)){
+                            change customers value { cusId }
+                        }
+                    </action>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>3</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>info_text_new_vehicle</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>3</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>creation_new_vehicle</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <action trigger="set">
+                        trans: t.t26,
+                        vehicles: f.vehicles,
+                        infoVehicle: f.info_text_new_vehicle,
+                        creation_new_vehicle_taskref: f.creation_new_vehicle_taskref,
+                        btn: f.this;
+
+                        make vehicles, hidden on trans when { btn.value }
+                        make vehicles, optional on trans when { btn.value }
+                        make infoVehicle, visible on trans when { btn.value }
+                        make creation_new_vehicle_taskref, editable on trans when { btn.value }
+
+                        make vehicles, editable on trans when { !btn.value }
+                        make vehicles, required on trans when { !btn.value }
+                        make infoVehicle, hidden on trans when { !btn.value }
+                        make creation_new_vehicle_taskref, hidden on trans when { !btn.value }
+                    </action>
+                    <action trigger="set">
+                        veh_taskref: f.creation_new_vehicle_taskref,
+                        btn: f.this;
+
+                        // not creating new vehicle - clear the taskref value
+                        if(!btn.value &amp;&amp; veh_taskref.value != null &amp;&amp; veh_taskref.value != []){
+                            clear_and_cancel_taskref(veh_taskref)
+                            return
+                        }
+
+                        // creating, but previous value present - clear the taskref value
+                        if(btn.value &amp;&amp; veh_taskref.value != null &amp;&amp; veh_taskref.value != []){
+                            clear_and_cancel_taskref(veh_taskref)
+                        }
+
+                        // creating - reference creation form of new vehicle instance
+                        if(btn.value){
+                            def vehicleCase = createCase("vehicle")
+                            def creationTask = assignTask("t_create", vehicleCase)
+                            change veh_taskref value { [creationTask?.stringId] }
+                        }
+                    </action>
+                </logic>
+                <layout>
+                    <x>3</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>vehicle_part2</id>
+            <layout>grid</layout>
+            <dataRef>
+                <id>creation_new_vehicle_taskref</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>4</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>customer_part1</id>
+            <title name="t_complex_creation_customer_part">Customer</title>
+            <layout>grid</layout>
+            <dataRef>
+                <id>customers</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <behavior>required</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>3</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>info_text_new_customer</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>3</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>creation_new_customer</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <action trigger="set">
+                        trans: t.t26,
+                        customers: f.customers,
+                        infoCustomer: f.info_text_new_customer,
+                        creation_new_customer_taskref: f.creation_new_customer_taskref,
+                        btn: f.this;
+
+                        make customers, hidden on trans when { btn.value }
+                        make customers, optional on trans when { btn.value }
+                        make infoCustomer, visible on trans when { btn.value }
+                        make creation_new_customer_taskref, editable on trans when { btn.value }
+
+                        make customers, editable on trans when { !btn.value }
+                        make customers, required on trans when { !btn.value }
+                        make infoCustomer, hidden on trans when { !btn.value }
+                        make creation_new_customer_taskref, hidden on trans when { !btn.value }
+                    </action>
+                    <action trigger="set">
+                        cus_taskref: f.creation_new_customer_taskref,
+                        btn: f.this;
+
+                        // not creating new vehicle - clear the taskref value
+                        if(!btn.value &amp;&amp; cus_taskref.value != null &amp;&amp; cus_taskref.value != []){
+                            clear_and_cancel_taskref(cus_taskref)
+                            return
+                        }
+
+                        // creating, but previous value present - clear the taskref value
+                        if(btn.value &amp;&amp; cus_taskref.value != null &amp;&amp; cus_taskref.value != []){
+                            clear_and_cancel_taskref(cus_taskref)
+                        }
+
+                        // creating - reference creation form of new vehicle instance
+                        if(btn.value){
+                            def customerCase = createCase("customer")
+                            def creationTask = assignTask("t_create", customerCase)
+                            change cus_taskref value { [creationTask?.stringId] }
+                        }
+                    </action>
+                </logic>
+                <layout>
+                    <x>3</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>customer_part2</id>
+            <layout>grid</layout>
+            <dataRef>
+                <id>creation_new_customer_taskref</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>4</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>other_part</id>
+            <title name="t_complex_creation_other_part">Problem description</title>
+            <stretch>true</stretch>
+            <dataRef>
+                <id>priority</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <behavior>required</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>description</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <behavior>required</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+        <event type="assign">
+            <id>0</id>
+            <actions phase="pre">
+                <!--				vehicles initialization-->
+                <action>
+                    vehicles: f.vehicles;
+
+                    def vehicle_cases = findCases( { it.processIdentifier.eq("vehicle").and(it.dataSet.get("status").value.eq("assigned")) } )
+
+                    if(vehicle_cases == null || vehicle_cases == [])
+                        return
+
+                    change vehicles options { [] }
+                    change vehicles value { "" }
+
+                    for(vehicle in vehicle_cases){
+                        def val = vehicle.dataSet.get("licenceNumber").value + " - " + vehicle.dataSet.get("manufacturer").value + " " + vehicle.dataSet.get("model").value
+                        change vehicles options { vehicles.options + [(vehicle.stringId): val] }
+                    }
+                </action>
+                <!--				customers initialization-->
+                <action>
+                    customers: f.customers;
+
+                    def customers_cases = findCases( { it.processIdentifier.eq("customer") } )
+                    if(customers_cases == null || customers_cases == [])
+                        return
+
+                    change customers options { [] }
+                    change customers value { "" }
+
+                    for(customer in customers_cases){
+                        def val
+                        if(!customer.getFieldValue("natural_legal_person")){
+                            val = customer.dataSet.get("surname").value + " " + customer.dataSet.get("name").value + "; " + customer.dataSet.get("city").value + ", " + customer.dataSet.get("street").value
+                        }
+                        else {
+                            val = customer.dataSet.get("company_name").value + ", " + customer.dataSet.get("businessID").value
+                        }
+                        change customers options { customers.options + [(customer.stringId): val] }
+                    }
+                </action>
+            </actions>
+        </event>
+        <event type="finish">
+            <id>2</id>
+            <actions phase="pre">
+                <!-- save selected customer (existing / newly created)-->
+                <action>
+                    selected_customer_id: f.selected_customer_id,
+                    newlyCreatedTaskref: f.creation_new_customer_taskref,
+                    customers: f.customers,
+                    newlyCreated: f.creation_new_customer;
+
+                    if(!newlyCreated.value){
+                        change selected_customer_id value { customers.value }
+                    }
+                    // needed caseId is "in" taskref
+                    else {
+                        def creationTask = findTask( { it._id.eq(newlyCreatedTaskref.value.first()) } )
+                        if(creationTask == null)
+                            throw new IllegalArgumentException("Could not set the customer id for current repair: cannot find the creation task")
+                        change selected_customer_id value { creationTask.caseId }
+
+                        finishTask(creationTask)
+                    }
+                </action>
+                <!-- save selected vehicle (existing / newly created)-->
+                <action>
+                    selected_customer_id: f.selected_customer_id,
+                    selected_vehicle_id: f.selected_vehicle_id,
+                    newlyCreatedTaskref: f.creation_new_vehicle_taskref,
+                    vehicles: f.vehicles,
+                    newlyCreated: f.creation_new_vehicle;
+
+                    if(!newlyCreated.value){
+                        change selected_vehicle_id value { vehicles.value }
+                    }
+                    else {
+                        def creationTask = findTask( { it._id.eq(newlyCreatedTaskref.value.first()) } )
+                        if(creationTask == null)
+                            throw new IllegalArgumentException("Could not set the vehicle id for current repair: cannot find the creation task")
+                        change selected_vehicle_id value { creationTask.caseId }
+
+                        setData(creationTask, [
+                            "status" : [
+                                "type": "enumeration_map",
+                                "value": "assigned"
+                            ],
+                            "actual_customer_id" : [
+                                "type": "text",
+                                "value": selected_customer_id.value
+                            ],
+                        ])
+
+                        finishTask(creationTask)
+                    }
+                </action>
+                <!-- if customer is newly created, add selected_vehicle_id to his vehicles enumeration if: the vehicle is unassigned
+                    or the vehicle is assigned, but newly created -->
+                <action>
+                    isNewlyCreatedVehicle: f.creation_new_vehicle,
+                    selected_customer_id: f.selected_customer_id,
+                    selected_vehicle_id: f.selected_vehicle_id;
+
+                    def canAddVehicle = false
+
+                    def selectedVehicle = findCase( {it._id.eq(selected_vehicle_id.value)} )
+                    if(selectedVehicle == null)
+                        return
+
+                    def vehicleStatus = selectedVehicle.getFieldValue("status") as String
+                    if(vehicleStatus == "unassigned")
+                        canAddVehicle = true
+                    else if(vehicleStatus == "assigned" &amp;&amp; isNewlyCreatedVehicle.value)
+                        canAddVehicle = true
+
+                    if(canAddVehicle){
+                        def selectedCustomer = findCase( {it._id.eq(selected_customer_id.value)} )
+                        if(selectedCustomer == null)
+                        return
+
+                        def customerVehicles = selectedCustomer.dataSet.get("vehicles").choices
+                        def selectedVehicleId = new com.netgrif.application.engine.petrinet.domain.I18nString(selected_vehicle_id.value)
+                        if(customerVehicles == null)
+                            selectedCustomer.dataSet.get("vehicles").choices = [selectedVehicleId]
+                        else
+                            selectedCustomer.dataSet.get("vehicles").choices = customerVehicles + [selectedVehicleId]
+                        workflowService.save(selectedCustomer)
+                    }
+                    else return
+                </action>
+                <!-- change status -->
+                <action>
+                    status: f.status;
+
+                    change status value { return "started"; }
+                </action>
+            </actions>
+        </event>
+    </transition>
+    <!-- PLACES -->
+    <place>
+        <id>p14</id>
+        <x>1660</x>
+        <y>300</y>
+        <label>selected items to remove</label>
+        <tokens>0</tokens>
+        <static>false</static>
+    </place>
+    <place>
+        <id>p1</id>
+        <x>220</x>
+        <y>300</y>
+        <label>uninitialized</label>
+        <tokens>1</tokens>
+        <static>false</static>
+    </place>
+    <place>
+        <id>p2</id>
+        <x>460</x>
+        <y>180</y>
+        <label>extern</label>
+        <tokens>0</tokens>
+        <static>false</static>
+    </place>
+    <place>
+        <id>p3</id>
+        <x>460</x>
+        <y>420</y>
+        <label>intern</label>
+        <tokens>0</tokens>
+        <static>false</static>
+    </place>
+    <place>
+        <id>p4</id>
+        <x>820</x>
+        <y>180</y>
+        <label/>
+        <tokens>0</tokens>
+        <static>false</static>
+    </place>
+    <place>
+        <id>p5</id>
+        <x>1060</x>
+        <y>380</y>
+        <label>created</label>
+        <tokens>0</tokens>
+        <static>false</static>
+    </place>
+    <place>
+        <id>p6</id>
+        <x>620</x>
+        <y>60</y>
+        <label/>
+        <tokens>0</tokens>
+        <static>false</static>
+    </place>
+    <place>
+        <id>p7</id>
+        <x>340</x>
+        <y>100</y>
+        <label/>
+        <tokens>0</tokens>
+        <static>false</static>
+    </place>
+    <place>
+        <id>p8</id>
+        <x>620</x>
+        <y>380</y>
+        <label>validated</label>
+        <tokens>0</tokens>
+        <static>false</static>
+    </place>
+    <place>
+        <id>p9</id>
+        <x>340</x>
+        <y>20</y>
+        <label/>
+        <tokens>0</tokens>
+        <static>false</static>
+    </place>
+    <place>
+        <id>p10</id>
+        <x>1060</x>
+        <y>580</y>
+        <label>controlling</label>
+        <tokens>0</tokens>
+        <static>false</static>
+    </place>
+    <place>
+        <id>p11</id>
+        <x>1420</x>
+        <y>60</y>
+        <label>processing addition</label>
+        <tokens>0</tokens>
+        <static>false</static>
+    </place>
+    <place>
+        <id>p12</id>
+        <x>1540</x>
+        <y>500</y>
+        <label>finished</label>
+        <tokens>0</tokens>
+        <static>false</static>
+    </place>
+    <place>
+        <id>p13</id>
+        <x>1060</x>
+        <y>60</y>
+        <label>denied</label>
+        <tokens>0</tokens>
+        <static>false</static>
+    </place>
+    <!-- ARCS -->
+    <arc>
+        <id>a1</id>
+        <type>regular</type>
+        <sourceId>p1</sourceId>
+        <destinationId>t_init</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>a4</id>
+        <type>regular</type>
+        <sourceId>p2</sourceId>
+        <destinationId>t2</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>a5</id>
+        <type>regular</type>
+        <sourceId>p3</sourceId>
+        <destinationId>t_quick_create</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>a6</id>
+        <type>regular</type>
+        <sourceId>t_quick_create</sourceId>
+        <destinationId>p5</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>a7</id>
+        <type>regular</type>
+        <sourceId>t2</sourceId>
+        <destinationId>p6</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>a8</id>
+        <type>regular</type>
+        <sourceId>t2</sourceId>
+        <destinationId>p4</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>a9</id>
+        <type>regular</type>
+        <sourceId>p4</sourceId>
+        <destinationId>t4</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>a13</id>
+        <type>regular</type>
+        <sourceId>p6</sourceId>
+        <destinationId>t5</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>a14</id>
+        <type>regular</type>
+        <sourceId>t5</sourceId>
+        <destinationId>p7</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>a15</id>
+        <type>regular</type>
+        <sourceId>t4</sourceId>
+        <destinationId>p8</destinationId>
+        <multiplicity>0</multiplicity>
+        <reference>val_accept</reference>
+    </arc>
+    <arc>
+        <id>a16</id>
+        <type>regular</type>
+        <sourceId>p8</sourceId>
+        <destinationId>t8</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>a17</id>
+        <type>inhibitor</type>
+        <sourceId>p6</sourceId>
+        <destinationId>t10</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>a18</id>
+        <type>regular</type>
+        <sourceId>t10</sourceId>
+        <destinationId>p9</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>a19</id>
+        <type>regular</type>
+        <sourceId>p3</sourceId>
+        <destinationId>t_complex_creation</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>a20</id>
+        <type>regular</type>
+        <sourceId>t_complex_creation</sourceId>
+        <destinationId>p5</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>a22</id>
+        <type>read</type>
+        <sourceId>p6</sourceId>
+        <destinationId>t11</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>a23</id>
+        <type>regular</type>
+        <sourceId>t_quick_create</sourceId>
+        <destinationId>p10</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>a24</id>
+        <type>regular</type>
+        <sourceId>t_complex_creation</sourceId>
+        <destinationId>p10</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>a25</id>
+        <type>regular</type>
+        <sourceId>p5</sourceId>
+        <destinationId>t_add_items</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>a26</id>
+        <type>regular</type>
+        <sourceId>t_add_items</sourceId>
+        <destinationId>p11</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>a27</id>
+        <type>regular</type>
+        <sourceId>p11</sourceId>
+        <destinationId>t_item_added</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>a28</id>
+        <type>regular</type>
+        <sourceId>t_item_added</sourceId>
+        <destinationId>p5</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>a33</id>
+        <type>regular</type>
+        <sourceId>p5</sourceId>
+        <destinationId>t_finish_repair</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>a34</id>
+        <type>regular</type>
+        <sourceId>t_finish_repair</sourceId>
+        <destinationId>p12</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>a35</id>
+        <type>read</type>
+        <sourceId>p12</sourceId>
+        <destinationId>t17</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>a36</id>
+        <type>read</type>
+        <sourceId>p10</sourceId>
+        <destinationId>t_view_and_control</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>a37</id>
+        <type>read</type>
+        <sourceId>p10</sourceId>
+        <destinationId>t18</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>a38</id>
+        <type>regular</type>
+        <sourceId>t8</sourceId>
+        <destinationId>p5</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>a39</id>
+        <type>regular</type>
+        <sourceId>t8</sourceId>
+        <destinationId>p10</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>a40</id>
+        <type>regular</type>
+        <sourceId>t_init</sourceId>
+        <destinationId>p3</destinationId>
+        <multiplicity>0</multiplicity>
+        <reference>is_intern</reference>
+    </arc>
+    <arc>
+        <id>a42</id>
+        <type>regular</type>
+        <sourceId>t_init</sourceId>
+        <destinationId>p2</destinationId>
+        <multiplicity>1</multiplicity>
+        <reference>is_extern</reference>
+    </arc>
+    <arc>
+        <id>a43</id>
+        <type>read</type>
+        <sourceId>p4</sourceId>
+        <destinationId>t5</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>a44</id>
+        <type>read</type>
+        <sourceId>p2</sourceId>
+        <destinationId>t10</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>a45</id>
+        <type>regular</type>
+        <sourceId>t4</sourceId>
+        <destinationId>p13</destinationId>
+        <multiplicity>0</multiplicity>
+        <reference>val_deny</reference>
+    </arc>
+    <arc>
+        <id>a46</id>
+        <type>regular</type>
+        <sourceId>p5</sourceId>
+        <destinationId>t_remove_items</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>a47</id>
+        <type>regular</type>
+        <sourceId>t_remove_items</sourceId>
+        <destinationId>p14</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>a48</id>
+        <type>regular</type>
+        <sourceId>p14</sourceId>
+        <destinationId>t_process_removal</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>a49</id>
+        <type>regular</type>
+        <sourceId>t_process_removal</sourceId>
+        <destinationId>p5</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>a56</id>
+        <type>regular</type>
+        <sourceId>p10</sourceId>
+        <destinationId>t24</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>a57</id>
+        <type>regular</type>
+        <sourceId>p12</sourceId>
+        <destinationId>t_reopen_repair</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>a58</id>
+        <type>regular</type>
+        <sourceId>t_reopen_repair</sourceId>
+        <destinationId>p5</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+</document>

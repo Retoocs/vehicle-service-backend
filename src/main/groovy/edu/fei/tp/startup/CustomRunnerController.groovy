@@ -1,4 +1,4 @@
-package org.example.starter.startup
+package edu.fei.tp.startup
 
 import com.netgrif.application.engine.startup.*
 
@@ -21,19 +21,18 @@ class CustomRunnerController extends RunnerController {
             FlushSessionsRunner,
             MailRunner,
             PostalCodeImporter,
-            // CUSTOM IMPORT RUNNERS
-//TODO:     CUSTOM IMPORT RUNNER
-
-            // END OF CUSTOM IMPORT RUNNERS
             DemoRunner,
             QuartzSchedulerRunner,
             PdfRunner,
             FinisherRunnerSuperCreator,
-            // ADDITIONAL CUSTOM RUNNERS
-//TODO:     CUSTOM RUNNERS
-            CustomRunner,
+            // ADDITIONAL CUSTOM RUNNERS - keep order
+            NetImportRunner,
+            UserRunner,
+            CaseImportRunner,
+            CsvImportRunner,
             // END OF ADDITIONAL CUSTOM RUNNERS
             FinisherRunner,
+            VSFinisherRunner,
     ]
 
     @Override
