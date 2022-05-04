@@ -13,6 +13,13 @@
 		<id>admin</id>
 		<title>Admin</title>
 	</role>
+	<roleRef>
+		<id>system</id>
+		<caseLogic>
+			<create>true</create>
+			<delete>true</delete>
+		</caseLogic>
+	</roleRef>
 	<!-- TRANSACTIONS -->
 	<!-- ROLES -->
 	<!-- PROCESS ROLE REFS -->
@@ -212,8 +219,6 @@ change check_all value { false }
 					file: f.import_file,
 					system_manufacturers: f.system_manufacturers,
 					system_models: f.system_models;
-
-					// todo: validate file structure (call ActionDelegate function)
 
 					if (!setCars(system_manufacturers, system_models, file.value.path)) {
 						throw new IllegalArgumentException("File is not in correct format!");

@@ -39,6 +39,30 @@
 			</actions>
 		</event>
 	</role>
+	<roleRef>
+		<id>system</id>
+		<caseLogic>
+			<create>true</create>
+			<delete>true</delete>
+			<view>true</view>
+		</caseLogic>
+	</roleRef>
+	<roleRef>
+		<id>admin</id>
+		<caseLogic>
+			<create>true</create>
+			<delete>true</delete>
+			<view>true</view>
+		</caseLogic>
+	</roleRef>
+	<roleRef>
+		<id>mechanic</id>
+		<caseLogic>
+			<create>true</create>
+			<delete>true</delete>
+			<view>true</view>
+		</caseLogic>
+	</roleRef>
 	<caseName name="default_case_name">Customer</caseName>
 	<caseEvents>
 		<event type="delete">
@@ -113,38 +137,38 @@
 	<data type="text">
 		<id>businessID</id>
 		<title name="businessID">Business ID</title>
-<!--		<valid>regex("^[A-Z]{2}[0-9]{10}$")</valid>-->
+		<valid>regex("^[A-Z]{2}[0-9]{10}$")</valid>
 	</data>
 	<data type="text">
 		<id>taxID</id>
 		<title name="taxID">Tax ID</title>
-<!--		<valid>regex("^[0-9]{10}$")</valid>-->
+		<valid>regex("^[0-9]{10}$")</valid>
 	</data>
 	<data type="text">
 		<id>phone_number</id>
 		<title name="phone_number">Phone number</title>
-<!--		<valid>regex("^\+?[0-9]{7,14}$")</valid>-->
+		<valid>regex("^\+?[0-9]{7,14}$")</valid>
 	</data>
 	<data type="text">
 		<id>street</id>
 		<title name="street">Street</title>
-		<!--		<valid>minLength 2</valid>-->
+		<valid>minLength 2</valid>
 	</data>
 	<data type="text">
 		<id>house_number</id>
 		<title name="house_number">House number</title>
 	</data>
-	<data type="text">
+	<data type="text" immediate="true">
 		<id>city</id>
 		<title name="city">City</title>
-		<!--		<valid>minLength 2</valid>-->
+		<valid>minLength 2</valid>
 	</data>
 	<data type="text">
 		<id>postal_code</id>
 		<title name="postal_code">Postal code</title>
-		<!--		<valid>regex("^\d{3} ?\d{2}$")</valid>-->
+		<valid>regex("^\d{3} ?\d{2}$")</valid>
 	</data>
-	<data type="boolean">
+	<data type="boolean" immediate="true">
 		<id>natural_legal_person</id>
 		<title name="natural_legal_person">Natural P. - Legal P.</title>
 		<init>false</init>
@@ -207,6 +231,10 @@
 		<id>has_owner_flag</id>
 		<title></title>
 		<init>false</init>
+	</data>
+	<data type="boolean" immediate="true">
+		<id>is_created</id>
+		<title>is_created</title>
 	</data>
 	<!-- I18NS -->
 	<i18n locale="sk">
@@ -354,6 +382,10 @@
 				<action>
 					useCase.dataSet.get("adress_form").value = []
 					workflowService.save(useCase)
+				</action>
+				<action>
+					is_created: f.is_created;
+					change is_created value { true }
 				</action>
 			</actions>
 		</event>
