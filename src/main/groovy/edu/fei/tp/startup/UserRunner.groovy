@@ -83,6 +83,11 @@ class UserRunner extends AbstractOrderedCommandLineRunner{
     }
 
     private void createTimakUser(){
+        IUser timakUser = userService.findByEmail(this.timakEmail, true)
+
+        if (timakUser != null)
+            return
+
         log.info("Creating Timak Projekt user...")
 
         Authority adminAuthority = authorityService.getOrCreate(Authority.admin)
