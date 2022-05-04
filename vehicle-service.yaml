@@ -215,6 +215,10 @@ spec:
               value: com.netgrif.workflow.configuration.HibernateNamingStrategy
             - name: nae.security.jwt.private-key
               value: file:src/main/resources/certificates/private.der
+            - name: nae.mail.redirect-to.port
+              value: 
+            - name: nae.mail.redirect-to.host
+              value: autoservis.bawix.xyz
           image: timakprojekt/vehicle-service-backend:1.0.0
           imagePullPolicy: Always
           name: vehicle-service-backend-pod
