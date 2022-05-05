@@ -166,7 +166,7 @@
             selected_customer_id: f.selected_customer_id,
             selected_customer_title: f.selected_customer_title;
 
-            if(selected_vehicle_id.value == null)
+            if(selected_customer_id.value == null)
                 return
 
             def aCase = workflowService.findOne(selected_customer_id.value)

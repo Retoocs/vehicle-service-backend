@@ -377,7 +377,13 @@
 					if(Case == null)
 						throw new IllegalArgumentException("Cannot find your instance of process Child addresses enumeration")
 
-					finishTask("t_select_address", Case)
+					try {
+						finishTask("t_select_address", Case)
+					}
+					catch(IllegalArgumentException e) {
+						assignTask("t_select_address", Case)
+						finishTask("t_select_address", Case)
+					}
 				</action>
 				<action>
 					useCase.dataSet.get("adress_form").value = []
@@ -413,6 +419,7 @@
 					if(addressTask == null)
 						throw new IllegalArgumentException("Cannot find task with id t_select_address in ${Case.title}")
 
+					cancelTask(addressTask)
 					assignTask(addressTask)
                     setData(addressTask, [
 						"target_id": [
@@ -714,6 +721,7 @@
 						if(enumTask == null)
 							throw new IllegalArgumentException("Cannot find task with id t_select_address in ${myEnumCase.title}")
 
+						cancelTask(enumTask)
 						async.run { assignTask(enumTask) }
 						setData(enumTask, [
 							"target_id": [
@@ -858,7 +866,13 @@
 					if(myEnumCase == null)
 						throw new IllegalArgumentException("Cannot find your instance of process Child address enumeration")
 
-					finishTask("t_select_address", myEnumCase)
+					try {
+						finishTask("t_select_address", myEnumCase)
+					}
+					catch(IllegalArgumentException e) {
+						assignTask("t_select_address", myEnumCase)
+						finishTask("t_select_address", myEnumCase)
+					}
 				</action>
 				<action>
 					adress_form: f.adress_form;
