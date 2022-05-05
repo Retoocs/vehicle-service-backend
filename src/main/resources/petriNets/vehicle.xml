@@ -400,6 +400,7 @@
 					if(enumTask == null)
 						throw new IllegalArgumentException("Cannot find task with id t_select_vehicle in ${myEnumCase.title}")
 
+					cancelTask(enumTask)
 					assignTask(enumTask)
 					setData(enumTask, [
 						"vehicle_id": [
@@ -438,7 +439,13 @@
 					if(myEnumCase == null)
 						throw new IllegalArgumentException("Cannot find your instance of process Child vehicles enumeration")
 
-					finishTask("t_select_vehicle", myEnumCase)
+					try {
+						finishTask("t_select_vehicle", myEnumCase)
+					}
+					catch(IllegalArgumentException e) {
+						assignTask("t_select_vehicle", myEnumCase)
+						finishTask("t_select_vehicle", myEnumCase)
+					}
 				</action>
 				<action>
 					moreData: f.moreData;
@@ -816,6 +823,8 @@
 						if(enumTask == null)
 							throw new IllegalArgumentException("Cannot find task with id t_select_vehicle in ${myEnumCase.title}")
 
+						cancelTask(enumTask)
+
 						async.run { assignTask(enumTask) }
 						setData(enumTask, [
 							"vehicle_id": [
@@ -917,7 +926,13 @@
 					if(myEnumCase == null)
 						throw new IllegalArgumentException("Cannot find your instance of process Child vehicles enumeration")
 
-					finishTask("t_select_vehicle", myEnumCase)
+					try {
+						finishTask("t_select_vehicle", myEnumCase)
+						}
+					catch(IllegalArgumentException e) {
+						assignTask("t_select_vehicle", myEnumCase)
+						finishTask("t_select_vehicle", myEnumCase)
+					}
 				</action>
 				<action>
                     moreData: f.moreData;

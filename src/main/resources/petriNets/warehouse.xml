@@ -41,10 +41,25 @@
 		</event>
 	</role>
 	<roleRef>
+		<id>system</id>
+		<caseLogic>
+			<create>true</create>
+			<delete>true</delete>
+			<view>true</view>
+		</caseLogic>
+	</roleRef>
+	<roleRef>
 		<id>admin</id>
 		<caseLogic>
 			<create>true</create>
 			<delete>true</delete>
+			<view>true</view>
+		</caseLogic>
+	</roleRef>
+	<roleRef>
+		<id>mechanic</id>
+		<caseLogic>
+			<view>true</view>
 		</caseLogic>
 	</roleRef>
 	<caseEvents>
@@ -296,7 +311,13 @@
 					if(Case == null)
 						throw new IllegalArgumentException("Cannot find your instance of process Child addresses enumeration")
 
-					finishTask("t_select_address", Case)
+					try {
+						finishTask("t_select_address", Case)
+					}
+					catch(IllegalArgumentException e) {
+						assignTask("t_select_address", Case)
+						finishTask("t_select_address", Case)
+					}
 				</action>
 				<action>
 					useCase.dataSet.get("t_adress_form").value = []
@@ -332,6 +353,7 @@
 					if(addressTask == null)
 						throw new IllegalArgumentException("Cannot find task with id t_select_address in ${Case.title}")
 
+					cancelTask(addressTask)
 					assignTask(addressTask)
                     setData(addressTask, [
 						"target_id": [
@@ -398,6 +420,7 @@
 						if(enumTask == null)
 							throw new IllegalArgumentException("Cannot find task with id t_select_address in ${myEnumCase.title}")
 
+						cancelTask(enumTask)
 						async.run{ assignTask(enumTask) }
 						setData(enumTask, [
 							"target_id": [
@@ -491,7 +514,13 @@
 					if(myEnumCase == null)
 						throw new IllegalArgumentException("Cannot find your instance of process Child address enumeration")
 
-					async.run{ finishTask("t_select_address", myEnumCase) }
+					try {
+						finishTask("t_select_address", myEnumCase)
+					}
+					catch(IllegalArgumentException e) {
+						assignTask("t_select_address", myEnumCase)
+						finishTask("t_select_address", myEnumCase)
+					}
 				</action>
 				<action>
 					t_adress_form: f.t_adress_form;
