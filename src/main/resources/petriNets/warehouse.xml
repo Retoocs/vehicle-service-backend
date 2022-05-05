@@ -41,10 +41,25 @@
 		</event>
 	</role>
 	<roleRef>
+		<id>system</id>
+		<caseLogic>
+			<create>true</create>
+			<delete>true</delete>
+			<view>true</view>
+		</caseLogic>
+	</roleRef>
+	<roleRef>
 		<id>admin</id>
 		<caseLogic>
 			<create>true</create>
 			<delete>true</delete>
+			<view>true</view>
+		</caseLogic>
+	</roleRef>
+	<roleRef>
+		<id>mechanic</id>
+		<caseLogic>
+			<view>true</view>
 		</caseLogic>
 	</roleRef>
 	<caseEvents>

@@ -14,6 +14,7 @@
 		<caseLogic>
 			<create>true</create>
 			<delete>true</delete>
+			<view>true</view>
 		</caseLogic>
 	</roleRef>
 	<!-- TRANSACTIONS -->
