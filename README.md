@@ -1,16 +1,17 @@
 ## Installation
 
 This project can be used as a base to your NAE application. Before you start coding please consider doing following
-steps to personalize project:
+steps:
 
-- Rename root java package - **done**
-- Edit maven project attributes in pom.xml, mainly groupId and artifactId - **done**
-- Generate security certificates for token encryption
+1. Clone the repository:
+    ```sh
+    git clone https://github.com/Retoocs/vehicle-service-backend.git
+    ```
+2. Install Maven dependencies ``clean``, ``compile``, ``package``, ``install`` in Lifecycle.
+3. Change SDK version to 11.
+4. Run command in directory where docker-compose.yml is located:
+   ```sh
+    docker-compose up
+    ```
+5. In ``src/main/resources/application.properties`` change URLs and ports for yours elastic, redis and mongo databases.
 
-#### Generate certificates
-
-You should generate own certificates to encrypt token used by NAE.
-
-```shell
-$ cd src/main/resources/certificates && openssl genrsa -out keypair.pem 4096 && openssl rsa -in keypair.pem -pubout -out public.crt && openssl pkcs8 -topk8 -inform PEM -outform DER -nocrypt -in keypair.pem -out private.der && cd ../../../..
-```
