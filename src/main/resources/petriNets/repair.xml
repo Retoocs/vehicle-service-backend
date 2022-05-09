@@ -362,7 +362,14 @@
     </data>
     <data type="multichoice_map">
         <id>repair_items_for_removal</id>
-        <title name="repair_items_for_removal">Repaired items for removal</title>
+        <title name="repair_items_for_removal">Repair items for removal</title>
+    </data>
+    <data type="multichoice_map">
+        <id>repair_items_for_status</id>
+        <title>Repair items</title>
+        <view>
+            <list/>
+        </view>
     </data>
     <data type="taskRef">
         <id>selected_wi_taskref</id>
@@ -634,7 +641,7 @@
         <layout>
             <offset>0</offset>
         </layout>
-        <label>Remove items [synch up]</label>
+        <label>Remove items</label>
         <roleRef>
             <id>admin</id>
             <logic>
@@ -1324,7 +1331,7 @@
         <layout>
             <offset>0</offset>
         </layout>
-        <label>Add items [await synch]</label>
+        <label>Add items</label>
         <roleRef>
             <id>mechanic</id>
             <logic>
@@ -1442,7 +1449,8 @@
             <actions phase="pre">
                 <action>
                     selected_wi_taskref: f.selected_wi_taskref;
-                    change selected_wi_taskref value { [] }
+                    useCase.dataSet['selected_wi_taskref'].value = []
+                    workflowService.save(useCase)
                 </action>
                 <action>
                     warehouses: f.warehouses,
@@ -1683,6 +1691,71 @@
                 <view>true</view>
             </logic>
         </roleRef>
+        <dataGroup>
+            <id>t_view_and_control_dataGroup</id>
+            <layout>flow</layout>
+            <cols>1</cols>
+            <dataRef>
+                <id>status</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+                <layout>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>selected_vehicle_title</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+                <layout>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>selected_customer_title</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+                <layout>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>repair_items_for_status</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+                <layout>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+        </dataGroup>
+        <event type="assign">
+            <id>0</id>
+            <actions phase="pre">
+                <action>
+                    repair_items: f.repair_items,
+                    repair_items_for_status: f.repair_items_for_status;
+
+                    def tmpMap = [:]
+                    for(itemId in repair_items.choices){
+                        def riCase = findCase( {it._id.eq(itemId.defaultValue)} )
+                        if(riCase != null){
+                            def itemTitle = riCase.dataSet.get("title").value
+                            tmpMap = tmpMap + [(itemId.defaultValue): itemTitle]
+                        }
+                    }
+
+                    change repair_items_for_status options { tmpMap }
+                </action>
+            </actions>
+        </event>
     </transition>
     <transition>
         <id>t_reopen_repair</id>
