@@ -118,7 +118,7 @@
             <autocomplete/>
         </view>
     </data>
-    <data type="text">
+    <data type="text" immediate="true">
         <id>description</id>
         <title name="description">Description</title>
         <valid>minLength 2</valid>
@@ -174,7 +174,7 @@
                 return
 
             def title
-            if(aCase.dataSet['natural_legal_person'].value){
+            if(!aCase.dataSet['natural_legal_person'].value){
                 title = aCase.dataSet['name'].value + " " + aCase.dataSet['surname'].value
             }
             else {
@@ -242,7 +242,7 @@
         <title name="is_finished">Is Finished</title>
         <init>false</init>
     </data>
-    <data type="enumeration_map">
+    <data type="enumeration_map" immediate="true">
         <id>public_status_extern_text</id>
         <title name="status">Status</title>
         <options>
@@ -1145,37 +1145,398 @@
             </logic>
         </roleRef>
         <dataGroup>
-            <id>t2_0</id>
-            <cols>4</cols>
+            <id>vehicle_part1</id>
+            <title name="t_complex_creation_vehicle_part">Vehicle</title>
             <layout>grid</layout>
             <dataRef>
-                <id>complex_creation_taskref</id>
+                <id>vehicles</id>
                 <logic>
                     <behavior>editable</behavior>
+                    <behavior>required</behavior>
+                    <action trigger="set">
+                        customers: f.customers,
+                        vehicles: f.vehicles;
+
+                        def vehicleCase = findCase( {it._id.eq(vehicles.value)} )
+                        if(vehicleCase == null)
+                        return
+
+                        def cusId = vehicleCase.getFieldValue("actual_customer_id") as String
+                        if(cusId == null)
+                        return
+
+                        if(customers.options?.containsKey(cusId)){
+                        change customers value { cusId }
+                        }
+                    </action>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>3</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>info_text_new_vehicle</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>3</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>creation_new_vehicle</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <action trigger="set">
+                        trans: t.t26,
+                        vehicles: f.vehicles,
+                        infoVehicle: f.info_text_new_vehicle,
+                        creation_new_vehicle_taskref: f.creation_new_vehicle_taskref,
+                        btn: f.this;
+
+                        make vehicles, hidden on trans when { btn.value }
+                        make vehicles, optional on trans when { btn.value }
+                        make infoVehicle, visible on trans when { btn.value }
+                        make creation_new_vehicle_taskref, editable on trans when { btn.value }
+
+                        make vehicles, editable on trans when { !btn.value }
+                        make vehicles, required on trans when { !btn.value }
+                        make infoVehicle, hidden on trans when { !btn.value }
+                        make creation_new_vehicle_taskref, hidden on trans when { !btn.value }
+                    </action>
+                    <action trigger="set">
+                        veh_taskref: f.creation_new_vehicle_taskref,
+                        btn: f.this;
+
+                        // not creating new vehicle - clear the taskref value
+                        if(!btn.value &amp;&amp; veh_taskref.value != null &amp;&amp; veh_taskref.value != []){
+                        clear_and_cancel_taskref(veh_taskref)
+                        return
+                        }
+
+                        // creating, but previous value present - clear the taskref value
+                        if(btn.value &amp;&amp; veh_taskref.value != null &amp;&amp; veh_taskref.value != []){
+                        clear_and_cancel_taskref(veh_taskref)
+                        }
+
+                        // creating - reference creation form of new vehicle instance
+                        if(btn.value){
+                        def vehicleCase = createCase("vehicle")
+                        def creationTask = assignTask("t_create", vehicleCase)
+                        change veh_taskref value { [creationTask?.stringId] }
+                        }
+                    </action>
+                </logic>
+                <layout>
+                    <x>3</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>vehicle_part2</id>
+            <layout>grid</layout>
+            <dataRef>
+                <id>creation_new_vehicle_taskref</id>
+                <logic>
+                    <behavior>hidden</behavior>
                 </logic>
                 <layout>
                     <x>0</x>
                     <y>0</y>
                     <rows>1</rows>
                     <cols>4</cols>
+                    <offset>0</offset>
                     <template>material</template>
                     <appearance>outline</appearance>
                 </layout>
             </dataRef>
         </dataGroup>
+        <dataGroup>
+            <id>customer_part1</id>
+            <title name="t_complex_creation_customer_part">Customer</title>
+            <layout>grid</layout>
+            <dataRef>
+                <id>customers</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <behavior>required</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>3</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>info_text_new_customer</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>3</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>creation_new_customer</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <action trigger="set">
+                        trans: t.t26,
+                        customers: f.customers,
+                        infoCustomer: f.info_text_new_customer,
+                        creation_new_customer_taskref: f.creation_new_customer_taskref,
+                        btn: f.this;
+
+                        make customers, hidden on trans when { btn.value }
+                        make customers, optional on trans when { btn.value }
+                        make infoCustomer, visible on trans when { btn.value }
+                        make creation_new_customer_taskref, editable on trans when { btn.value }
+
+                        make customers, editable on trans when { !btn.value }
+                        make customers, required on trans when { !btn.value }
+                        make infoCustomer, hidden on trans when { !btn.value }
+                        make creation_new_customer_taskref, hidden on trans when { !btn.value }
+                    </action>
+                    <action trigger="set">
+                        cus_taskref: f.creation_new_customer_taskref,
+                        btn: f.this;
+
+                        // not creating new vehicle - clear the taskref value
+                        if(!btn.value &amp;&amp; cus_taskref.value != null &amp;&amp; cus_taskref.value != []){
+                        clear_and_cancel_taskref(cus_taskref)
+                        return
+                        }
+
+                        // creating, but previous value present - clear the taskref value
+                        if(btn.value &amp;&amp; cus_taskref.value != null &amp;&amp; cus_taskref.value != []){
+                        clear_and_cancel_taskref(cus_taskref)
+                        }
+
+                        // creating - reference creation form of new vehicle instance
+                        if(btn.value){
+                        def customerCase = createCase("customer")
+                        def creationTask = assignTask("t_create", customerCase)
+                        change cus_taskref value { [creationTask?.stringId] }
+                        }
+                    </action>
+                </logic>
+                <layout>
+                    <x>3</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>customer_part2</id>
+            <layout>grid</layout>
+            <dataRef>
+                <id>creation_new_customer_taskref</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>4</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>other_part</id>
+            <title name="t_complex_creation_other_part">Problem description</title>
+            <stretch>true</stretch>
+            <dataRef>
+                <id>priority</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <behavior>required</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>description</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <behavior>required</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
         <event type="assign">
             <id>0</id>
             <actions phase="pre">
+                <!--				vehicles initialization-->
                 <action>
-                    assignTask("t26")
+                    vehicles: f.vehicles;
+
+                    def vehicle_cases = findCases( { it.processIdentifier.eq("vehicle").and(it.dataSet.get("status").value.eq("assigned")) } )
+
+                    if(vehicle_cases == null || vehicle_cases == [])
+                    return
+
+                    change vehicles options { [] }
+                    change vehicles value { "" }
+
+                    for(vehicle in vehicle_cases){
+                    def val = vehicle.dataSet.get("licenceNumber").value + " - " + vehicle.dataSet.get("manufacturer").value + " " + vehicle.dataSet.get("model").value
+                    change vehicles options { vehicles.options + [(vehicle.stringId): val] }
+                    }
+                </action>
+                <!--				customers initialization-->
+                <action>
+                    customers: f.customers;
+
+                    def customers_cases = findCases( { it.processIdentifier.eq("customer") } )
+                    if(customers_cases == null || customers_cases == [])
+                    return
+
+                    change customers options { [] }
+                    change customers value { "" }
+
+                    for(customer in customers_cases){
+                    def val
+                    if(!customer.getFieldValue("natural_legal_person")){
+                    val = customer.dataSet.get("surname").value + " " + customer.dataSet.get("name").value + "; " + customer.dataSet.get("city").value + ", " + customer.dataSet.get("street").value
+                    }
+                    else {
+                    val = customer.dataSet.get("company_name").value + ", " + customer.dataSet.get("businessID").value
+                    }
+                    change customers options { customers.options + [(customer.stringId): val] }
+                    }
                 </action>
             </actions>
         </event>
         <event type="finish">
-            <id>0</id>
+            <id>2</id>
             <actions phase="pre">
+                <!-- save selected customer (existing / newly created)-->
                 <action>
-                    finishTask("t26")
+                    selected_customer_id: f.selected_customer_id,
+                    newlyCreatedTaskref: f.creation_new_customer_taskref,
+                    customers: f.customers,
+                    newlyCreated: f.creation_new_customer;
+
+                    if(!newlyCreated.value){
+                    change selected_customer_id value { customers.value }
+                    }
+                    // needed caseId is "in" taskref
+                    else {
+                    def creationTask = findTask( { it._id.eq(newlyCreatedTaskref.value.first()) } )
+                    if(creationTask == null)
+                    throw new IllegalArgumentException("Could not set the customer id for current repair: cannot find the creation task")
+                    change selected_customer_id value { creationTask.caseId }
+
+                    finishTask(creationTask)
+                    }
+                </action>
+                <!-- save selected vehicle (existing / newly created)-->
+                <action>
+                    selected_customer_id: f.selected_customer_id,
+                    selected_vehicle_id: f.selected_vehicle_id,
+                    newlyCreatedTaskref: f.creation_new_vehicle_taskref,
+                    vehicles: f.vehicles,
+                    newlyCreated: f.creation_new_vehicle;
+
+                    if(!newlyCreated.value){
+                    change selected_vehicle_id value { vehicles.value }
+                    }
+                    else {
+                    def creationTask = findTask( { it._id.eq(newlyCreatedTaskref.value.first()) } )
+                    if(creationTask == null)
+                    throw new IllegalArgumentException("Could not set the vehicle id for current repair: cannot find the creation task")
+                    change selected_vehicle_id value { creationTask.caseId }
+
+                    setData(creationTask, [
+                    "status" : [
+                    "type": "enumeration_map",
+                    "value": "assigned"
+                    ],
+                    "actual_customer_id" : [
+                    "type": "text",
+                    "value": selected_customer_id.value
+                    ],
+                    ])
+
+                    finishTask(creationTask)
+                    }
+                </action>
+                <!-- if customer is newly created, add selected_vehicle_id to his vehicles enumeration if: the vehicle is unassigned
+                    or the vehicle is assigned, but newly created -->
+                <action>
+                    isNewlyCreatedVehicle: f.creation_new_vehicle,
+                    selected_customer_id: f.selected_customer_id,
+                    selected_vehicle_id: f.selected_vehicle_id;
+
+                    if(!isNewlyCreatedVehicle.value)
+                    return
+
+                    def canAddVehicle = false
+
+                    def selectedVehicle = findCase( {it._id.eq(selected_vehicle_id.value)} )
+                    if(selectedVehicle == null)
+                    return
+
+                    def vehicleStatus = selectedVehicle.getFieldValue("status") as String
+                    if(vehicleStatus == "unassigned")
+                    canAddVehicle = true
+                    else if(vehicleStatus == "assigned" &amp;&amp; isNewlyCreatedVehicle.value)
+                    canAddVehicle = true
+
+                    if(canAddVehicle){
+                    def selectedCustomer = findCase( {it._id.eq(selected_customer_id.value)} )
+                    if(selectedCustomer == null)
+                    return
+
+                    def customerVehicles = selectedCustomer.dataSet.get("vehicles").choices
+                    def selectedVehicleId = new com.netgrif.application.engine.petrinet.domain.I18nString(selected_vehicle_id.value)
+                    if(customerVehicles == null)
+                    selectedCustomer.dataSet.get("vehicles").choices = [selectedVehicleId]
+                    else
+                    selectedCustomer.dataSet.get("vehicles").choices = customerVehicles + [selectedVehicleId]
+                    workflowService.save(selectedCustomer)
+                    }
+                    else return
+                </action>
+                <!-- change status -->
+                <action>
+                    status: f.status;
+
+                    change status value { return "started"; }
                 </action>
             </actions>
         </event>
@@ -2064,399 +2425,7 @@
                 <perform>true</perform>
             </logic>
         </roleRef>
-        <dataGroup>
-            <id>vehicle_part1</id>
-            <title name="t_complex_creation_vehicle_part">Vehicle</title>
-            <layout>grid</layout>
-            <dataRef>
-                <id>vehicles</id>
-                <logic>
-                    <behavior>editable</behavior>
-                    <behavior>required</behavior>
-                    <action trigger="set">
-                        customers: f.customers,
-                        vehicles: f.vehicles;
 
-                        def vehicleCase = findCase( {it._id.eq(vehicles.value)} )
-                        if(vehicleCase == null)
-                            return
-
-                        def cusId = vehicleCase.getFieldValue("actual_customer_id") as String
-                        if(cusId == null)
-                            return
-
-                        if(customers.options?.containsKey(cusId)){
-                            change customers value { cusId }
-                        }
-                    </action>
-                </logic>
-                <layout>
-                    <x>0</x>
-                    <y>0</y>
-                    <rows>1</rows>
-                    <cols>3</cols>
-                    <offset>0</offset>
-                    <template>material</template>
-                    <appearance>outline</appearance>
-                </layout>
-            </dataRef>
-            <dataRef>
-                <id>info_text_new_vehicle</id>
-                <logic>
-                    <behavior>hidden</behavior>
-                </logic>
-                <layout>
-                    <x>0</x>
-                    <y>0</y>
-                    <rows>1</rows>
-                    <cols>3</cols>
-                    <offset>0</offset>
-                    <template>material</template>
-                    <appearance>outline</appearance>
-                </layout>
-            </dataRef>
-            <dataRef>
-                <id>creation_new_vehicle</id>
-                <logic>
-                    <behavior>editable</behavior>
-                    <action trigger="set">
-                        trans: t.t26,
-                        vehicles: f.vehicles,
-                        infoVehicle: f.info_text_new_vehicle,
-                        creation_new_vehicle_taskref: f.creation_new_vehicle_taskref,
-                        btn: f.this;
-
-                        make vehicles, hidden on trans when { btn.value }
-                        make vehicles, optional on trans when { btn.value }
-                        make infoVehicle, visible on trans when { btn.value }
-                        make creation_new_vehicle_taskref, editable on trans when { btn.value }
-
-                        make vehicles, editable on trans when { !btn.value }
-                        make vehicles, required on trans when { !btn.value }
-                        make infoVehicle, hidden on trans when { !btn.value }
-                        make creation_new_vehicle_taskref, hidden on trans when { !btn.value }
-                    </action>
-                    <action trigger="set">
-                        veh_taskref: f.creation_new_vehicle_taskref,
-                        btn: f.this;
-
-                        // not creating new vehicle - clear the taskref value
-                        if(!btn.value &amp;&amp; veh_taskref.value != null &amp;&amp; veh_taskref.value != []){
-                            clear_and_cancel_taskref(veh_taskref)
-                            return
-                        }
-
-                        // creating, but previous value present - clear the taskref value
-                        if(btn.value &amp;&amp; veh_taskref.value != null &amp;&amp; veh_taskref.value != []){
-                            clear_and_cancel_taskref(veh_taskref)
-                        }
-
-                        // creating - reference creation form of new vehicle instance
-                        if(btn.value){
-                            def vehicleCase = createCase("vehicle")
-                            def creationTask = assignTask("t_create", vehicleCase)
-                            change veh_taskref value { [creationTask?.stringId] }
-                        }
-                    </action>
-                </logic>
-                <layout>
-                    <x>3</x>
-                    <y>0</y>
-                    <rows>1</rows>
-                    <cols>1</cols>
-                    <offset>0</offset>
-                    <template>material</template>
-                    <appearance>outline</appearance>
-                </layout>
-            </dataRef>
-        </dataGroup>
-        <dataGroup>
-            <id>vehicle_part2</id>
-            <layout>grid</layout>
-            <dataRef>
-                <id>creation_new_vehicle_taskref</id>
-                <logic>
-                    <behavior>hidden</behavior>
-                </logic>
-                <layout>
-                    <x>0</x>
-                    <y>0</y>
-                    <rows>1</rows>
-                    <cols>4</cols>
-                    <offset>0</offset>
-                    <template>material</template>
-                    <appearance>outline</appearance>
-                </layout>
-            </dataRef>
-        </dataGroup>
-        <dataGroup>
-            <id>customer_part1</id>
-            <title name="t_complex_creation_customer_part">Customer</title>
-            <layout>grid</layout>
-            <dataRef>
-                <id>customers</id>
-                <logic>
-                    <behavior>editable</behavior>
-                    <behavior>required</behavior>
-                </logic>
-                <layout>
-                    <x>0</x>
-                    <y>0</y>
-                    <rows>1</rows>
-                    <cols>3</cols>
-                    <offset>0</offset>
-                    <template>material</template>
-                    <appearance>outline</appearance>
-                </layout>
-            </dataRef>
-            <dataRef>
-                <id>info_text_new_customer</id>
-                <logic>
-                    <behavior>hidden</behavior>
-                </logic>
-                <layout>
-                    <x>0</x>
-                    <y>0</y>
-                    <rows>1</rows>
-                    <cols>3</cols>
-                    <offset>0</offset>
-                    <template>material</template>
-                    <appearance>outline</appearance>
-                </layout>
-            </dataRef>
-            <dataRef>
-                <id>creation_new_customer</id>
-                <logic>
-                    <behavior>editable</behavior>
-                    <action trigger="set">
-                        trans: t.t26,
-                        customers: f.customers,
-                        infoCustomer: f.info_text_new_customer,
-                        creation_new_customer_taskref: f.creation_new_customer_taskref,
-                        btn: f.this;
-
-                        make customers, hidden on trans when { btn.value }
-                        make customers, optional on trans when { btn.value }
-                        make infoCustomer, visible on trans when { btn.value }
-                        make creation_new_customer_taskref, editable on trans when { btn.value }
-
-                        make customers, editable on trans when { !btn.value }
-                        make customers, required on trans when { !btn.value }
-                        make infoCustomer, hidden on trans when { !btn.value }
-                        make creation_new_customer_taskref, hidden on trans when { !btn.value }
-                    </action>
-                    <action trigger="set">
-                        cus_taskref: f.creation_new_customer_taskref,
-                        btn: f.this;
-
-                        // not creating new vehicle - clear the taskref value
-                        if(!btn.value &amp;&amp; cus_taskref.value != null &amp;&amp; cus_taskref.value != []){
-                            clear_and_cancel_taskref(cus_taskref)
-                            return
-                        }
-
-                        // creating, but previous value present - clear the taskref value
-                        if(btn.value &amp;&amp; cus_taskref.value != null &amp;&amp; cus_taskref.value != []){
-                            clear_and_cancel_taskref(cus_taskref)
-                        }
-
-                        // creating - reference creation form of new vehicle instance
-                        if(btn.value){
-                            def customerCase = createCase("customer")
-                            def creationTask = assignTask("t_create", customerCase)
-                            change cus_taskref value { [creationTask?.stringId] }
-                        }
-                    </action>
-                </logic>
-                <layout>
-                    <x>3</x>
-                    <y>0</y>
-                    <rows>1</rows>
-                    <cols>1</cols>
-                    <offset>0</offset>
-                    <template>material</template>
-                    <appearance>outline</appearance>
-                </layout>
-            </dataRef>
-        </dataGroup>
-        <dataGroup>
-            <id>customer_part2</id>
-            <layout>grid</layout>
-            <dataRef>
-                <id>creation_new_customer_taskref</id>
-                <logic>
-                    <behavior>hidden</behavior>
-                </logic>
-                <layout>
-                    <x>0</x>
-                    <y>0</y>
-                    <rows>1</rows>
-                    <cols>4</cols>
-                    <offset>0</offset>
-                    <template>material</template>
-                    <appearance>outline</appearance>
-                </layout>
-            </dataRef>
-        </dataGroup>
-        <dataGroup>
-            <id>other_part</id>
-            <title name="t_complex_creation_other_part">Problem description</title>
-            <stretch>true</stretch>
-            <dataRef>
-                <id>priority</id>
-                <logic>
-                    <behavior>editable</behavior>
-                    <behavior>required</behavior>
-                </logic>
-            </dataRef>
-            <dataRef>
-                <id>description</id>
-                <logic>
-                    <behavior>editable</behavior>
-                    <behavior>required</behavior>
-                </logic>
-            </dataRef>
-        </dataGroup>
-        <event type="assign">
-            <id>0</id>
-            <actions phase="pre">
-                <!--				vehicles initialization-->
-                <action>
-                    vehicles: f.vehicles;
-
-                    def vehicle_cases = findCases( { it.processIdentifier.eq("vehicle").and(it.dataSet.get("status").value.eq("assigned")) } )
-
-                    if(vehicle_cases == null || vehicle_cases == [])
-                        return
-
-                    change vehicles options { [] }
-                    change vehicles value { "" }
-
-                    for(vehicle in vehicle_cases){
-                        def val = vehicle.dataSet.get("licenceNumber").value + " - " + vehicle.dataSet.get("manufacturer").value + " " + vehicle.dataSet.get("model").value
-                        change vehicles options { vehicles.options + [(vehicle.stringId): val] }
-                    }
-                </action>
-                <!--				customers initialization-->
-                <action>
-                    customers: f.customers;
-
-                    def customers_cases = findCases( { it.processIdentifier.eq("customer") } )
-                    if(customers_cases == null || customers_cases == [])
-                        return
-
-                    change customers options { [] }
-                    change customers value { "" }
-
-                    for(customer in customers_cases){
-                        def val
-                        if(!customer.getFieldValue("natural_legal_person")){
-                            val = customer.dataSet.get("surname").value + " " + customer.dataSet.get("name").value + "; " + customer.dataSet.get("city").value + ", " + customer.dataSet.get("street").value
-                        }
-                        else {
-                            val = customer.dataSet.get("company_name").value + ", " + customer.dataSet.get("businessID").value
-                        }
-                        change customers options { customers.options + [(customer.stringId): val] }
-                    }
-                </action>
-            </actions>
-        </event>
-        <event type="finish">
-            <id>2</id>
-            <actions phase="pre">
-                <!-- save selected customer (existing / newly created)-->
-                <action>
-                    selected_customer_id: f.selected_customer_id,
-                    newlyCreatedTaskref: f.creation_new_customer_taskref,
-                    customers: f.customers,
-                    newlyCreated: f.creation_new_customer;
-
-                    if(!newlyCreated.value){
-                        change selected_customer_id value { customers.value }
-                    }
-                    // needed caseId is "in" taskref
-                    else {
-                        def creationTask = findTask( { it._id.eq(newlyCreatedTaskref.value.first()) } )
-                        if(creationTask == null)
-                            throw new IllegalArgumentException("Could not set the customer id for current repair: cannot find the creation task")
-                        change selected_customer_id value { creationTask.caseId }
-
-                        finishTask(creationTask)
-                    }
-                </action>
-                <!-- save selected vehicle (existing / newly created)-->
-                <action>
-                    selected_customer_id: f.selected_customer_id,
-                    selected_vehicle_id: f.selected_vehicle_id,
-                    newlyCreatedTaskref: f.creation_new_vehicle_taskref,
-                    vehicles: f.vehicles,
-                    newlyCreated: f.creation_new_vehicle;
-
-                    if(!newlyCreated.value){
-                        change selected_vehicle_id value { vehicles.value }
-                    }
-                    else {
-                        def creationTask = findTask( { it._id.eq(newlyCreatedTaskref.value.first()) } )
-                        if(creationTask == null)
-                            throw new IllegalArgumentException("Could not set the vehicle id for current repair: cannot find the creation task")
-                        change selected_vehicle_id value { creationTask.caseId }
-
-                        setData(creationTask, [
-                            "status" : [
-                                "type": "enumeration_map",
-                                "value": "assigned"
-                            ],
-                            "actual_customer_id" : [
-                                "type": "text",
-                                "value": selected_customer_id.value
-                            ],
-                        ])
-
-                        finishTask(creationTask)
-                    }
-                </action>
-                <!-- if customer is newly created, add selected_vehicle_id to his vehicles enumeration if: the vehicle is unassigned
-                    or the vehicle is assigned, but newly created -->
-                <action>
-                    isNewlyCreatedVehicle: f.creation_new_vehicle,
-                    selected_customer_id: f.selected_customer_id,
-                    selected_vehicle_id: f.selected_vehicle_id;
-
-                    def canAddVehicle = false
-
-                    def selectedVehicle = findCase( {it._id.eq(selected_vehicle_id.value)} )
-                    if(selectedVehicle == null)
-                        return
-
-                    def vehicleStatus = selectedVehicle.getFieldValue("status") as String
-                    if(vehicleStatus == "unassigned")
-                        canAddVehicle = true
-                    else if(vehicleStatus == "assigned" &amp;&amp; isNewlyCreatedVehicle.value)
-                        canAddVehicle = true
-
-                    if(canAddVehicle){
-                        def selectedCustomer = findCase( {it._id.eq(selected_customer_id.value)} )
-                        if(selectedCustomer == null)
-                        return
-
-                        def customerVehicles = selectedCustomer.dataSet.get("vehicles").choices
-                        def selectedVehicleId = new com.netgrif.application.engine.petrinet.domain.I18nString(selected_vehicle_id.value)
-                        if(customerVehicles == null)
-                            selectedCustomer.dataSet.get("vehicles").choices = [selectedVehicleId]
-                        else
-                            selectedCustomer.dataSet.get("vehicles").choices = customerVehicles + [selectedVehicleId]
-                        workflowService.save(selectedCustomer)
-                    }
-                    else return
-                </action>
-                <!-- change status -->
-                <action>
-                    status: f.status;
-
-                    change status value { return "started"; }
-                </action>
-            </actions>
-        </event>
     </transition>
     <!-- PLACES -->
     <place>
