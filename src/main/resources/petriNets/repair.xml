@@ -244,7 +244,7 @@
     </data>
     <data type="enumeration_map" immediate="true">
         <id>public_status_extern_text</id>
-        <title name="status">Status</title>
+        <title>Status</title>
         <options>
             <option key="sent" name="sent">Request sent</option>
             <option key="accepted" name="accepted">Request accepted</option>
@@ -255,7 +255,6 @@
         <view>
             <autocomplete/>
         </view>
-        <init>not_started</init>
     </data>
     <data type="button">
         <id>public_remove_1</id>
