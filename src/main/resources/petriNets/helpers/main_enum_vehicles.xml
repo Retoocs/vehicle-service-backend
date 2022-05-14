@@ -267,11 +267,6 @@ change check_all value { false }
 					change status value {"Processing in progress"; }
 				</action>
 			</actions>
-			<actions phase="post">
-				<action>
-					// todo: file processing here (call ActionDelegate function)
-				</action>
-			</actions>
 		</event>
 		<event type="finish">
 			<id>t_process_import_finish</id>
